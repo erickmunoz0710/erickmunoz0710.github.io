@@ -1,1 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ari Auto App - Gestor de Tickets</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Carga de SheetJS (para importar XLSX) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* Estilos personalizados para la animación del logo y impresión */
+        @keyframes flameRise {
+            0% { transform: translateY(0px) scaleX(1); opacity: 0.8; }
+            50% { transform: translateY(-2px) scaleX(1.1); opacity: 1.0; }
+            100% { transform: translateY(0px) scaleX(1); opacity: 0.7; }
+        }
+        
+        .flame-path { animation: flameRise 1.5s ease-in-out infinite alternate; }
+        .flame-path-delay-1 { animation: flameRise 1.6s ease-in-out infinite alternate 0.2s; }
+        .flame-path-delay-2 { animation: flameRise 1.4s ease-in-out infinite alternate 0.4s; }
+        
+        .elegant-logo {
+            color: #1f2937; 
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2), 0 0 1px #FF6347;
+            font-weight: 900; 
+            letter-spacing: -0.1em; 
+        }
 
+        /* Oculta los spinners del input de cantidad */
+        .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .quantity-input {
+            -moz-appearance: textfield; /* Firefox */
+        }
+
+        /* ESTILO PARA EL BOTÓN DE VOZ ACTIVO (PULSO ROJO) */
+        .listening {
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); /* Rojo 500 */
+                transform: scale(1);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+                transform: scale(1.05);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                transform: scale(1);
+            }
+        }
+        
+        /* Estilos de Impresión */
+        @media print {
+            .print\:hidden { display: none !important; }
+            body > div { min-height: auto !important; padding: 0 !important; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+            main { padding: 0; }
+            table { width: 100%; border-collapse: collapse; }
+            /* Mostrar todas las columnas relevantes para impresión */
+            th:nth-child(3), td:nth-child(3) { display: table-cell; width: 15%; text-align: center; } /* P. UNIT. */
+            th:nth-child(4), td:nth-child(4) { display: table-cell; width: 15%; text-align: center; } /* CANT. */
+            .print-footer { display: block !important; text-align: right; padding: 10px 0; border-top: 2px dashed #333; margin-top: 20px; }
+            .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow: none !important; background-color: transparent !important; }
+            
+            /* Ocultar la descripción del producto en la impresión, si es necesario, para que solo se vea el código */
+            .product-description { display: none; }
+        }
+        
+        /* Oculta los iconos de Lucide al cargar la página (se renderizan después por JS) */
+        .lucide { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+
+    <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
+    <div id="clear-cart-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
+            <div class="flex items-center text-red-600 mb-4">
+                <i data-lucide="x" class="w-6 h-6 mr-2 flex-shrink-0"></i>
+                <h3 class="text-lg font-bold">Confirmar Eliminación</h3>
+            </div>
+            <p id="clear-modal-text" class="text-gray-700 mb-6"></p>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-clear-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+                    Cancelar
+                </button>
+                <button id="confirm-clear-btn" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150 shadow-md">
+                    Sí, Borrar Todo
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL DE PRECIO MANUAL -->
+    <div id="manual-price-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all">
+            <div class="flex items-center text-indigo-600 mb-4 border-b pb-2">
+                <i data-lucide="alert-triangle" class="w-6 h-6 mr-2 flex-shrink-0 text-yellow-500"></i>
+                <h3 class="text-lg font-bold text-gray-800">Producto No Encontrado</h3>
+            </div>
+            <p id="manual-modal-code" class="text-gray-700 mb-6 font-semibold"></p>
+            <div class="mb-4">
+                <label for="manual-price-input" class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario</label>
+                <div class="relative rounded-md shadow-sm">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <span class="text-gray-500 font-bold">$</span>
+                    </div>
+                    <input
+                      type="text" 
+                      id="manual-price-input"
+                      placeholder="0.00"
+                      class="block w-full rounded-md border border-gray-300 py-2 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 text-lg font-mono"
+                      aria-describedby="price-currency"
+                    />
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span class="text-gray-500 sm:text-sm" id="price-currency">MXN</span>
+                    </div>
+                </div>
+                <p id="manual-price-error" class="mt-2 text-sm text-red-600 hidden">Por favor, ingresa un precio válido (número positivo o cero).</p>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+                <button id="cancel-manual-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+                    Cancelar
+                </button>
+                <button id="confirm-manual-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
+                    Agregar con Precio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje Flotante (Toast) -->
+    <div id="toast-message" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden"></div>
+
+    <!-- Input de archivo oculto -->
+    <input type="file" id="xlsx-upload-hidden" accept=".xlsx, .xls" class="hidden print:hidden" />
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header y Búsqueda -->
+        <header class="bg-white shadow-md p-4 sticky top-0 z-10 print:hidden">
+            <div class="flex justify-between items-center mb-4">
+                <!-- LOGO -->
+                <div 
+                    id="logo-db-trigger" 
+                    class="flex items-center group space-x-0 cursor-pointer hover:opacity-80 transition duration-200 p-1 -ml-1 rounded-lg"
+                    title="Haga click para Cargar Base de Datos (XLSX). Su DB está guardada localmente."
+                >
+                    <!-- Icono de Logo (Catalizador/Mofle) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none"
+                        class="w-8 h-8 text-gray-700 transition transform duration-200 -mr-1"
+                        title="Icono de Catalizador/Mofle con Flujo de Escape Animado"
+                    >
+                        <rect x="35" y="25" width="30" height="50" rx="8" fill="#374151" stroke="#4b5563" strokeWidth="2"/>
+                        <rect x="42" y="75" width="16" height="10" fill="#4b5563" stroke="#4b5563" strokeWidth="2"/>
+                        <rect x="42" y="15" width="16" height="10" fill="#4b5563" stroke="#4b5563" strokeWidth="2"/>
+                        <circle cx="50" cy="50" r="3" fill="#9ca3af"/>
+                        <path class="flame-path" d="M 40 10 C 35 5, 45 0, 50 5" stroke="#FF6347" strokeWidth="2.5" strokeOpacity="0.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path class="flame-path-delay-1" d="M 50 10 C 50 5, 55 0, 60 5" stroke="#FFA500" strokeWidth="3" strokeOpacity="1.0" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path class="flame-path-delay-2" d="M 60 10 C 65 5, 65 0, 70 5" stroke="#FF6347" strokeWidth="2" strokeOpacity="0.6" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                        <line x1="45" y1="25" x2="45" y2="75" stroke="white" strokeOpacity="0.2" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    <h1 class="text-xl font-extrabold"> 
+                        <span class="elegant-logo">ARI AUTO APP</span>
+                    </h1>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <!-- FECHA -->
+                    <div class="px-3 py-1 bg-white rounded-md border border-gray-300 shadow-sm transition duration-150">
+                        <p class="text-xs font-bold text-gray-700">
+                            FECHA: <span id="current-date" class="text-indigo-600"></span>
+                        </p>
+                    </div>
+                    
+                    <button
+                        id="print-btn"
+                        disabled
+                        class="flex items-center px-3 py-1 bg-blue-500 text-white text-sm font-semibold rounded-full shadow-md hover:bg-blue-600 transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        title="Imprimir Ticket"
+                    >
+                        <i data-lucide="printer" class="w-4 h-4 mr-1"></i>
+                        IMPRIMIR
+                    </button>
+                    
+                    <!-- BOTÓN DE ELIMINAR MEJORADO CON SVG DIRECTO -->
+                    <button
+                        id="clear-cart-btn"
+                        disabled
+                        class="p-1.5 text-red-600 hover:text-white bg-red-100 hover:bg-red-600 rounded-full transition duration-200 shadow-md disabled:bg-gray-200 disabled:text-gray-400"
+                        title="BORRAR TODO EL TICKET"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor de Búsqueda Completo: FLEX para incluir el input y el micrófono -->
+            <div class="flex items-center space-x-3"> 
+                
+                <!-- Contenedor del Input (ocupa la mayor parte del espacio) -->
+                <div class="relative flex-grow">
+                    <div class="flex items-center border border-gray-300 rounded-full bg-gray-50 focus-within:ring-2 focus-within:ring-indigo-500 transition duration-150">
+                        <i data-lucide="search" class="w-5 h-5 ml-3 text-gray-400"></i>
+                        <input
+                            id="search-input"
+                            type="text"
+                            placeholder="BUSCADOR POR CÓDIGO (MÍNIMO 2 CARACTERES)"
+                            class="w-full p-3 pr-4 bg-transparent outline-none text-gray-800 placeholder-gray-400 uppercase"
+                            title="LA BÚSQUEDA COMIENZA A PARTIR DE 2 CARACTERES."
+                        />
+                    </div>
+                    
+                    <!-- Sugerencias (Combobox/Autocomplete) -->
+                    <div id="suggestions-container" class="absolute top-full mt-1 w-full bg-white border border-indigo-200 rounded-lg shadow-2xl z-20 max-h-80 overflow-y-auto hidden">
+                        <!-- Contenido de las sugerencias se inserta aquí con JS -->
+                    </div>
+                </div>
+                
+                <!-- Botón de Búsqueda por Voz (GRANDE Y VISIBLE CON FORMA DE MICRÓFONO) -->
+                <button
+                    id="voice-search-btn"
+                    class="mic-button flex-shrink-0 bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    title="BÚSQUEDA POR VOZ"
+                >
+                    <!-- SVG DE MICRÓFONO MÁS REALISTA (de Lucide) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" x2="12" y1="19" y2="22"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Contenido Solo para Impresión -->
+        <div class="hidden print-header">
+            <h1 class="text-2xl font-extrabold text-gray-900">AriAuto App - Ticket de Venta</h1>
+            <p class="text-sm text-gray-600">Fecha: <span id="print-ref-date"></span></p>
+            <!-- RECUADRO DE NOTA SOLO PARA IMPRESIÓN -->
+            <div class="text-sm font-semibold text-gray-700 mt-2">
+                NOTA DE VENTA: <span id="print-ref-note" class="font-normal text-gray-900"></span>
+            </div>
+            <hr class="my-2 border-gray-400"/>
+        </div>
+
+        <!-- Cuerpo del Ticket -->
+        <main class="container mx-auto p-4 flex-grow">
+            
+            <div id="empty-cart-message" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner hidden">
+                <i data-lucide="package" class="w-12 h-12 text-gray-400 mx-auto mb-3"></i>
+                <p class="text-gray-500 text-lg">EL TICKET ESTÁ VACÍO. USA EL BUSCADOR PARA AGREGAR ARTÍCULOS.</p>
+                <p class="text-sm text-gray-400 mt-2">(La base de datos actual se guarda automáticamente en la memoria de este navegador.)</p>
+            </div>
+
+            <div id="ticket-table-container" class="overflow-x-auto bg-white rounded-lg shadow-xl hidden">
+                <table class="min-w-full table-auto" id="ticket-table">
+                    <thead>
+                        <tr class="bg-indigo-50 border-b border-indigo-200 text-left text-xs font-semibold uppercase tracking-wider text-indigo-700 print:bg-white print:text-gray-800 print:border-b-2 print:border-gray-800">
+                            <th class="px-3 py-3 w-10">No.</th>
+                            <!-- TEXTO ACTUALIZADO: SOLO CÓDIGO -->
+                            <th class="px-3 py-3">CÓDIGO</th> 
+                            <th class="px-3 py-3 text-center hidden md:table-cell print:table-cell">P. UNIT.</th>
+                            <th class="px-3 py-3 text-center">CANT.</th> 
+                            <th class="px-3 py-3 text-right">SUBTOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticket-body" class="divide-y divide-gray-200 print:divide-gray-400">
+                        <!-- Filas de tickets se insertan aquí con JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        
+        <!-- Footer con la Nota y el Total -->
+        <footer class="sticky bottom-0 bg-blue-900 text-white shadow-2xl print:hidden">
+            <div class="container mx-auto p-3 flex justify-between items-center">
+                
+                <!-- CAMPO DE NOTA: SE MANTIENE EL ESTILO ORIGINAL AUNQUE ESTÉ BLOQUEADO -->
+                <div class="flex-none mr-auto">
+                    <input
+                        id="capital-note-input"
+                        type="text"
+                        value="#1"
+                        maxlength="5" 
+                        class="w-16 text-center px-1 py-1 text-base font-bold rounded-md border transition duration-150 outline-none
+                                focus:border-sky-300 focus:ring-1 focus:ring-sky-300 
+                                bg-blue-800 bg-opacity-70 text-sky-300 border-blue-700
+                                disabled:cursor-not-allowed"
+                        title="Nota/Referencia (Máximo 5 caracteres). Solo editable con ticket vacío."
+                    />
+                </div>
+                
+                <!-- TOTAL Y PIEZAS -->
+                <div class="flex items-center space-x-6 flex-shrink-0">
+                    <div class="text-lg font-medium whitespace-nowrap">PIEZAS: <span id="pieces-count" class="text-sky-300 font-bold">0</span></div>
+                    <div class="text-2xl font-extrabold flex items-center whitespace-nowrap">
+                        TOTAL: 
+                        <span id="total-display" class="ml-3 text-sky-300">
+                            $0.00
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript de la Aplicación -->
+    <script>
+        // ---------------------------------------------------------------------
+        // 1. CONFIGURACIÓN Y ESTADO GLOBAL
+        // ---------------------------------------------------------------------
+        const MIN_SEARCH_CHARS = 2; 
+        const MAX_ITEM_QUANTITY = 1.0; 
+        const STORAGE_KEYS = {
+            CART: 'salesTicketCartHTML',
+            PRODUCTS_DB: 'salesTicketProductsDBHTML',
+            CAPITAL_NOTE: 'salesTicketCapitalNoteHTML', 
+        };
+
+        // SVG para el ícono de eliminar (Garantiza visibilidad)
+        const TRASH_ICON_SVG = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+            </svg>
+        `;
+
+        let appState = {
+            cart: [],
+            searchText: '',
+            suggestions: [], 
+            lastSearchResults: [], // Almacena el último conjunto de sugerencias válidas
+            capitalNoteText: '#1', 
+            allProducts: [],
+            manualCode: null,
+            dbStatus: "Cargando...",
+            isListening: false,
+        };
+        
+        let recognition = null; // Para la API de SpeechRecognition
+
+        // ---------------------------------------------------------------------
+        // 2. UTILIDADES DEL DOM Y UI
+        // ---------------------------------------------------------------------
+
+        const $ = (selector) => document.querySelector(selector);
+        const $$ = (selector) => document.querySelectorAll(selector);
+
+        const dom = {
+            searchInput: $('#search-input'),
+            suggestionsContainer: $('#suggestions-container'),
+            ticketBody: $('#ticket-body'),
+            totalDisplay: $('#total-display'),
+            piecesCount: $('#pieces-count'),
+            noteInput: $('#capital-note-input'), 
+            clearCartBtn: $('#clear-cart-btn'),
+            printBtn: $('#print-btn'),
+            emptyCartMsg: $('#empty-cart-message'),
+            ticketTableContainer: $('#ticket-table-container'),
+            clearModal: $('#clear-cart-modal'),
+            confirmClearBtn: $('#confirm-clear-btn'),
+            cancelClearBtn: $('#cancel-clear-btn'),
+            toastMessage: $('#toast-message'),
+            voiceSearchBtn: $('#voice-search-btn'),
+            logoDbTrigger: $('#logo-db-trigger'),
+            manualModal: $('#manual-price-modal'),
+            manualPriceInput: $('#manual-price-input'),
+            confirmManualBtn: $('#confirm-manual-btn'),
+            cancelManualBtn: $('#cancel-manual-btn'),
+            manualModalCodeDisplay: $('#manual-modal-code'),
+            manualPriceError: $('#manual-price-error'),
+            fileInput: $('#xlsx-upload-hidden'),
+            currentDate: $('#current-date'),
+            printRefDate: $('#print-ref-date'),
+            printRefNote: $('#print-ref-note'), 
+        };
+
+        function showMessage(text, type = 'success') {
+            dom.toastMessage.textContent = text;
+            dom.toastMessage.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 print:hidden ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' :
+                'bg-indigo-500' 
+            }`;
+            dom.toastMessage.classList.remove('invisible', 'opacity-0');
+            dom.toastMessage.classList.add('visible', 'opacity-100');
+
+            setTimeout(() => {
+                dom.toastMessage.classList.remove('visible', 'opacity-100');
+                dom.toastMessage.classList.add('invisible', 'opacity-0');
+            }, 4000);
+        }
+        
+        function showModal(id) {
+            $(id).classList.remove('hidden');
+            $(id).classList.add('flex');
+        }
+        
+        function hideModal(id) {
+            $(id).classList.remove('flex');
+            $(id).classList.add('hidden');
+        }
+        
+        function getCurrentDateFormatted() {
+            const today = new Date();
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return today.toLocaleDateString('es-ES', options);
+        }
+
+        // ---------------------------------------------------------------------
+        // 3. LÓGICA DE NEGOCIO Y DATOS
+        // ---------------------------------------------------------------------
+
+        /**
+         * Normaliza el texto de búsqueda para ser indiferente a 'o', 'O' y '0'.
+         */
+        function normalizeSearchText(text) {
+            if (!text) return "";
+            // Convertir a minúsculas y reemplazar 'o' (letra) y '0' (número) por 'x'
+            return text.toLowerCase().replace(/[o0]/g, 'x');
+        }
+
+        function generateMockData() {
+            const products = [];
+            for (let i = 1; i <= 10000; i++) {
+                const paddedIndex = String(i).padStart(4, '0');
+                const code = i % 2 === 0 ? `P-0R-T${paddedIndex}` : `P-OR-T${paddedIndex}`; 
+                const make = `Producto ${i} - ${['Tornillo', 'Tuerca', 'Cable', 'Cinta', 'Broca', 'Sensor', 'Válvula'][i % 7]} ${i % 3 === 0 ? '(METAL)' : ''}`;
+                const price = parseFloat((Math.random() * 50 + 1).toFixed(2));
+                products.push({ code, make, price });
+            }
+            products.push({ code: 'RESISTOR-ELEMENT-10K', make: 'Resistencia calefactora (TEST-ELEM)', price: 15.50 });
+            products.push({ code: '456ELEMENT789', make: 'Cable de Elemento Térmico (TEST-ELEM)', price: 22.00 });
+            products.push({ code: 'ELEMENTO333', make: 'Sensor de nivel (elemento TEST-ELEM)', price: 99.90 });
+            products.push({ code: 'O-MEGA-100', make: 'Omega especial (LETRA O)', price: 50.00 });
+            products.push({ code: '0-MEGA-100', make: 'Omega especial (NUMERO CERO)', price: 51.00 });
+            products.push({ code: 'FRENOS-KIT', make: 'Kit de Pastillas de Freno Delanteras', price: 120.00 }); 
+            products.push({ code: 'ACEITE-5W40', make: 'Aceite Sintético 5W40', price: 35.00 }); 
+            products.push({ code: 'BUJ-950', make: 'BUJIA DE AUTO PARA HONDA CIVIC 2005 4PZ. MALA DESCRIPCION!', price: 10.00 }); 
+            return products;
+        }
+
+        function loadData() {
+            try {
+                // *** CARGAR LA BASE DE DATOS DE PRODUCTOS ***
+                const storedProducts = localStorage.getItem(STORAGE_KEYS.PRODUCTS_DB);
+                if (storedProducts) {
+                    appState.allProducts = JSON.parse(storedProducts);
+                    showMessage(`Base de datos restaurada desde la memoria local (${appState.allProducts.length} productos).`, 'info');
+                } else {
+                    // Si no hay DB guardada, cargar mock data y guardarla por primera vez
+                    appState.allProducts = generateMockData();
+                    saveData(); 
+                    showMessage("Base de datos de simulación cargada. Cargue su XLSX para persistencia.", 'error');
+                }
+
+                // *** CARGAR TICKET Y NOTA ***
+                const storedCart = localStorage.getItem(STORAGE_KEYS.CART);
+                const storedNote = localStorage.getItem(STORAGE_KEYS.CAPITAL_NOTE); 
+                
+                if (storedNote) { appState.capitalNoteText = JSON.parse(storedNote); } 
+                if (storedCart) { appState.cart = JSON.parse(storedCart); }
+                
+                dom.currentDate.textContent = getCurrentDateFormatted();
+                dom.noteInput.value = appState.capitalNoteText; 
+
+            } catch (e) {
+                console.error("Error al cargar datos:", e);
+                // En caso de error de parseo, reiniciar a datos limpios/mock
+                appState.allProducts = generateMockData();
+                appState.cart = [];
+                showMessage("Error al restaurar datos. Se reinició a la configuración inicial.", 'error');
+            }
+        }
+
+        /**
+         * Guarda el estado completo (cart, nota y DB) en LocalStorage.
+         */
+        function saveData() {
+            localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(appState.cart));
+            localStorage.setItem(STORAGE_KEYS.CAPITAL_NOTE, JSON.stringify(appState.capitalNoteText)); 
+            localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(appState.allProducts));
+            // NOTA: No se muestra mensaje de éxito para evitar spam de toasts
+        }
+
+        function performSearch() {
+            const text = appState.searchText.trim();
+            
+            if (text.length < MIN_SEARCH_CHARS) { 
+                appState.manualCode = null;
+                // Si el texto de búsqueda se borra o es muy corto, limpiamos la memoria de búsqueda
+                appState.lastSearchResults = []; 
+                renderSuggestions();
+                return;
+            }
+
+            const normalizedSearchText = normalizeSearchText(text);
+            
+            const filtered = appState.allProducts.filter(product => {
+                const normalizedProductCode = normalizeSearchText(product.code);
+                const normalizedProductMake = normalizeSearchText(product.make);
+
+                const codeMatch = normalizedProductCode.includes(normalizedSearchText);
+                const makeMatch = normalizedProductMake.includes(normalizedSearchText); 
+                
+                return codeMatch || makeMatch;
+            });
+            
+            let finalSuggestions = filtered.slice(0, 14); 
+
+            // LÓGICA DE MEMORIA: Guardar resultados si fueron encontrados
+            if (filtered.length > 0) {
+                appState.lastSearchResults = finalSuggestions;
+            } else {
+                appState.lastSearchResults = []; // Limpiar si la búsqueda no dio resultados
+            }
+
+            if (filtered.length === 0) {
+                finalSuggestions = [{
+                    code: text.toUpperCase(),
+                    make: `Agregar "${text.toUpperCase()}" manualmente (Asignar precio)`,
+                    isManualOption: true
+                }];
+            }
+            
+            appState.suggestions = finalSuggestions;
+            renderSuggestions();
+        }
+        
+        function addItem(product, manualPrice = null) {
+            
+            if (product.isManualOption) {
+                appState.manualCode = product.code;
+                showManualPriceModal(product.code);
+                return;
+            }
+            
+            const finalPrice = manualPrice !== null ? parseFloat(manualPrice) : product.price;
+
+            const productToAdd = {
+                id: crypto.randomUUID(), 
+                code: product.code,
+                // Conservamos la descripción (make) internamente para mostrarla debajo del código
+                make: manualPrice !== null ? `(MANUAL) ${product.code}` : product.make, 
+                price: finalPrice,
+                quantity: MAX_ITEM_QUANTITY, 
+            };
+
+            appState.cart.push(productToAdd);
+            
+            // 1. Limpiamos el input y el texto de búsqueda.
+            appState.searchText = '';
+            dom.searchInput.value = '';
+            
+            appState.manualCode = null;
+            
+            // 2. Forzamos la ocultación inmediata de las sugerencias
+            appState.suggestions = [];
+            
+            // 3. Renderizar y mostrar mensaje
+            render();
+            showMessage(`${productToAdd.code} agregado al ticket.`, 'success');
+
+            // 4. *** CORRECCIÓN DE FOCO: Quitar foco de la barra de búsqueda ***
+            dom.searchInput.blur();
+        }
+
+        function updateQuantity(id, newQuantityString) {
+            let newQuantity = parseFloat(newQuantityString);
+            
+            const item = appState.cart.find(i => i.id === id);
+            if (!item) return;
+
+            if (newQuantityString === "") {
+                item.quantity = 0;
+            } else if (!isNaN(newQuantity) && newQuantity >= 0) {
+                if (newQuantity > MAX_ITEM_QUANTITY) {
+                    newQuantity = MAX_ITEM_QUANTITY;
+                    showMessage(`La cantidad máxima permitida es ${MAX_ITEM_QUANTITY.toFixed(2)}.`, 'error');
+                }
+                item.quantity = newQuantity;
+                
+                if (newQuantity === 0) {
+                    // Si la cantidad es cero, eliminamos el artículo para limpiar el ticket
+                    removeItem(id);
+                    return; 
+                }
+            }
+            
+            renderCart();
+        }
+        
+        /**
+         * Elimina un artículo individual por su ID único.
+         */
+        function removeItem(id) {
+            const itemToRemove = appState.cart.find(item => item.id === id);
+            
+            if (!itemToRemove) {
+                 console.error(`Error: No se encontró el artículo con ID ${id}`);
+                 return;
+            }
+            
+            // Crea un nuevo array excluyendo el artículo con el ID proporcionado
+            appState.cart = appState.cart.filter(item => item.id !== id);
+            
+            showMessage(`Se eliminó el código ${itemToRemove.code} del ticket.`, 'error');
+            render();
+        }
+        
+        function clearCart() {
+            appState.cart = [];
+            appState.capitalNoteText = '#1'; 
+            dom.noteInput.value = '#1'; 
+            
+            appState.searchText = '';
+            dom.searchInput.value = '';
+            appState.suggestions = []; 
+            appState.lastSearchResults = []; // Limpiar la memoria al borrar todo
+
+            hideModal('#clear-cart-modal');
+            showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
+            render();
+        }
+        
+        function handleManualPriceConfirm(code, price) {
+            const validatedPrice = parseFloat(price);
+            
+            if (isNaN(validatedPrice) || validatedPrice < 0) {
+                dom.manualPriceError.textContent = "Por favor, ingresa un precio válido (número positivo o cero).";
+                dom.manualPriceError.classList.remove('hidden');
+                dom.manualPriceInput.classList.add('border-red-500');
+                return;
+            }
+
+            const manualProduct = {
+                code: code.toUpperCase(),
+                make: `Artículo no encontrado: ${code}`,
+                price: parseFloat(validatedPrice),
+            };
+            
+            hideModal('#manual-price-modal');
+            addItem(manualProduct, validatedPrice);
+        }
+
+        // ---------------------------------------------------------------------
+        // 4. RENDERING (ACTUALIZACIÓN DEL DOM)
+        // ---------------------------------------------------------------------
+        
+        function renderSuggestions() {
+            const container = dom.suggestionsContainer;
+            
+            // Solo renderizar si hay sugerencias O si el input está enfocado (para manejar la memoria)
+            if (appState.suggestions.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            container.innerHTML = '';
+            container.classList.remove('hidden');
+            
+            const listHTML = appState.suggestions.map((product) => {
+                if (product.isManualOption) {
+                    return `
+                        <li 
+                            data-code="${product.code}"
+                            data-manual="true"
+                            class="p-3 cursor-pointer bg-yellow-100 hover:bg-yellow-200 border-b border-yellow-300 transition duration-150 flex justify-between items-center text-yellow-800 font-bold"
+                            onclick="handleSuggestionClick(event)"
+                        >
+                            <div class="flex items-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5 mr-3 text-yellow-600"></i>
+                                ${product.make}
+                            </div>
+                        </li>
+                    `;
+                }
+                
+                return `
+                    <li
+                        data-code="${product.code}"
+                        data-price="${product.price}"
+                        class="p-3 cursor-pointer hover:bg-indigo-50 border-b border-indigo-100 transition duration-150 flex justify-between items-center"
+                        onclick="handleSuggestionClick(event)"
+                    >
+                        <div>
+                            <div class="font-semibold text-gray-800 flex items-center">
+                                <i data-lucide="tag" class="w-4 h-4 mr-2 text-indigo-500"></i>
+                                ${product.code}
+                            </div>
+                            <div class="text-xs text-gray-500 truncate product-description">${product.make}</div>
+                        </div>
+                        <div class="font-bold text-green-600">$${product.price.toFixed(2)}</div>
+                    </li>
+                `;
+            }).join('');
+            
+            container.innerHTML = `<ul>${listHTML}</ul>`;
+            lucide.createIcons();
+        }
+
+        function renderCart() {
+            const tbody = dom.ticketBody;
+            tbody.innerHTML = '';
+            
+            const total = appState.cart.reduce((sum, item) => {
+                const price = parseFloat(item.price) || 0;
+                const quantity = parseFloat(item.quantity) || 0;
+                const subtotal = price * quantity;
+                return sum + subtotal;
+            }, 0);
+            
+            dom.totalDisplay.textContent = `$${total.toFixed(2)}`;
+            dom.piecesCount.textContent = appState.cart.length;
+            
+            const hasItems = appState.cart.length > 0;
+            
+            dom.clearCartBtn.disabled = !hasItems;
+            dom.printBtn.disabled = !hasItems;
+            dom.emptyCartMsg.classList.toggle('hidden', hasItems);
+            dom.ticketTableContainer.classList.toggle('hidden', !hasItems);
+            
+            // LÓGICA DE EDICIÓN DE NOTA: Deshabilitar si hay ítems 
+            dom.noteInput.disabled = hasItems; 
+
+            if (hasItems) {
+                const rowsHTML = appState.cart.map((item, index) => {
+                    const price = parseFloat(item.price) || 0;
+                    const quantity = parseFloat(item.quantity) || 0;
+                    const subtotal = (price * quantity).toFixed(2);
+                    const displayQuantity = quantity === 0 ? "" : quantity.toFixed(2); 
+                    const isManual = item.make.includes('(MANUAL)');
+
+                    return `
+                        <tr class="border-b hover:bg-gray-50 transition duration-150">
+                            <td class="px-3 py-2 text-center text-gray-600 font-bold w-10">${index + 1}</td>
+                            <!-- CAMBIO: ENFOCARSE EN EL CÓDIGO Y MOSTRAR DESCRIPCIÓN EN LÍNEA PEQUEÑA -->
+                            <td class="px-3 py-2 text-gray-800 font-medium">
+                                <p class="text-sm font-mono font-bold ${isManual ? 'text-red-600' : 'text-gray-900'}">
+                                    ${item.code}
+                                    ${isManual ? '<span class="text-xs ml-1 text-red-400 print:hidden">(Manual)</span>' : ''}
+                                </p>
+                                <!-- Descripción (make) en línea pequeña, visible en pantalla, oculta en impresión -->
+                                <p class="text-xs text-gray-600 mt-0.5 flex items-center justify-between product-description print:hidden">
+                                    <span class="truncate">${item.make}</span>
+                                </p>
+                            </td>
+                            <td class="px-3 py-2 text-center font-semibold hidden md:table-cell print:table-cell">
+                                <span class="${isManual ? 'text-red-500' : 'text-gray-800'}">$${price.toFixed(2)}</span>
+                            </td>
+                            <td class="px-3 py-2 text-center print:block"> 
+                                <span class="hidden print:inline text-sm font-bold text-gray-800">${quantity.toFixed(2)}</span>
+                                <div class="flex items-center justify-center space-x-2 print:hidden">
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        max="${MAX_ITEM_QUANTITY.toFixed(2)}" 
+                                        value="${displayQuantity}" 
+                                        onchange="handleQuantityChange(event, '${item.id}')"
+                                        class="w-16 text-center border border-gray-300 rounded-md py-1 px-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm appearance-none quantity-input"
+                                        aria-label="Cantidad para ${item.make}"
+                                    />
+                                    <!-- BOTÓN DE ELIMINAR ARTÍCULO con SVG Directo. Usa item.id -->
+                                    <button
+                                        onclick="handleRemoveItemClick('${item.id}')"
+                                        class="text-white bg-red-600 hover:bg-red-700 p-2 rounded-full transition shadow-md"
+                                        aria-label="Eliminar ${item.make}"
+                                    >
+                                        ${TRASH_ICON_SVG}
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-3 py-2 font-bold text-right text-sky-600">$${subtotal}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                tbody.innerHTML = rowsHTML;
+            }
+            
+            // Actualizar datos de impresión (fecha y nota)
+            dom.printRefDate.textContent = getCurrentDateFormatted();
+            dom.printRefNote.textContent = appState.capitalNoteText; 
+
+            saveData(); // Llama a saveData después de cada renderizado para asegurar la persistencia.
+        }
+
+        // Renderizado general (llama a los específicos)
+        function render() {
+            renderCart();
+            renderSuggestions();
+        }
+
+        // ---------------------------------------------------------------------
+        // 5. MANEJADORES DE EVENTOS GLOBALES
+        // ---------------------------------------------------------------------
+        
+        // Exponer la función para ser llamada desde el HTML
+        window.handleSuggestionClick = (event) => {
+            let li = event.target.closest('li');
+            if (!li) return;
+
+            const isManual = li.dataset.manual === 'true';
+            
+            if (isManual) {
+                const code = li.dataset.code;
+                appState.manualCode = code;
+                showManualPriceModal(code);
+            } else {
+                const code = li.dataset.code;
+                const price = parseFloat(li.dataset.price);
+                const makeElement = li.querySelector('.product-description');
+                const make = makeElement ? makeElement.textContent.trim() : code; 
+                addItem({ code, price, make: make });
+            }
+        };
+        
+        // Exponer la función para ser llamada desde el HTML
+        window.handleQuantityChange = (event, id) => {
+            const newQuantity = event.target.value;
+            updateQuantity(id, newQuantity);
+        };
+        
+        window.handleRemoveItemClick = removeItem;
+
+        function handleInputFocus() {
+            // LÓGICA DE MEMORIA DE BÚSQUEDA
+            // Si el input está vacío Y tenemos resultados de una búsqueda previa, muéstralos.
+            if (dom.searchInput.value.trim() === '' && appState.lastSearchResults.length > 0) {
+                appState.suggestions = appState.lastSearchResults;
+                renderSuggestions();
+            }
+        }
+
+        function handleSearchKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                
+                if (appState.suggestions.length === 1) {
+                    const suggestion = appState.suggestions[0];
+                    if (suggestion.isManualOption) {
+                        showManualPriceModal(suggestion.code);
+                    } else {
+                        addItem(suggestion);
+                    }
+                } else if (appState.suggestions.length > 1) {
+                    showMessage("Múltiples resultados. Selecciona uno de la lista.", 'error');
+                } else if (appState.searchText.length >= MIN_SEARCH_CHARS) {
+                    showManualPriceModal(appState.searchText.toUpperCase());
+                }
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (typeof window.XLSX === 'undefined') {
+                showMessage('La librería de XLSX aún no está cargada. Inténtalo de nuevo en un momento.', 'error');
+                return;
+            }
+            
+            showMessage("Procesando archivo XLSX...", 'info');
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                try {
+                    const data = e.target.result;
+                    const workbook = window.XLSX.read(data, { type: 'binary' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    
+                    const rawJson = window.XLSX.utils.sheet_to_json(worksheet);
+                    
+                    const newProducts = rawJson
+                        .map(row => {
+                            // Búsqueda flexible de encabezados
+                            const codeKey = Object.keys(row).find(k => k.toLowerCase().includes('code') || k.toLowerCase().includes('código') || k.toLowerCase().includes('sku'));
+                            const makeKey = Object.keys(row).find(k => k.toLowerCase().includes('make') || k.toLowerCase().includes('descrip') || k.toLowerCase().includes('producto'));
+                            const priceKey = Object.keys(row).find(k => k.toLowerCase().includes('price') || k.toLowerCase().includes('precio'));
+                            
+                            if (!codeKey || !makeKey || !priceKey) return null;
+
+                            const code = String(row[codeKey]).trim();
+                            const make = String(row[makeKey]).trim();
+                            const price = parseFloat(row[priceKey]);
+
+                            if (code && !isNaN(price) && price >= 0) {
+                                return { code, make, price: parseFloat(price.toFixed(2)) };
+                            }
+                            return null;
+                        })
+                        .filter(p => p !== null);
+
+                    if (newProducts.length > 0) {
+                        appState.allProducts = newProducts;
+                        // *** LA ACCIÓN CLAVE: GUARDAR LA NUEVA BASE DE DATOS EN LOCALSTORAGE ***
+                        localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(newProducts));
+                        
+                        // Limpiar el estado de búsqueda después de cargar la DB
+                        appState.cart = []; 
+                        appState.suggestions = []; 
+                        appState.lastSearchResults = []; 
+
+                        showMessage(`¡Base de datos cargada con éxito! ${newProducts.length} productos importados y GUARDADOS.`, 'success');
+                    } else {
+                        showMessage("Error: No se encontraron productos válidos en el archivo XLSX. Revise sus encabezados (debe tener Código, Descripción y Precio).", 'error');
+                    }
+                } catch (error) {
+                    console.error("Error al procesar el archivo XLSX:", error);
+                    showMessage("Ocurrió un error al leer el archivo. Consulte la consola.", 'error');
+                } finally {
+                    if (dom.fileInput) { dom.fileInput.value = ''; }
+                    dom.searchInput.focus();
+                    render();
+                }
+            };
+
+            reader.readAsBinaryString(file);
+        }
+
+        function showClearCartModal() {
+            $('#clear-modal-text').innerHTML = `¿Estás seguro de que deseas eliminar los **${appState.cart.length} artículos** de este ticket? Esta acción no se puede deshacer.`;
+            showModal('#clear-cart-modal');
+        }
+        
+        function showManualPriceModal(code) {
+            appState.manualCode = code;
+            dom.manualModalCodeDisplay.textContent = `El código ${code} no se encontró. Asigna un precio unitario:`;
+            dom.manualPriceInput.value = '0.00';
+            dom.manualPriceInput.classList.remove('border-red-500');
+            dom.manualPriceError.classList.add('hidden');
+            dom.manualPriceInput.focus();
+            showModal('#manual-price-modal');
+        }
+        
+        function setupEventListeners() {
+            // Buscador
+            dom.searchInput.addEventListener('input', (e) => {
+                appState.searchText = e.target.value;
+                performSearch(); 
+            });
+            
+            // LÓGICA DE MEMORIA: Al enfocar, restauramos los últimos resultados si el campo está vacío
+            dom.searchInput.addEventListener('focus', () => {
+                handleInputFocus(); 
+                renderSuggestions(); 
+            }); 
+            
+            // CORRECCIÓN CLAVE: PREVENIR QUE EL CLICK EN LA SUGERENCIA DESENFOQUE EL INPUT
+            dom.suggestionsContainer.addEventListener('mousedown', (e) => {
+                e.preventDefault(); 
+            });
+
+            dom.searchInput.addEventListener('blur', () => {
+                // Ocultamos las sugerencias si el foco se pierde y no hay una acción de mousedown
+                setTimeout(() => {
+                    if (appState.suggestions.length > 0) {
+                         dom.suggestionsContainer.classList.add('hidden');
+                    }
+                }, 150); 
+            });
+            
+            dom.searchInput.addEventListener('keydown', handleSearchKeydown);
+
+            // LÓGICA: Borrar texto de búsqueda si se hace clic fuera del input o las sugerencias
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+                
+                // Verifica si el clic fue fuera de la barra de búsqueda Y fuera del contenedor de sugerencias
+                const clickedSearchBar = dom.searchInput.contains(target);
+                const clickedSuggestions = dom.suggestionsContainer.contains(target);
+
+                if (!clickedSearchBar && !clickedSuggestions) {
+                    
+                    if (dom.searchInput.value.trim() !== '') {
+                        appState.searchText = '';
+                        dom.searchInput.value = '';
+                        appState.lastSearchResults = []; 
+                        appState.suggestions = [];
+                        renderSuggestions();
+                        showMessage("Búsqueda borrada al hacer clic en espacio en blanco.", 'info');
+                    }
+                    
+                    // Asegurarse de quitar el foco
+                    dom.searchInput.blur();
+                }
+            });
+
+
+            // Nota de capital
+            dom.noteInput.addEventListener('input', (event) => {
+                if (!dom.noteInput.disabled) {
+                    appState.capitalNoteText = event.target.value;
+                    saveData();
+                }
+            });
+            
+            // Botones de control
+            dom.clearCartBtn.addEventListener('click', showClearCartModal);
+            dom.printBtn.addEventListener('click', () => { window.print(); });
+            dom.logoDbTrigger.addEventListener('click', () => { dom.fileInput.click(); });
+            dom.fileInput.addEventListener('change', handleFileUpload);
+
+            // Modal de Borrado
+            dom.confirmClearBtn.addEventListener('click', clearCart);
+            dom.cancelClearBtn.addEventListener('click', () => hideModal('#clear-cart-modal'));
+            
+            // Modal Manual
+            dom.confirmManualBtn.addEventListener('click', () => {
+                handleManualPriceConfirm(appState.manualCode, dom.manualPriceInput.value);
+            });
+            dom.cancelManualBtn.addEventListener('click', () => { 
+                hideModal('#manual-price-modal'); 
+                dom.searchInput.focus();
+            });
+            dom.manualPriceInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    handleManualPriceConfirm(appState.manualCode, dom.manualPriceInput.value);
+                }
+            });
+            
+            // -------------------------------------------------------------------
+            // Lógica de Búsqueda por Voz
+            // -------------------------------------------------------------------
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'es-ES'; 
+                
+                dom.voiceSearchBtn.disabled = false;
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    appState.searchText = transcript;
+                    dom.searchInput.value = transcript;
+                    dom.searchInput.focus();
+                    performSearch(); 
+                    showMessage(`Voz detectada: "${transcript}"`, 'success');
+                };
+                
+                recognition.onend = () => {
+                    appState.isListening = false;
+                    dom.voiceSearchBtn.classList.remove('listening');
+                    dom.voiceSearchBtn.classList.remove('bg-red-800');
+                    dom.voiceSearchBtn.classList.add('bg-red-600'); 
+                };
+                
+                recognition.onerror = (event) => {
+                    appState.isListening = false;
+                    recognition.onend();
+                    if (event.error === 'no-speech') {
+                        showMessage("No se detectó voz.", 'info');
+                    } else if (event.error === 'not-allowed') {
+                        showMessage("Permiso de micrófono denegado. Revise la configuración de su navegador.", 'error');
+                    } else {
+                        console.error('Error de reconocimiento:', event.error);
+                        showMessage("Error en el reconocimiento de voz.", 'error');
+                    }
+                };
+                
+                dom.voiceSearchBtn.addEventListener('click', () => {
+                    if (appState.isListening) {
+                        recognition.stop();
+                    } else {
+                        try {
+                            recognition.start();
+                            appState.isListening = true;
+                            appState.searchText = '';
+                            dom.searchInput.value = '';
+                            showMessage("Escuchando... di el código o descripción.", 'info');
+                            dom.voiceSearchBtn.classList.remove('bg-red-600');
+                            dom.voiceSearchBtn.classList.add('bg-red-800', 'listening');
+                        } catch (e) {
+                            showMessage("Reconocimiento ya activo o error de inicialización.", 'error');
+                        }
+                    }
+                });
+            } else {
+                dom.voiceSearchBtn.disabled = true;
+                dom.voiceSearchBtn.title = "Búsqueda por voz no soportada en este navegador.";
+                dom.voiceSearchBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                dom.voiceSearchBtn.classList.add('bg-gray-400');
+            }
+        }
+        
+        // ---------------------------------------------------------------------
+        // 6. INICIALIZACIÓN
+        // ---------------------------------------------------------------------
+        window.onload = function() {
+            lucide.createIcons(); 
+            loadData();
+            setupEventListeners();
+            render();
+            dom.searchInput.focus();
+        };
+    </script>
+</body>
+</html>
