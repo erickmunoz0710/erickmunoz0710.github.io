@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ari Auto App - Gestor de Tickets</title>
-    <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga de Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Carga de SheetJS (para importar XLSX) -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         /* Estilos personalizados para la animación del logo y impresión */
@@ -82,7 +79,6 @@
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
 
-    <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
     <div id="clear-cart-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
             <div class="flex items-center text-red-600 mb-4">
@@ -101,7 +97,6 @@
         </div>
     </div>
     
-    <!-- MODAL DE PRECIO MANUAL -->
     <div id="manual-price-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all">
             <div class="flex items-center text-indigo-600 mb-4 border-b pb-2">
@@ -139,23 +134,18 @@
         </div>
     </div>
 
-    <!-- Mensaje Flotante (Toast) -->
     <div id="toast-message" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden"></div>
 
-    <!-- Input de archivo oculto -->
     <input type="file" id="xlsx-upload-hidden" accept=".xlsx, .xls" class="hidden print:hidden" />
 
     <div class="min-h-screen flex flex-col">
-        <!-- Header y Búsqueda -->
         <header class="bg-white shadow-md p-4 sticky top-0 z-10 print:hidden">
             <div class="flex justify-between items-center mb-4">
-                <!-- LOGO -->
                 <div 
                     id="logo-db-trigger" 
                     class="flex items-center group space-x-0 cursor-pointer hover:opacity-80 transition duration-200 p-1 -ml-1 rounded-lg"
                     title="Haga click para Cargar Base de Datos (XLSX). Su DB está guardada localmente."
                 >
-                    <!-- Icono de Logo (Catalizador/Mofle) -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none"
                         class="w-8 h-8 text-gray-700 transition transform duration-200 -mr-1"
                         title="Icono de Catalizador/Mofle con Flujo de Escape Animado"
@@ -175,7 +165,6 @@
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <!-- FECHA -->
                     <div class="px-3 py-1 bg-white rounded-md border border-gray-300 shadow-sm transition duration-150">
                         <p class="text-xs font-bold text-gray-700">
                             FECHA: <span id="current-date" class="text-indigo-600"></span>
@@ -192,7 +181,6 @@
                         IMPRIMIR
                     </button>
                     
-                    <!-- BOTÓN DE ELIMINAR MEJORADO CON SVG DIRECTO -->
                     <button
                         id="clear-cart-btn"
                         disabled
@@ -206,10 +194,8 @@
                 </div>
             </div>
 
-            <!-- Contenedor de Búsqueda Completo: FLEX para incluir el input y el micrófono -->
             <div class="flex items-center space-x-3"> 
                 
-                <!-- Contenedor del Input (ocupa la mayor parte del espacio) -->
                 <div class="relative flex-grow">
                     <div class="flex items-center border border-gray-300 rounded-full bg-gray-50 focus-within:ring-2 focus-within:ring-indigo-500 transition duration-150">
                         <i data-lucide="search" class="w-5 h-5 ml-3 text-gray-400"></i>
@@ -222,19 +208,15 @@
                         />
                     </div>
                     
-                    <!-- Sugerencias (Combobox/Autocomplete) -->
                     <div id="suggestions-container" class="absolute top-full mt-1 w-full bg-white border border-indigo-200 rounded-lg shadow-2xl z-20 max-h-80 overflow-y-auto hidden">
-                        <!-- Contenido de las sugerencias se inserta aquí con JS -->
-                    </div>
+                        </div>
                 </div>
                 
-                <!-- Botón de Búsqueda por Voz (GRANDE Y VISIBLE CON FORMA DE MICRÓFONO) -->
                 <button
                     id="voice-search-btn"
                     class="mic-button flex-shrink-0 bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     title="BÚSQUEDA POR VOZ"
                 >
-                    <!-- SVG DE MICRÓFONO MÁS REALISTA (de Lucide) -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
                         <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
                         <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -244,18 +226,15 @@
             </div>
         </header>
         
-        <!-- Contenido Solo para Impresión -->
         <div class="hidden print-header">
             <h1 class="text-2xl font-extrabold text-gray-900">AriAuto App - Ticket de Venta</h1>
             <p class="text-sm text-gray-600">Fecha: <span id="print-ref-date"></span></p>
-            <!-- RECUADRO DE NOTA SOLO PARA IMPRESIÓN -->
             <div class="text-sm font-semibold text-gray-700 mt-2">
                 NOTA DE VENTA: <span id="print-ref-note" class="font-normal text-gray-900"></span>
             </div>
             <hr class="my-2 border-gray-400"/>
         </div>
 
-        <!-- Cuerpo del Ticket -->
         <main class="container mx-auto p-4 flex-grow">
             
             <div id="empty-cart-message" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner hidden">
@@ -269,7 +248,6 @@
                     <thead>
                         <tr class="bg-indigo-50 border-b border-indigo-200 text-left text-xs font-semibold uppercase tracking-wider text-indigo-700 print:bg-white print:text-gray-800 print:border-b-2 print:border-gray-800">
                             <th class="px-3 py-3 w-10">No.</th>
-                            <!-- TEXTO ACTUALIZADO: SOLO CÓDIGO -->
                             <th class="px-3 py-3">CÓDIGO</th> 
                             <th class="px-3 py-3 text-center hidden md:table-cell print:table-cell">P. UNIT.</th>
                             <th class="px-3 py-3 text-center">CANT.</th> 
@@ -277,17 +255,14 @@
                         </tr>
                     </thead>
                     <tbody id="ticket-body" class="divide-y divide-gray-200 print:divide-gray-400">
-                        <!-- Filas de tickets se insertan aquí con JS -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </main>
         
-        <!-- Footer con la Nota y el Total -->
         <footer class="sticky bottom-0 bg-blue-900 text-white shadow-2xl print:hidden">
             <div class="container mx-auto p-3 flex justify-between items-center">
                 
-                <!-- CAMPO DE NOTA: SE MANTIENE EL ESTILO ORIGINAL AUNQUE ESTÉ BLOQUEADO -->
                 <div class="flex-none mr-auto">
                     <input
                         id="capital-note-input"
@@ -302,7 +277,6 @@
                     />
                 </div>
                 
-                <!-- TOTAL Y PIEZAS -->
                 <div class="flex items-center space-x-6 flex-shrink-0">
                     <div class="text-lg font-medium whitespace-nowrap">PIEZAS: <span id="pieces-count" class="text-sky-300 font-bold">0</span></div>
                     <div class="text-2xl font-extrabold flex items-center whitespace-nowrap">
@@ -316,7 +290,6 @@
         </footer>
     </div>
 
-    <!-- JavaScript de la Aplicación -->
     <script>
         // ---------------------------------------------------------------------
         // 1. CONFIGURACIÓN Y ESTADO GLOBAL
@@ -745,13 +718,11 @@
                     return `
                         <tr class="border-b hover:bg-gray-50 transition duration-150">
                             <td class="px-3 py-2 text-center text-gray-600 font-bold w-10">${index + 1}</td>
-                            <!-- CAMBIO: ENFOCARSE EN EL CÓDIGO Y MOSTRAR DESCRIPCIÓN EN LÍNEA PEQUEÑA -->
                             <td class="px-3 py-2 text-gray-800 font-medium">
                                 <p class="text-sm font-mono font-bold ${isManual ? 'text-red-600' : 'text-gray-900'}">
                                     ${item.code}
                                     ${isManual ? '<span class="text-xs ml-1 text-red-400 print:hidden">(Manual)</span>' : ''}
                                 </p>
-                                <!-- Descripción (make) en línea pequeña, visible en pantalla, oculta en impresión -->
                                 <p class="text-xs text-gray-600 mt-0.5 flex items-center justify-between product-description print:hidden">
                                     <span class="truncate">${item.make}</span>
                                 </p>
@@ -772,7 +743,6 @@
                                         class="w-16 text-center border border-gray-300 rounded-md py-1 px-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm appearance-none quantity-input"
                                         aria-label="Cantidad para ${item.make}"
                                     />
-                                    <!-- BOTÓN DE ELIMINAR ARTÍCULO con SVG Directo. Usa item.id -->
                                     <button
                                         onclick="handleRemoveItemClick('${item.id}')"
                                         class="text-white bg-red-600 hover:bg-red-700 p-2 rounded-full transition shadow-md"
@@ -1034,7 +1004,7 @@
             });
             
             // -------------------------------------------------------------------
-            // Lógica de Búsqueda por Voz
+            // Lógica de Búsqueda por Voz (MODIFICADA)
             // -------------------------------------------------------------------
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
@@ -1048,11 +1018,27 @@
 
                 recognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript;
-                    appState.searchText = transcript;
-                    dom.searchInput.value = transcript;
+                    
+                    // --- MODIFICACIÓN CLAVE: LIMPIEZA DE VOZ ---
+                    
+                    // 1. Convertir a mayúsculas
+                    let cleanedTranscript = transcript.toUpperCase();
+                    
+                    // 2. Eliminar acentos
+                    cleanedTranscript = cleanedTranscript
+                        .normalize("NFD") 
+                        .replace(/[\u0300-\u036f]/g, "");
+                        
+                    // 3. Eliminar espacios y comas
+                    cleanedTranscript = cleanedTranscript.replace(/[\s,]/g, "");
+                    
+                    // --- FIN DE LA MODIFICACIÓN ---
+                    
+                    appState.searchText = cleanedTranscript; 
+                    dom.searchInput.value = cleanedTranscript;
                     dom.searchInput.focus();
                     performSearch(); 
-                    showMessage(`Voz detectada: "${transcript}"`, 'success');
+                    showMessage(`Voz: "${transcript}" -> Búsqueda Limpia: "${cleanedTranscript}"`, 'success');
                 };
                 
                 recognition.onend = () => {
