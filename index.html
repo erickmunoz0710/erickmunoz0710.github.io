@@ -58,47 +58,94 @@
         
         /* Estilos de Impresión */
         @media print {
-            .print\:hidden { display: none !important; }
-            body > div { min-height: auto !important; padding: 0 !important; }
-            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
-            main { padding: 0; }
-            table { width: 100%; border-collapse: collapse; }
-            /* Mostrar todas las columnas relevantes para impresión */
-            th:nth-child(3), td:nth-child(3) { display: table-cell; width: 15%; text-align: center; } /* P. UNIT. */
-            th:nth-child(4), td:nth-child(4) { display: table-cell; width: 15%; text-align: center; } /* CANT. */
-            .print-footer { display: block !important; text-align: right; padding: 10px 0; border-top: 2px dashed #333; margin-top: 20px; }
-            .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow: none !important; background-color: transparent !important; }
+            /* 1. OCULTAR TODOS LOS CONTROLES Y NAVEGACIÓN (HEADER, FOOTER, MODALES) */
+            /* Se oculta la clase print:hidden y todos los elementos que componen la UI */
+            .print\:hidden, 
+            header, footer, #empty-cart-message, 
+            #partial-sum-container, #total-display-container,
+            #clear-cart-modal, #manual-price-modal, #saved-tickets-modal, 
+            #toast-message { 
+                display: none !important; 
+                visibility: hidden !important; 
+            }
             
-            /* Ocultar la descripción del producto en la impresión, si es necesario, para que solo se vea el código */
-            /* .product-description { display: none; } <- Eliminado para que se vea en el ticket individual */
+            /* 2. REGLA CLAVE PARA IMPRESIÓN INDIVIDUAL: Asegura que el BODY y MAIN se muestren */
+            body, main {
+                background-color: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                min-height: auto !important;
+                font-size: 10pt;
+            }
+
+            /* Mostrar la cabecera del ticket individual */
+            .print-header { 
+                display: block !important; 
+                text-align: center; 
+                margin-bottom: 20px; 
+            }
             
-            /* Estilos específicos para la impresión de todos los tickets */
-            .print-all-tickets-container { display: block !important; }
-            .print-all-tickets-container * { box-shadow: none !important; background-color: transparent !important; }
-            
-            /* Ajuste para que el cuerpo sea solo el contenedor de impresión */
-            body { 
-                visibility: hidden; 
+            /* 3. ESTILOS DE TABLA Y TICKET INDIVIDUAL */
+            #ticket-table-container {
+                display: block !important;
+                visibility: visible !important;
+                width: 100%;
+                max-width: 100%;
                 margin: 0;
                 padding: 0;
-                font-size: 10pt; /* NUEVO: Letra base más pequeña para impresión */
+                box-shadow: none !important;
+                background-color: transparent !important;
             }
-            .print-all-tickets-container {
+
+            table { width: 100%; border-collapse: collapse; }
+            .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow: none !important; background-color: transparent !important; }
+
+            /* Ocultar la columna de selección (checkbox) */
+            #ticket-table thead th:nth-child(2), 
+            #ticket-table tbody td:nth-child(2) {
+                display: none !important; 
+            }
+
+            /* Mostrar todas las columnas relevantes (Ajuste de anchos en impresión) */
+            /* No. */
+            th:nth-child(1), td:nth-child(1) { width: 5%; }
+            /* CÓDIGO/DESCRIPCIÓN */
+            th:nth-child(3), td:nth-child(3) { display: table-cell; width: auto; text-align: left; }
+            /* P. UNIT. */
+            th:nth-child(4), td:nth-child(4) { display: table-cell; width: 15%; text-align: center; } 
+            /* CANT. */
+            th:nth-child(5), td:nth-child(5) { display: table-cell; width: 15%; text-align: center; } 
+
+            /* Ocultar inputs, botones y sus contenedores (CLAVE PARA LA CANTIDAD) */
+            .flex.items-center.justify-center.space-x-2.print\:hidden {
+                display: none !important;
+            }
+            /* Mostrar el span que tiene la cantidad en texto */
+            #ticket-table .print\:inline {
+                display: inline !important;
+                font-size: 10pt;
+            }
+            
+            /* 4. REGLAS PARA IMPRESIÓN MASIVA */
+            /* Por defecto está oculto en el single print */
+            .print-all-tickets-container { 
+                display: none !important; 
+                visibility: hidden !important;
+            }
+
+            /* Si se activa la impresión masiva, se hace visible temporalmente */
+            .print-all-tickets-container.printing {
+                display: block !important;
                 visibility: visible !important;
                 position: absolute;
                 left: 0;
                 top: 0;
                 width: 100%;
-                font-size: 10pt; /* NUEVO: Letra base más pequeña para impresión consolidada */
+                font-size: 10pt; 
             }
-            
-            .ticket-break {
-                /* Forzar salto de página entre tickets, pero que no salte al inicio */
-                page-break-after: always;
-            }
-            .ticket-break:last-child {
-                page-break-after: auto;
-            }
+            .ticket-break { page-break-after: always; }
+            .ticket-break:last-child { page-break-after: auto; }
         }
         
         /* Oculta el contenedor de impresión masiva por defecto */
@@ -995,13 +1042,17 @@
             `;
             
             container.innerHTML = allTicketsHTML;
+            
+            // **CLAVE DE IMPRESIÓN MASIVA: Agregar la clase para hacer visible el contenedor solo ahora**
+            container.classList.add('printing');
 
             // Disparar la impresión
             window.print();
             
-            // Limpiar el contenedor después de un breve retraso para asegurar que el diálogo de impresión se abra
+            // Limpiar el contenedor y remover la clase después de un breve retraso
             setTimeout(() => {
                 container.innerHTML = '';
+                container.classList.remove('printing');
             }, 500);
         }
 
@@ -1542,4 +1593,3 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
-
