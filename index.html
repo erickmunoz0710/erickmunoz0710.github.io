@@ -70,7 +70,7 @@
             .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow: none !important; background-color: transparent !important; }
             
             /* Ocultar la descripción del producto en la impresión, si es necesario, para que solo se vea el código */
-            .product-description { display: none; }
+            /* .product-description { display: none; } <- Eliminado para que se vea en el ticket individual */
             
             /* Estilos específicos para la impresión de todos los tickets */
             .print-all-tickets-container { display: block !important; }
@@ -81,6 +81,7 @@
                 visibility: hidden; 
                 margin: 0;
                 padding: 0;
+                font-size: 10pt; /* NUEVO: Letra base más pequeña para impresión */
             }
             .print-all-tickets-container {
                 visibility: visible !important;
@@ -88,6 +89,7 @@
                 left: 0;
                 top: 0;
                 width: 100%;
+                font-size: 10pt; /* NUEVO: Letra base más pequeña para impresión consolidada */
             }
             
             .ticket-break {
@@ -939,10 +941,10 @@
             
             // 1. Cabecera general y estructura de la tabla consolidada
             let allTicketsHTML = `
-                <div class="p-8">
-                    <h1 class="text-3xl font-extrabold text-gray-900 text-center mb-4">AriAuto APP</h1>
+                <div class="p-4">
+                    <h1 class="text-xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
                     
-                    <p class="text-lg text-gray-700 text-center mb-6 border-b-2 border-gray-400 pb-3">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
+                    <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
                     
                     <table class="min-w-full table-auto border-collapse">
                         <thead>
@@ -968,13 +970,14 @@
 
                     allTicketsHTML += `
                         <tr class="border-b border-gray-200">
-                            <td class="px-3 py-1 text-center text-gray-600 font-bold">${globalItemCount++}</td>
+                            <td class="px-3 py-1 text-center text-gray-600 font-bold text-xs">${globalItemCount++}</td>
                             <td class="px-3 py-1 text-gray-800 font-medium">
-                                <p class="text-sm font-mono font-bold ${isManual ? 'text-red-600' : 'text-gray-900'}">${item.code}</p>
-                                </td>
-                            <td class="px-3 py-1 text-center font-semibold text-gray-800">$${price.toFixed(2)}</td>
-                            <td class="px-3 py-1 text-center font-semibold text-gray-800">${quantity.toFixed(2)}</td>
-                            <td class="px-3 py-1 font-bold text-right text-sky-600">$${subtotal}</td>
+                                <p class="font-mono font-bold text-sm ${isManual ? 'text-red-600' : 'text-gray-900'}">${item.code}</p>
+                                <p class="text-xs text-gray-600">${item.make}</p>
+                            </td>
+                            <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">$${price.toFixed(2)}</td>
+                            <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">${quantity.toFixed(2)}</td>
+                            <td class="px-3 py-1 font-bold text-right text-sky-600 text-sm">$${subtotal}</td>
                         </tr>
                     `;
                 });
@@ -985,7 +988,7 @@
                         </tbody>
                     </table>
                     
-                    <div class="text-3xl font-extrabold text-right mt-8 pt-4 border-t-4 border-double border-gray-900">
+                    <div class="text-xl font-extrabold text-right mt-4 pt-2 border-t-2 border-double border-gray-900">
                         TOTAL: <span class="text-green-700">$${overallTotal.toFixed(2)}</span>
                     </div>
                 </div>
@@ -1108,7 +1111,7 @@
                                     ${item.code}
                                     ${isManual ? '<span class="text-xs ml-1 text-red-400 print:hidden">(Manual)</span>' : ''}
                                 </p>
-                                <p class="text-xs text-gray-600 mt-0.5 flex items-center justify-between product-description print:hidden">
+                                <p class="text-xs text-gray-600 mt-0.5 flex items-center justify-between product-description print:block">
                                     <span class="truncate">${item.make}</span>
                                 </p>
                             </td>
