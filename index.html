@@ -564,21 +564,27 @@
                     showMessage("Base de datos de simulación cargada. Cargue su XLSX para persistencia.", 'error');
                 }
 
-                // *** CARGAR TICKET Y NOTA ***
-                const storedCart = localStorage.getItem(STORAGE_KEYS.CART);
-                const storedNote = localStorage.getItem(STORAGE_KEYS.CAPITAL_NOTE); 
-                
-                if (storedNote) { appState.capitalNoteText = JSON.parse(storedNote); } else {
-                    appState.capitalNoteText = '#1';
-                }
-                if (storedCart) { appState.cart = JSON.parse(storedCart); }
-                
                 // *** CARGAR TICKETS GUARDADOS (NUEVO) ***
                 const storedSavedTickets = localStorage.getItem(STORAGE_KEYS.SAVED_TICKETS);
                 if (storedSavedTickets) {
                     appState.savedTickets = JSON.parse(storedSavedTickets);
                 }
-
+                
+                // *** CARGAR TICKET Y NOTA ***
+                const storedCart = localStorage.getItem(STORAGE_KEYS.CART);
+                const storedNote = localStorage.getItem(STORAGE_KEYS.CAPITAL_NOTE); 
+                
+                if (storedNote) { 
+                    appState.capitalNoteText = JSON.parse(storedNote); 
+                } else {
+                    // Si no hay nota guardada, calcular la siguiente ref válida
+                    const allRefs = appState.savedTickets.map(t => parseInt(t.ref.replace('#', ''))).filter(n => !isNaN(n));
+                    const maxRefNumber = allRefs.length > 0 ? Math.max(...allRefs) : 0;
+                    appState.capitalNoteText = `#${maxRefNumber + 1}`;
+                }
+                
+                if (storedCart) { appState.cart = JSON.parse(storedCart); }
+                
                 dom.currentDate.textContent = getCurrentDateFormatted();
                 // dom.noteInput.value = appState.capitalNoteText; // ELIMINADO
 
@@ -776,28 +782,44 @@
                 return;
             }
 
-            const newTicket = {
-                id: crypto.randomUUID(),
-                ref: appState.capitalNoteText,
+            const currentRef = appState.capitalNoteText;
+            const existingTicketIndex = appState.savedTickets.findIndex(t => t.ref === currentRef);
+
+            const ticketToSave = {
+                id: crypto.randomUUID(), // Nuevo ID para la versión guardada, ayuda a la unicidad
+                ref: currentRef,
                 date: new Date().toISOString(),
-                cart: [...appState.cart], // Copia del carrito
+                cart: [...appState.cart],
                 total: calculateTicketTotal(appState.cart),
             };
+
+            let message = '';
+
+            if (existingTicketIndex !== -1) {
+                // 1. REEMPLAZAR TICKET EXISTENTE
+                appState.savedTickets[existingTicketIndex] = ticketToSave;
+                message = `Ticket Ref. ${currentRef} actualizado y guardado.`;
+            } else {
+                // 1. AÑADIR NUEVO TICKET
+                appState.savedTickets.unshift(ticketToSave); 
+                message = `Ticket Ref. ${currentRef} cerrado y guardado.`;
+            }
             
-            // 1. Añadir a tickets guardados y guardar
-            appState.savedTickets.unshift(newTicket); // Añadir al inicio para que el más reciente salga primero
+            // 2. Guardar la lista de tickets
             saveSavedTicketsData();
 
-            // 2. Limpiar ticket actual para el nuevo
+            // 3. Limpiar ticket actual e iniciar uno nuevo
             _internalClearCart(); 
             
-            // 3. Actualizar la nota para el nuevo ticket (#N + 1)
-            const lastRefNumber = parseInt(newTicket.ref.replace('#', '')) || 0;
-            const newRef = `#${lastRefNumber + 1}`;
-            appState.capitalNoteText = newRef;
-            // dom.noteInput.value = newRef; // ELIMINADO
+            // 4. Actualizar la nota para el nuevo ticket (#N + 1)
+            // Buscamos el número más alto en toda la lista de guardados para el nuevo ticket.
+            const allRefs = appState.savedTickets.map(t => parseInt(t.ref.replace('#', ''))).filter(n => !isNaN(n));
+            const maxRefNumber = allRefs.length > 0 ? Math.max(...allRefs) : 0;
+            const newRef = `#${maxRefNumber + 1}`;
             
-            showMessage(`Ticket Ref. ${newTicket.ref} cerrado y guardado. Nuevo ticket iniciado: ${newRef}.`, 'success');
+            appState.capitalNoteText = newRef;
+            
+            showMessage(`${message} Nuevo ticket iniciado: ${newRef}.`, 'success');
             render(); // Rerenderiza el estado limpio
         }
         
@@ -817,7 +839,7 @@
                 // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
                 
                 hideModal('#saved-tickets-modal');
-                showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema.`, 'info');
+                showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
                 render();
             } else if (appState.cart.length === 0) {
                  // Si el carrito está vacío, se carga sin preguntar
@@ -826,7 +848,7 @@
                  // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
                  
                  hideModal('#saved-tickets-modal');
-                 showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema.`, 'info');
+                 showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
                  render();
             }
         }
@@ -1492,7 +1514,6 @@
             lucide.createIcons(); 
             loadData();
             setupEventListeners();
-            render();
             dom.searchInput.focus();
         };
     </script>
