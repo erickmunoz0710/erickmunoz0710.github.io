@@ -921,7 +921,8 @@
         }
 
         /**
-         * Genera y dispara la impresión de todos los tickets guardados, CONSOLIDADOS en una sola lista.
+         * Genera y dispara la impresión de todos los tickets guardados.
+         * MODIFICADO para eliminar datos extra y columnas.
          */
         function printAllSavedTickets() {
             if (appState.savedTickets.length === 0) {
@@ -939,16 +940,15 @@
             // 1. Cabecera general y estructura de la tabla consolidada
             let allTicketsHTML = `
                 <div class="p-8">
-                    <h1 class="text-3xl font-extrabold text-gray-900 text-center mb-4">CORTE DE CAJA CONSOLIDADO</h1>
-                    <p class="text-lg text-gray-700 text-center mb-2">Tickets consolidados: ${appState.savedTickets.length}</p>
-                    <p class="text-lg text-gray-700 text-center mb-6 border-b-2 border-gray-400 pb-3">Fecha de Impresión: ${getCurrentDateFormatted()} ${getCurrentTimeFormatted()}</p>
+                    <h1 class="text-3xl font-extrabold text-gray-900 text-center mb-4">AriAuto APP</h1>
+                    
+                    <p class="text-lg text-gray-700 text-center mb-6 border-b-2 border-gray-400 pb-3">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
                     
                     <table class="min-w-full table-auto border-collapse">
                         <thead>
                             <tr class="bg-gray-100 border-b-2 border-gray-800 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                 <th class="px-3 py-2 w-10">No.</th>
-                                <th class="px-3 py-2">CÓDIGO / DESCRIPCIÓN</th> 
-                                <th class="px-3 py-2 text-center">TICKET REF.</th>
+                                <th class="px-3 py-2">CÓDIGO</th> 
                                 <th class="px-3 py-2 text-center">P. UNIT.</th>
                                 <th class="px-3 py-2 text-center">CANT.</th> 
                                 <th class="px-3 py-2 text-right">SUBTOTAL</th>
@@ -971,9 +971,7 @@
                             <td class="px-3 py-1 text-center text-gray-600 font-bold">${globalItemCount++}</td>
                             <td class="px-3 py-1 text-gray-800 font-medium">
                                 <p class="text-sm font-mono font-bold ${isManual ? 'text-red-600' : 'text-gray-900'}">${item.code}</p>
-                                <p class="text-xs text-gray-600 mt-0.5">${item.make.replace('(MANUAL)', '')}</p>
-                            </td>
-                            <td class="px-3 py-1 text-center font-bold text-indigo-700">${ticket.ref}</td>
+                                </td>
                             <td class="px-3 py-1 text-center font-semibold text-gray-800">$${price.toFixed(2)}</td>
                             <td class="px-3 py-1 text-center font-semibold text-gray-800">${quantity.toFixed(2)}</td>
                             <td class="px-3 py-1 font-bold text-right text-sky-600">$${subtotal}</td>
@@ -988,7 +986,7 @@
                     </table>
                     
                     <div class="text-3xl font-extrabold text-right mt-8 pt-4 border-t-4 border-double border-gray-900">
-                        TOTAL CONSOLIDADO: <span class="text-green-700">$${overallTotal.toFixed(2)}</span>
+                        TOTAL: <span class="text-green-700">$${overallTotal.toFixed(2)}</span>
                     </div>
                 </div>
             `;
@@ -1266,7 +1264,7 @@
                     if (newProducts.length > 0) {
                         appState.allProducts = newProducts;
                         // *** LA ACCIÓN CLAVE: GUARDAR LA NUEVA BASE DE DATOS EN LOCALSTORAGE ***
-                        localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(newProducts));
+                        localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(appState.allProducts));
                         
                         // Limpiar el estado de búsqueda después de cargar la DB
                         _internalClearCart(); 
@@ -1356,16 +1354,6 @@
                 }
             });
 
-            // Nota de capital - ELIMINADA
-            /*
-            dom.noteInput.addEventListener('input', (event) => {
-                if (!dom.noteInput.disabled) {
-                    appState.capitalNoteText = event.target.value;
-                    saveAppState(); // Guarda el estado de la nota
-                }
-            });
-            */
-            
             // Botones de control
             dom.clearCartBtn.addEventListener('click', clearCartWithConfirmation); // Usa el flow con modal
             dom.saveTicketBtn.addEventListener('click', saveTicket); // NUEVO: Guardar Ticket
