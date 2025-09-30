@@ -56,31 +56,22 @@
             }
         }
         
-        /* Estilos de Impresión */
+        /* Estilos de Impresión UNIFICADOS */
         @media print {
             .print\:hidden { display: none !important; }
+            /* Se oculta toda la aplicación principal para que solo se vea el contenedor temporal */
             body > div { min-height: auto !important; padding: 0 !important; }
-            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
             
-            /* --- CORRECCIÓN 1: Ticket Individual --- */
-            main { 
-                padding: 0; 
-                visibility: visible !important; /* Fuerza la visibilidad del ticket individual */
-                position: absolute;
-                left: 0;
-                top: 0;
-            }
-            /* -------------------------------------- */
+            /* Se eliminan las reglas que mostraban el main o la cabecera individual */
             
             table { width: 100%; border-collapse: collapse; }
             /* Mostrar todas las columnas relevantes para impresión */
             th:nth-child(3), td:nth-child(3) { display: table-cell; width: 15%; text-align: center; } /* P. UNIT. */
             th:nth-child(4), td:nth-child(4) { display: table-cell; width: 15%; text-align: center; } /* CANT. */
+            
+            /* Ocultar el pie de página de la app y sombras */
             .print-footer { display: block !important; text-align: right; padding: 10px 0; border-top: 2px dashed #333; margin-top: 20px; }
             .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow: none !important; background-color: transparent !important; }
-            
-            /* Ocultar la descripción del producto en la impresión, si es necesario, para que solo se vea el código */
-            /* .product-description { display: none; } <- Eliminado para que se vea en el ticket individual */
             
             /* Estilos específicos para la impresión de todos los tickets */
             .print-all-tickets-container { display: block !important; }
@@ -91,10 +82,10 @@
                 visibility: hidden; 
                 margin: 0;
                 padding: 0;
-                font-size: 10pt; /* NUEVO: Letra base más pequeña para impresión */
+                font-size: 10pt; /* Letra base más pequeña para impresión */
             }
             
-            /* --- CORRECCIÓN 2: Imprimir Todos (Para que el contenido no quede fuera de flujo) --- */
+            /* CORRECCIÓN para que el contenido de impresión fluya correctamente (para individuales y todos) */
             .print-all-tickets-container {
                 visibility: visible !important;
                 display: block !important; /* Asegura que se muestre como un bloque completo */
@@ -102,7 +93,7 @@
                 left: 0;
                 top: 0;
                 width: 100%;
-                font-size: 10pt; /* Letra base más pequeña para impresión consolidada */
+                font-size: 10pt; 
             }
             /* --------------------------------------------------------------------------------- */
             
@@ -324,15 +315,6 @@
             </div>
         </header>
         
-        <div class="hidden print-header">
-            <h1 class="text-2xl font-extrabold text-gray-900">AriAuto App - Ticket de Venta</h1>
-            <p class="text-sm text-gray-600">Fecha: <span id="print-ref-date"></span></p>
-            <div class="text-sm font-semibold text-gray-700 mt-2">
-                NOTA DE VENTA: <span id="print-ref-note" class="font-normal text-gray-900"></span>
-            </div>
-            <hr class="my-2 border-gray-400"/>
-        </div>
-
         <main class="container mx-auto p-4 flex-grow">
             
             <div id="empty-cart-message" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner hidden">
@@ -451,7 +433,6 @@
             suggestionsContainer: $('#suggestions-container'),
             ticketBody: $('#ticket-body'),
             totalDisplay: $('#total-display'),
-            // noteInput: $('#capital-note-input'), // ELIMINADO
             clearCartBtn: $('#clear-cart-btn'),
             printBtn: $('#print-btn'),
             emptyCartMsg: $('#empty-cart-message'),
@@ -470,8 +451,8 @@
             manualPriceError: $('#manual-price-error'),
             fileInput: $('#xlsx-upload-hidden'),
             currentDate: $('#current-date'),
-            printRefDate: $('#print-ref-date'),
-            printRefNote: $('#print-ref-note'), 
+            // dom.printRefDate: $('#print-ref-date'), // ELIMINADO
+            // dom.printRefNote: $('#print-ref-note'), // ELIMINADO
             // NUEVOS ELEMENTOS DEL DOM
             saveTicketBtn: $('#save-ticket-btn'),
             openSavedTicketsBtn: $('#open-saved-tickets-btn'),
@@ -602,7 +583,6 @@
                 if (storedCart) { appState.cart = JSON.parse(storedCart); }
                 
                 dom.currentDate.textContent = getCurrentDateFormatted();
-                // dom.noteInput.value = appState.capitalNoteText; // ELIMINADO
 
             } catch (e) {
                 console.error("Error al cargar datos:", e);
@@ -743,7 +723,6 @@
         function _internalClearCart() {
             appState.cart = [];
             appState.capitalNoteText = '#1'; // La nota se reinicia internamente
-            // dom.noteInput.value = '#1'; // ELIMINADO
             
             appState.searchText = '';
             dom.searchInput.value = '';
@@ -852,7 +831,6 @@
                 // Cargar el carrito y nota
                 appState.cart = [...ticketToLoad.cart];
                 appState.capitalNoteText = ticketToLoad.ref;
-                // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
                 
                 hideModal('#saved-tickets-modal');
                 showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
@@ -861,7 +839,6 @@
                  // Si el carrito está vacío, se carga sin preguntar
                  appState.cart = [...ticketToLoad.cart];
                  appState.capitalNoteText = ticketToLoad.ref;
-                 // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
                  
                  hideModal('#saved-tickets-modal');
                  showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
@@ -938,7 +915,6 @@
 
         /**
          * Genera y dispara la impresión de todos los tickets guardados.
-         * MODIFICADO para eliminar datos extra y columnas.
          */
         function printAllSavedTickets() {
             if (appState.savedTickets.length === 0) {
@@ -956,9 +932,11 @@
             // 1. Cabecera general y estructura de la tabla consolidada
             let allTicketsHTML = `
                 <div class="p-4">
-                    <h1 class="text-xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
+                    <h1 class="text-2xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
                     
-                    <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
+                    <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">
+                        CORTE DE CAJA | Fecha de Impresión: ${getCurrentDateFormatted()} ${getCurrentTimeFormatted()}
+                    </p>
                     
                     <table class="min-w-full table-auto border-collapse">
                         <thead>
@@ -1003,7 +981,7 @@
                     </table>
                     
                     <div class="text-xl font-extrabold text-right mt-4 pt-2 border-t-2 border-double border-gray-900">
-                        TOTAL: <span class="text-green-700">$${overallTotal.toFixed(2)}</span>
+                        TOTAL CORTE: <span class="text-green-700">$${overallTotal.toFixed(2)}</span>
                     </div>
                 </div>
             `;
@@ -1019,13 +997,93 @@
             }, 500);
         }
 
+        /**
+         * NUEVO: Genera y dispara la impresión del TICKET ACTUAL.
+         * Utiliza la misma estructura que "IMPRIMIR TODOS".
+         */
+        function printCurrentTicket() {
+            if (appState.cart.length === 0) {
+                showMessage("El ticket está vacío. No hay nada que imprimir.", 'error');
+                return;
+            }
+            
+            const container = dom.printAllTicketsContainer;
+            container.innerHTML = '';
+            let globalItemCount = 1;
+            const currentTicketTotal = calculateTicketTotal(appState.cart);
+
+            // 1. Cabecera y estructura de la tabla (idéntica al formato de impresión de todos)
+            let currentTicketHTML = `
+                <div class="p-4 ticket-break"> 
+                    <h1 class="text-2xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
+                    <div class="text-sm font-semibold text-gray-700 mt-2 text-center">
+                        NOTA DE VENTA: <span class="font-bold text-lg text-gray-900">${appState.capitalNoteText}</span>
+                    </div>
+                    <p class="text-xs text-gray-600 text-center mb-4 border-b border-gray-400 pb-1">
+                        Fecha: ${getCurrentDateFormatted()} | Hora: ${getCurrentTimeFormatted()}
+                    </p>
+                    
+                    <table class="min-w-full table-auto border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 border-b-2 border-gray-800 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th class="px-3 py-2 w-10">No.</th>
+                                <th class="px-3 py-2">CÓDIGO</th> 
+                                <th class="px-3 py-2 text-center">P. UNIT.</th>
+                                <th class="px-3 py-2 text-center">CANT.</th> 
+                                <th class="px-3 py-2 text-right">SUBTOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // 2. Iterar sobre los artículos del carrito actual
+            appState.cart.forEach(item => {
+                const price = parseFloat(item.price) || 0;
+                const quantity = parseFloat(item.quantity) || 0;
+                const subtotal = (price * quantity).toFixed(2);
+                const isManual = item.make.includes('(MANUAL)');
+
+                currentTicketHTML += `
+                    <tr class="border-b border-gray-200">
+                        <td class="px-3 py-1 text-center text-gray-600 font-bold text-xs">${globalItemCount++}</td>
+                        <td class="px-3 py-1 text-gray-800 font-medium">
+                            <p class="font-mono font-bold text-sm ${isManual ? 'text-red-600' : 'text-gray-900'}">${item.code}</p>
+                            <p class="text-xs text-gray-600">${item.make}</p>
+                        </td>
+                        <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">$${price.toFixed(2)}</td>
+                        <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">${quantity.toFixed(2)}</td>
+                        <td class="px-3 py-1 font-bold text-right text-sky-600 text-sm">$${subtotal}</td>
+                    </tr>
+                `;
+            });
+
+            // 3. Cerrar la tabla y añadir el total
+            currentTicketHTML += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="text-xl font-extrabold text-right mt-4 pt-2 border-t-2 border-double border-gray-900">
+                        TOTAL TICKET: <span class="text-green-700">$${currentTicketTotal.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = currentTicketHTML;
+
+            // Disparar la impresión
+            window.print();
+            
+            // Limpiar el contenedor después de un breve retraso para asegurar que el diálogo de impresión se abra
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 500);
+        }
 
         // ---------------------------------------------------------------------
         // 4. RENDERING (ACTUALIZACIÓN DEL DOM)
         // ---------------------------------------------------------------------
         
         function renderSuggestions() {
-            // ... (Lógica de renderSuggestions sin cambios)
             const container = dom.suggestionsContainer;
             
             if (appState.suggestions.length === 0) {
@@ -1096,9 +1154,6 @@
             dom.saveTicketBtn.disabled = !hasItems; // NUEVO: Habilitar botón de guardar
             dom.emptyCartMsg.classList.toggle('hidden', hasItems);
             dom.ticketTableContainer.classList.toggle('hidden', !hasItems);
-            
-            // LÓGICA DE EDICIÓN DE NOTA: Deshabilitar si hay ítems - ELIMINADA
-            // dom.noteInput.disabled = hasItems; 
 
             if (hasItems) {
                 const rowsHTML = appState.cart.map((item, index) => {
@@ -1162,10 +1217,6 @@
                 tbody.innerHTML = rowsHTML;
                 handlePartialSumChange();
             }
-            
-            // Actualizar datos de impresión (fecha y nota)
-            dom.printRefDate.textContent = getCurrentDateFormatted();
-            dom.printRefNote.textContent = appState.capitalNoteText; 
 
             saveAppState(); // Llama a saveData después de cada renderizado para asegurar la persistencia del ticket actual.
         }
@@ -1378,7 +1429,10 @@
                 renderSavedTickets();
                 showModal('#saved-tickets-modal');
             });
-            dom.printBtn.addEventListener('click', () => { window.print(); });
+            
+            // *** CAMBIO CLAVE: Usar la nueva función de impresión unificada ***
+            dom.printBtn.addEventListener('click', printCurrentTicket);
+            
             dom.logoDbTrigger.addEventListener('click', () => { dom.fileInput.click(); });
             dom.fileInput.addEventListener('change', handleFileUpload);
             
@@ -1553,4 +1607,3 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
-
