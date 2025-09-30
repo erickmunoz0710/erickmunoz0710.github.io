@@ -62,15 +62,15 @@
             body > div { min-height: auto !important; padding: 0 !important; }
             .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
             
-            /* --- SOLUCIÓN APLICADA AQUÍ --- */
+            /* --- CORRECCIÓN 1: Ticket Individual --- */
             main { 
                 padding: 0; 
-                visibility: visible !important; /* <--- Esto fuerza al ticket individual a mostrarse */
+                visibility: visible !important; /* Fuerza la visibilidad del ticket individual */
                 position: absolute;
                 left: 0;
                 top: 0;
             }
-            /* ---------------------------- */
+            /* -------------------------------------- */
             
             table { width: 100%; border-collapse: collapse; }
             /* Mostrar todas las columnas relevantes para impresión */
@@ -93,14 +93,18 @@
                 padding: 0;
                 font-size: 10pt; /* NUEVO: Letra base más pequeña para impresión */
             }
+            
+            /* --- CORRECCIÓN 2: Imprimir Todos (Para que el contenido no quede fuera de flujo) --- */
             .print-all-tickets-container {
                 visibility: visible !important;
-                position: absolute;
+                display: block !important; /* Asegura que se muestre como un bloque completo */
+                position: relative; /* Lo mantiene en el flujo normal del documento */
                 left: 0;
                 top: 0;
                 width: 100%;
-                font-size: 10pt; /* NUEVO: Letra base más pequeña para impresión consolidada */
+                font-size: 10pt; /* Letra base más pequeña para impresión consolidada */
             }
+            /* --------------------------------------------------------------------------------- */
             
             .ticket-break {
                 /* Forzar salto de página entre tickets, pero que no salte al inicio */
@@ -1549,3 +1553,4 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
