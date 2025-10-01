@@ -266,6 +266,7 @@
                         <tr>
                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref.</th>
                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha/Hora</th>
+<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                             <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
                             <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
@@ -882,7 +883,17 @@ function confirmClearCart() {
             const currentRef = appState.capitalNoteText;
             const existingTicketIndex = appState.savedTickets.findIndex(t => t.ref === currentRef);
 
+            // 🔹 Preguntar nombre SOLO si es nuevo
+            let customerName = "";
+            if (existingTicketIndex === -1) {
+                customerName = prompt("Ingresa el nombre del cliente para este ticket:");
+                if (!customerName) customerName = "SIN NOMBRE";
+            } else {
+                customerName = appState.savedTickets[existingTicketIndex].customer || "SIN NOMBRE";
+            }
+
             const ticketToSave = {
+                customer: customerName,
                 id: crypto.randomUUID(), // Nuevo ID para la versión guardada, ayuda a la unicidad
                 ref: currentRef,
                 date: new Date().toISOString(),
@@ -992,6 +1003,7 @@ function confirmClearCart() {
                 tbody.innerHTML = `<tr id="empty-saved-tickets-row"><td colspan="4" class="py-4 text-center text-gray-500">No hay tickets cerrados.</td></tr>`;
             } else {
                 const rowsHTML = appState.savedTickets.map(ticket => {
+                    const customerName = ticket.customer || "SIN NOMBRE";
                     const date = new Date(ticket.date);
                     const dateStr = date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
                     const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
@@ -1000,7 +1012,8 @@ function confirmClearCart() {
                         <tr class="hover:bg-gray-50 transition duration-150">
                             <td class="px-3 py-2 text-sm font-bold text-gray-800">${ticket.ref}</td>
                             <td class="px-3 py-2 text-sm text-gray-600 whitespace-nowrap">${dateStr} ${timeStr}</td>
-                            <td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
+                            <td class="px-3 py-2 text-sm text-gray-700">${customerName}</td>
+<td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
                             <td class="px-3 py-2 text-center flex justify-center space-x-2">
                                 <button onclick="loadSavedTicket('${ticket.id}')" class="text-white bg-indigo-500 hover:bg-indigo-600 p-1 rounded-md shadow-sm text-xs font-semibold">
                                     CARGAR
