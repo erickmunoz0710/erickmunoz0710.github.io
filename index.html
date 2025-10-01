@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,54 +8,179 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        /* Estilos personalizados */
+        /* Estilos personalizados para la animación del logo y impresión */
         @keyframes flameRise {
             0% { transform: translateY(0px) scaleX(1); opacity: 0.8; }
             50% { transform: translateY(-2px) scaleX(1.1); opacity: 1.0; }
             100% { transform: translateY(0px) scaleX(1); opacity: 0.7; }
         }
+        
         .flame-path { animation: flameRise 1.5s ease-in-out infinite alternate; }
         .flame-path-delay-1 { animation: flameRise 1.6s ease-in-out infinite alternate 0.2s; }
-        .flame-path-delay-2 { animation: flameRise 1.4s ease-in-out infinite alternate 0.4s; }.elegant-logo { color: #1f2937; text-shadow: 1px 1px 1px rgba(0,0,0,0.2), 0 0 1px #FF6347; font-weight: 900; letter-spacing: -0.1em; }
-
-    /* Impresión */
-    @media print {
-        .print\:hidden, header, footer, #empty-cart-message, #partial-sum-container, #total-display-container, #clear-cart-modal, #manual-price-modal, #saved-tickets-modal, #toast-message { display: none !important; visibility: hidden !important; }
-
-        body { background-color: transparent !important; box-shadow: none !important; padding:0!important; margin:0!important; font-size:10pt; }
-        main { display:none; visibility:hidden; }
-        .print-header { display:block!important; text-align:center; margin-bottom:20px; }
-
-        #ticket-table-container { display:block!important; visibility:visible!important; width:100%; font-size:10pt; }
-        main { display:block!important; visibility:visible!important; }
-
-        table { width:100%; border-collapse:collapse; }
-        .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow:none!important; background-color:transparent!important; }
-
-        #ticket-table thead th:nth-child(2), #ticket-table tbody td:nth-child(2) { display:none!important; }
-
-        .flex.items-center.justify-center.space-x-2.print\:hidden { display:none!important; }
-        #ticket-table .print\:inline { display:inline!important; font-size:10pt; }
-
-        .print-all-tickets-container { display:none!important; visibility:hidden!important; }
-        .print-all-tickets-container.printing { display:block!important; visibility:visible!important; position:absolute; left:0; top:0; width:100%; font-size:10pt; }
-        .print-all-tickets-container.printing ~ .min-h-screen > main { display:none!important; visibility:hidden!important; }
-
-        /* FIX: evitar empalme de títulos */
-        .print-all-tickets-container.printing ~ .print-header {
-            display: none !important;
-            visibility: hidden !important;
+        .flame-path-delay-2 { animation: flameRise 1.4s ease-in-out infinite alternate 0.4s; }
+        
+        .elegant-logo {
+            color: #1f2937; 
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2), 0 0 1px #FF6347;
+            font-weight: 900; 
+            letter-spacing: -0.1em; 
         }
 
-        .ticket-break { page-break-after: always; }
-        .ticket-break:last-child { page-break-after:auto; }
-    }
+        /* Oculta los spinners del input de cantidad */
+        .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .quantity-input {
+            -moz-appearance: textfield; /* Firefox */
+        }
 
-    .print-all-tickets-container { display:none; }
-</style>
+        /* ESTILO PARA EL BOTÓN DE VOZ ACTIVO (PULSO ROJO) */
+        .listening {
+            animation: pulse-red 1.5s infinite;
+        }
 
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); /* Rojo 500 */
+                transform: scale(1);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+                transform: scale(1.05);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+                transform: scale(1);
+            }
+        }
+        
+        /* Estilos de Impresión */
+        @media print {
+            /* 1. OCULTAR TODOS LOS CONTROLES Y NAVEGACIÓN (HEADER, FOOTER, MODALES) */
+            .print\:hidden, 
+            header, footer, #empty-cart-message, 
+            #partial-sum-container, #total-display-container,
+            #clear-cart-modal, #manual-price-modal, #saved-tickets-modal, 
+            #toast-message { 
+                display: none !important; 
+                visibility: hidden !important; 
+            }
+            
+            /* 2. REGLAS PARA IMPRESIÓN INDIVIDUAL (DEFAULT) */
+            body {
+                background-color: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                min-height: auto !important;
+                font-size: 10pt;
+            }
+            
+            /* OCULTAR MAIN POR DEFECTO. (Se hace visible para la impresión individual más adelante) */
+            main { 
+                display: none; 
+                visibility: hidden; 
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                background-color: transparent !important;
+            }
+
+            /* Mostrar la cabecera del ticket individual */
+            .print-header { 
+                display: block !important; 
+                text-align: center; 
+                margin-bottom: 20px; 
+            }
+            
+            /* 3. ESTILOS DE TABLA Y TICKET INDIVIDUAL */
+            #ticket-table-container {
+                /* Para impresión individual: forzamos a que el main y el contenedor se muestren */
+                display: block !important;
+                visibility: visible !important;
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none !important;
+                background-color: transparent !important;
+                font-size: 10pt;
+            }
+
+            /* HACK: Cuando imprimimos un ticket individual, hacemos visible el contenedor main */
+            #ticket-table-container, .print-header {
+                /* Si alguno de estos está siendo impreso, su padre 'main' debe ser visible. */
+                display: block !important;
+                visibility: visible !important;
+            }
+            main { 
+                /* Se hace visible el main cuando el contenedor del ticket está visible */
+                display: block !important; 
+                visibility: visible !important;
+            }
+            
+            table { width: 100%; border-collapse: collapse; }
+            .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow: none !important; background-color: transparent !important; }
+
+            /* Ocultar la columna de selección (checkbox) */
+            #ticket-table thead th:nth-child(2), 
+            #ticket-table tbody td:nth-child(2) {
+                display: none !important; 
+            }
+
+            /* Mostrar todas las columnas relevantes (Ajuste de anchos en impresión) */
+            th:nth-child(1), td:nth-child(1) { width: 5%; }
+            th:nth-child(3), td:nth-child(3) { display: table-cell; width: auto; text-align: left; }
+            th:nth-child(4), td:nth-child(4) { display: table-cell; width: 15%; text-align: center; } 
+            th:nth-child(5), td:nth-child(5) { display: table-cell; width: 15%; text-align: center; } 
+
+            /* Ocultar inputs, botones y sus contenedores, y mostrar el texto de cantidad */
+            .flex.items-center.justify-center.space-x-2.print\:hidden {
+                display: none !important;
+            }
+            #ticket-table .print\:inline {
+                display: inline !important;
+                font-size: 10pt;
+            }
+            
+            /* 4. REGLAS PARA IMPRESIÓN MASIVA (OCULTA EL MAIN DE LA PÁGINA) */
+            .print-all-tickets-container { 
+                display: none !important; 
+                visibility: hidden !important;
+            }
+
+            /* Cuando se está imprimiendo el corte de caja, forzamos la ocultación del main */
+            .print-all-tickets-container.printing {
+                display: block !important;
+                visibility: visible !important;
+                position: absolute; 
+                left: 0;
+                top: 0;
+                width: 100%;
+                font-size: 10pt; 
+            }
+            
+            /* CLAVE DEL ARREGLO CONTRA EL EMPALME: Ocultamos el main que es hermano del contenedor de impresión masiva */
+            .print-all-tickets-container.printing ~ .min-h-screen > main {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            .ticket-break { page-break-after: always; }
+            .ticket-break:last-child { page-break-after: auto; }
+        }
+        
+        /* Oculta el contenedor de impresión masiva por defecto */
+        .print-all-tickets-container {
+            display: none;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans antialiased"><div id="print-all-tickets-container" class="print-all-tickets-container"></div>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+    
+    <div id="print-all-tickets-container" class="print-all-tickets-container"></div>
 
     <div id="clear-cart-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
