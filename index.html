@@ -1066,20 +1066,28 @@
             `;
             
             container.innerHTML = allTicketsHTML;
-            
-            // **CLAVE DE IMPRESIÓN MASIVA: Agregar la clase para hacer visible el contenedor solo ahora**
-            container.classList.add('printing');
+    container.classList.add('printing');
 
-            // Disparar la impresión
-            window.print();
-            
-            // Limpiar el contenedor y remover la clase después de un breve retraso
-            setTimeout(() => {
-                container.innerHTML = '';
-                container.classList.remove('printing');
-            }, 500);
+    // 🔴 Quitar encabezado fijo antes de imprimir masivo
+    const fixedHeader = document.querySelector('.print-header');
+    let fixedHeaderParent = null;
+    if (fixedHeader) {
+        fixedHeaderParent = fixedHeader.parentNode;
+        fixedHeaderParent.removeChild(fixedHeader);
+    }
+
+    window.print();
+
+    setTimeout(() => {
+        container.innerHTML = '';
+        container.classList.remove('printing');
+
+        // 🔵 Restaurar encabezado fijo después
+        if (fixedHeader && fixedHeaderParent) {
+            fixedHeaderParent.insertBefore(fixedHeader, fixedHeaderParent.firstChild);
         }
-
+    }, 500);
+        }
 
         // ---------------------------------------------------------------------
         // 4. RENDERING (ACTUALIZACIÓN DEL DOM)
@@ -1445,7 +1453,6 @@
             
             // NUEVO: Botón Imprimir Todos
             dom.printAllTicketsBtn.addEventListener('click', printAllSavedTickets);
-
 
             // Modal de Borrado
             dom.confirmClearBtn.addEventListener('click', confirmClearCart); // Usa la función de confirmación limpia
