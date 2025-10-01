@@ -781,20 +781,33 @@
         /**
          * Elimina un artículo individual por su ID único.
          */
-        function removeItem(id) {
+        
+function removeItem(id) {
             const itemToRemove = appState.cart.find(item => item.id === id);
-            
             if (!itemToRemove) {
                  console.error(`Error: No se encontró el artículo con ID ${id}`);
                  return;
             }
-            
-            // Crea un nuevo array excluyendo el artículo con el ID proporcionado
+            // Eliminar el artículo del carrito
             appState.cart = appState.cart.filter(item => item.id !== id);
-            
             showMessage(`Se eliminó el código ${itemToRemove.code} del ticket.`, 'error');
+
+            // Si el carrito quedó vacío, eliminar el ticket guardado con la misma ref (si existe)
+            if (appState.cart.length === 0) {
+                const currentRef = appState.capitalNoteText;
+                const idx = appState.savedTickets.findIndex(t => t.ref === currentRef);
+                if (idx !== -1) {
+                    appState.savedTickets.splice(idx, 1);
+                    if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
+                    showMessage(`El ticket ${currentRef} quedó vacío y se eliminó de tickets guardados.`, 'error');
+                }
+                // Reiniciar la nota del ticket actual
+                appState.capitalNoteText = '#1';
+            }
+
             render();
         }
+
         
         // Función interna para limpiar el estado del ticket sin mensajes ni modales
         function _internalClearCart() {
@@ -812,12 +825,23 @@
             showClearCartModal();
         }
 
-        function confirmClearCart() {
+        
+function confirmClearCart() {
+            // Antes de limpiar, eliminar también el ticket guardado (si existe) con la misma ref
+            const currentRef = appState.capitalNoteText;
+            const idx = appState.savedTickets.findIndex(t => t.ref === currentRef);
+            if (idx !== -1) {
+                appState.savedTickets.splice(idx, 1);
+                if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
+                showMessage(`Se eliminó el ticket guardado ${currentRef} porque se borró todo su contenido.`, 'error');
+            }
+
             _internalClearCart();
             hideModal('#clear-cart-modal');
             showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
             render();
         }
+
 
         function handleManualPriceConfirm(code, price) {
             const validatedPrice = parseFloat(price);
