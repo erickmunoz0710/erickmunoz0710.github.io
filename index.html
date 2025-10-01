@@ -630,7 +630,7 @@
                 const storedProducts = localStorage.getItem(STORAGE_KEYS.PRODUCTS_DB);
                 if (storedProducts) {
                     appState.allProducts = JSON.parse(storedProducts);
-                    showMessage(`Base de datos restaurada desde la memoria local (${appState.allProducts.length} productos).`, 'info');
+                    showMessage(`Base de datos ${localStorage.getItem('lastFileName') || 'archivo desconocido'}.`, 'info');
                 } else {
                     // Si no hay DB guardada, cargar mock data y guardarla por primera vez
                     appState.allProducts = generateMockData();
@@ -1345,6 +1345,9 @@ function confirmClearCart() {
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            const fileName = file.name.replace(/\.[^/.]+$/, "");
+            localStorage.setItem('lastFileName', fileName);
+
             
             if (typeof window.XLSX === 'undefined') {
                 showMessage('La librería de XLSX aún no está cargada. Inténtalo de nuevo en un momento.', 'error');
