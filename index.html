@@ -418,7 +418,7 @@
         </main>
         
         <footer class="sticky bottom-0 bg-blue-900 text-white shadow-2xl print:hidden">
-            <div class="container mx-auto p-3 flex justify-between items-center">
+            <div class="container mx-auto p-2 flex justify-between items-center text-sm">
                 
                 <div class="flex items-center space-x-6 flex-shrink-0">
                     
@@ -443,7 +443,7 @@
                     <button
                         id="save-ticket-btn"
                         disabled
-                        class="flex items-center p-3 bg-green-500 text-white text-base font-bold rounded-lg shadow-md hover:bg-green-600 transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        class="flex items-center p-2 bg-green-500 text-white text-sm font-bold rounded-md shadow hover:bg-green-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                         title="Cerrar y guardar ticket (Nuevo Ticket)."
                     >
                         <i data-lucide="save" class="w-8 h-8"></i>
@@ -452,7 +452,7 @@
                     <button
                         id="print-btn"
                         disabled
-                        class="flex items-center p-3 bg-blue-500 text-white text-base font-bold rounded-lg shadow-md hover:bg-blue-600 transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        class="flex items-center p-2 bg-blue-500 text-white text-sm font-bold rounded-md shadow hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                         title="Imprimir Ticket"
                     >
                         <i data-lucide="printer" class="w-8 h-8"></i>
@@ -1012,7 +1012,7 @@ function confirmClearCart() {
                         <tr class="hover:bg-gray-50 transition duration-150">
                             <td class="px-3 py-2 text-sm font-bold text-gray-800">${ticket.ref}</td>
                             <td class="px-3 py-2 text-sm text-gray-600 whitespace-nowrap">${dateStr} ${timeStr}</td>
-                            <td class="px-3 py-2 text-sm text-gray-700">${customerName}</td>
+                            <td class="px-3 py-2 text-sm text-gray-700 uppercase">${customerName}</td>
 <td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
                             <td class="px-3 py-2 text-center flex justify-center space-x-2">
                                 <button onclick="loadSavedTicket('${ticket.id}')" class="text-white bg-indigo-500 hover:bg-indigo-600 p-1 rounded-md shadow-sm text-xs font-semibold">
