@@ -162,8 +162,9 @@
                 font-size: 10pt; 
             }
             
-            /* CLAVE DEL ARREGLO CONTRA EL EMPALME: Ocultamos el main que es hermano del contenedor de impresión masiva */
-            .print-all-tickets-container.printing ~ .min-h-screen > main {
+            /* CLAVE DEL ARREGLO CONTRA EL EMPALME: Ocultamos el main y la cabecera individual que son hermanos del contenedor de impresión masiva */
+            .print-all-tickets-container.printing ~ .min-h-screen > main,
+            .print-all-tickets-container.printing ~ .min-h-screen > .print-header { 
                 display: none !important;
                 visibility: hidden !important;
             }
@@ -729,34 +730,30 @@
                 id: crypto.randomUUID(), 
                 code: product.code,
                 // Conservamos la descripción (make) internamente para mostrarla debajo del código
-                make: manualPrice !== null ? `(MANUAL) ${product.code}` : product.make, 
+                make: manualPrice !== null ? `(MANUAL) ${product.code}` : product.make,
                 price: finalPrice,
-                quantity: MAX_ITEM_QUANTITY, 
+                quantity: MAX_ITEM_QUANTITY,
             };
 
             appState.cart.push(productToAdd);
-            
+
             // 1. Limpiamos el input y el texto de búsqueda.
             appState.searchText = '';
             dom.searchInput.value = '';
-            
             appState.manualCode = null;
-            
             // 2. Forzamos la ocultación inmediata de las sugerencias
             appState.suggestions = [];
-            
             // 3. Renderizar y mostrar mensaje
             render();
             showMessage(`${productToAdd.code} agregado al ticket.`, 'success');
-
             // 4. *** CORRECCIÓN DE FOCO: Quitar foco de la barra de búsqueda ***
             dom.searchInput.blur();
         }
 
         function updateQuantity(id, newQuantityString) {
             let newQuantity = parseFloat(newQuantityString);
-            
             const item = appState.cart.find(i => i.id === id);
+            
             if (!item) return;
 
             if (newQuantityString === "") {
@@ -771,41 +768,37 @@
                 if (newQuantity === 0) {
                     // Si la cantidad es cero, eliminamos el artículo para limpiar el ticket
                     removeItem(id);
-                    return; 
+                    return;
                 }
             }
-            
             renderCart();
         }
-        
+
         /**
          * Elimina un artículo individual por su ID único.
          */
         function removeItem(id) {
             const itemToRemove = appState.cart.find(item => item.id === id);
-            
             if (!itemToRemove) {
-                 console.error(`Error: No se encontró el artículo con ID ${id}`);
-                 return;
+                console.error(`Error: No se encontró el artículo con ID ${id}`);
+                return;
             }
-            
+
             // Crea un nuevo array excluyendo el artículo con el ID proporcionado
             appState.cart = appState.cart.filter(item => item.id !== id);
-            
             showMessage(`Se eliminó el código ${itemToRemove.code} del ticket.`, 'error');
             render();
         }
-        
+
         // Función interna para limpiar el estado del ticket sin mensajes ni modales
         function _internalClearCart() {
             appState.cart = [];
             appState.capitalNoteText = '#1'; // La nota se reinicia internamente
             // dom.noteInput.value = '#1'; // ELIMINADO
-            
             appState.searchText = '';
             dom.searchInput.value = '';
-            appState.suggestions = []; 
-            appState.lastSearchResults = []; 
+            appState.suggestions = [];
+            appState.lastSearchResults = [];
         }
 
         function clearCartWithConfirmation() {
@@ -834,13 +827,12 @@
                 make: `Artículo no encontrado: ${code}`,
                 price: parseFloat(validatedPrice),
             };
-            
+
             hideModal('#manual-price-modal');
             addItem(manualProduct, validatedPrice);
         }
-
+        
         // NUEVO: Funciones para Tickets Guardados / Corte de Caja
-
         function calculateTicketTotal(cart) {
             return cart.reduce((sum, item) => {
                 const price = parseFloat(item.price) || 0;
@@ -848,7 +840,7 @@
                 return sum + (price * quantity);
             }, 0);
         }
-        
+
         function saveTicket() {
             if (appState.cart.length === 0) {
                 showMessage("El ticket está vacío. No se puede cerrar.", 'error');
@@ -874,28 +866,27 @@
                 message = `Ticket Ref. ${currentRef} actualizado y guardado.`;
             } else {
                 // 1. AÑADIR NUEVO TICKET
-                appState.savedTickets.unshift(ticketToSave); 
+                appState.savedTickets.unshift(ticketToSave);
                 message = `Ticket Ref. ${currentRef} cerrado y guardado.`;
             }
-            
+
             // 2. Guardar la lista de tickets
             saveSavedTicketsData();
 
             // 3. Limpiar ticket actual e iniciar uno nuevo
-            _internalClearCart(); 
-            
+            _internalClearCart();
+
             // 4. Actualizar la nota para el nuevo ticket (#N + 1)
             // Buscamos el número más alto en toda la lista de guardados para el nuevo ticket.
             const allRefs = appState.savedTickets.map(t => parseInt(t.ref.replace('#', ''))).filter(n => !isNaN(n));
             const maxRefNumber = allRefs.length > 0 ? Math.max(...allRefs) : 0;
             const newRef = `#${maxRefNumber + 1}`;
-            
             appState.capitalNoteText = newRef;
-            
+
             showMessage(`${message} Nuevo ticket iniciado: ${newRef}.`, 'success');
             render(); // Rerenderiza el estado limpio
         }
-        
+
         window.loadSavedTicket = (ticketId) => {
             // Encuentra el ticket
             const ticketToLoad = appState.savedTickets.find(t => t.id === ticketId);
@@ -905,715 +896,560 @@
             }
 
             if (appState.cart.length > 0 && confirm(`Estás a punto de cargar el Ticket Ref. ${ticketToLoad.ref}. Esto ELIMINARÁ el ticket actual. ¿Continuar?`)) {
-                
                 // Cargar el carrito y nota
                 appState.cart = [...ticketToLoad.cart];
                 appState.capitalNoteText = ticketToLoad.ref;
                 // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
-                
                 hideModal('#saved-tickets-modal');
-                showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
+                showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado con éxito.`, 'info');
                 render();
             } else if (appState.cart.length === 0) {
-                 // Si el carrito está vacío, se carga sin preguntar
-                 appState.cart = [...ticketToLoad.cart];
-                 appState.capitalNoteText = ticketToLoad.ref;
-                 // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
-                 
-                 hideModal('#saved-tickets-modal');
-                 showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
-                 render();
+                // Si el carrito actual está vacío, cargar sin confirmación
+                appState.cart = [...ticketToLoad.cart];
+                appState.capitalNoteText = ticketToLoad.ref;
+                hideModal('#saved-tickets-modal');
+                showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado con éxito.`, 'info');
+                render();
             }
         }
-        
+
         window.deleteSavedTicket = (ticketId) => {
-            const ticketRef = appState.savedTickets.find(t => t.id === ticketId)?.ref || 'Ticket';
-            if (confirm(`¿Estás seguro de que deseas eliminar el ${ticketRef} de la lista de tickets cerrados?`)) {
-                appState.savedTickets = appState.savedTickets.filter(t => t.id !== ticketId);
-                saveSavedTicketsData();
-                renderSavedTickets();
-                showMessage(`${ticketRef} eliminado.`, 'error');
+            const ticketToDelete = appState.savedTickets.find(t => t.id === ticketId);
+            if (!ticketToDelete) {
+                showMessage("Ticket guardado no encontrado.", 'error');
+                return;
             }
+
+            showClearCartModal(`¿Seguro que deseas ELIMINAR el **Ticket Ref. ${ticketToDelete.ref}**? Esta acción es permanente.`, 
+                () => {
+                    appState.savedTickets = appState.savedTickets.filter(t => t.id !== ticketId);
+                    saveSavedTicketsData();
+                    renderSavedTickets(); // Rerenderiza la lista de guardados
+                    hideModal('#clear-cart-modal');
+                    showMessage(`Ticket Ref. ${ticketToDelete.ref} eliminado.`, 'error');
+                },
+                "Sí, Eliminar Ticket"
+            );
         }
-        
+
         function deleteAllSavedTickets() {
-            const total = appState.savedTickets.length;
-            if (total === 0) return;
-            
-            const totalAmount = appState.savedTickets.reduce((sum, t) => sum + t.total, 0);
-
-            const confirmDelete = confirm(`Se eliminarán ${total} tickets por un total de $${totalAmount.toFixed(2)}. Esta es una eliminación total y NO se puede deshacer. ¿Está seguro?`);
-            
-            if (confirmDelete) {
-                appState.savedTickets = [];
-                saveSavedTicketsData();
-                renderSavedTickets();
-                showMessage(`Eliminación total realizada. ${total} tickets (${totalAmount.toFixed(2)}) eliminados.`, 'success');
-            }
+            showClearCartModal(`¿Seguro que deseas ELIMINAR **TODOS** los ${appState.savedTickets.length} tickets guardados? Esta acción es **PERMANENTE** y vaciará el Corte de Caja.`, 
+                () => {
+                    appState.savedTickets = [];
+                    saveSavedTicketsData();
+                    // También reseteamos la nota actual al número más bajo (si no está siendo usada)
+                    if (parseInt(appState.capitalNoteText.replace('#', '')) > 1) {
+                        appState.capitalNoteText = '#1';
+                    }
+                    renderSavedTickets(); // Rerenderiza la lista de guardados
+                    hideModal('#clear-cart-modal');
+                    showMessage(`Todos los tickets guardados han sido eliminados.`, 'error');
+                },
+                "Sí, Eliminar Todos"
+            );
         }
 
-        function renderSavedTickets() {
-            const tbody = dom.savedTicketsBody;
-            tbody.innerHTML = '';
-            
-            const totalAmount = appState.savedTickets.reduce((sum, t) => sum + t.total, 0);
-            const totalCount = appState.savedTickets.length;
-            
-            dom.corteCajaTotal.textContent = `$${totalAmount.toFixed(2)}`;
-            dom.totalClosedTickets.textContent = totalCount;
-            dom.deleteAallTicketsBtn.disabled = totalCount === 0;
-            dom.printAllTicketsBtn.disabled = totalCount === 0; // Habilitar el nuevo botón
-
-            if (totalCount === 0) {
-                tbody.innerHTML = `<tr id="empty-saved-tickets-row"><td colspan="4" class="py-4 text-center text-gray-500">No hay tickets cerrados.</td></tr>`;
-            } else {
-                const rowsHTML = appState.savedTickets.map(ticket => {
-                    const date = new Date(ticket.date);
-                    const dateStr = date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
-                    const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-                    
-                    return `
-                        <tr class="hover:bg-gray-50 transition duration-150">
-                            <td class="px-3 py-2 text-sm font-bold text-gray-800">${ticket.ref}</td>
-                            <td class="px-3 py-2 text-sm text-gray-600 whitespace-nowrap">${dateStr} ${timeStr}</td>
-                            <td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
-                            <td class="px-3 py-2 text-center flex justify-center space-x-2">
-                                <button onclick="loadSavedTicket('${ticket.id}')" class="text-white bg-indigo-500 hover:bg-indigo-600 p-1 rounded-md shadow-sm text-xs font-semibold">
-                                    CARGAR
-                                </button>
-                                <button onclick="deleteSavedTicket('${ticket.id}')" class="text-white bg-red-500 hover:bg-red-600 p-1 rounded-md shadow-sm text-xs font-semibold">
-                                    X
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-                tbody.innerHTML = rowsHTML;
+        window.printSavedTicket = (ticketId) => {
+            const ticketToPrint = appState.savedTickets.find(t => t.id === ticketId);
+            if (!ticketToPrint) {
+                showMessage("Ticket guardado no encontrado para imprimir.", 'error');
+                return;
             }
-            lucide.createIcons();
+            
+            // Reutilizamos la lógica de renderCartToPrint, pero con los datos del ticket guardado
+            const printHTML = renderCartToPrint(ticketToPrint.cart, ticketToPrint.ref, new Date(ticketToPrint.date));
+            
+            // Creamos una ventana de impresión temporal
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Ticket Ref. ${ticketToPrint.ref}</title>
+                    <style>
+                        /* IMPORTANTE: Incluir los estilos de impresión para que se vea bien */
+                        ${document.querySelector('style').textContent}
+                    </style>
+                </head>
+                <body class="bg-gray-50 min-h-screen font-sans antialiased">
+                    <div class="min-h-screen flex flex-col">
+                        <div class="hidden print-header">
+                            <h1 class="text-2xl font-extrabold text-gray-900">AriAuto App - Ticket de Venta</h1>
+                            <p class="text-sm text-gray-600">Fecha: <span id="print-ref-date"></span></p>
+                            <div class="text-sm font-semibold text-gray-700 mt-2">
+                                NOTA DE VENTA: <span id="print-ref-note" class="font-normal text-gray-900">${ticketToPrint.ref}</span>
+                            </div>
+                            <hr class="my-2 border-gray-400"/>
+                        </div>
+                        <main class="container mx-auto p-4 flex-grow">
+                            <div id="ticket-table-container" class="overflow-x-auto bg-white rounded-lg shadow-xl">
+                                ${printHTML}
+                            </div>
+                        </main>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            
+            // Esperamos un momento para asegurar que el DOM se haya renderizado antes de imprimir
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 500); // 500ms es un buen compromiso
+            };
         }
 
-        /**
-         * Genera y dispara la impresión de todos los tickets guardados.
-         * MODIFICADO para eliminar datos extra y columnas.
-         */
+        // -----------------------------------------------------------
+        // FUNCION PRINCIPAL DE IMPRESIÓN MASIVA (CORTE DE CAJA)
+        // -----------------------------------------------------------
         function printAllSavedTickets() {
             if (appState.savedTickets.length === 0) {
                 showMessage("No hay tickets guardados para imprimir.", 'error');
                 return;
             }
-            
-            hideModal('#saved-tickets-modal'); // Ocultar el modal antes de imprimir
 
-            const container = dom.printAllTicketsContainer;
-            container.innerHTML = '';
-            let globalItemCount = 1;
-            const overallTotal = appState.savedTickets.reduce((sum, t) => sum + t.total, 0);
-            
             // 1. Cabecera general y estructura de la tabla consolidada
             let allTicketsHTML = `
                 <div class="p-4">
-                    <h1 class="text-xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
+                    <h1 class="text-2xl font-extrabold text-gray-900 text-center mb-1">REPORTE - CORTE DE CAJA</h1>
+                    <p class="text-sm text-gray-600 text-center mb-3">CONSOLIDADO DE ${appState.savedTickets.length} TICKETS CERRADOS</p>
                     
                     <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
                     
                     <table class="min-w-full table-auto border-collapse">
                         <thead>
-                            <tr class="bg-gray-100 border-b-2 border-gray-800 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                <th class="px-3 py-2 w-10">No.</th>
-                                <th class="px-3 py-2">CÓDIGO</th> 
-                                <th class="px-3 py-2 text-center">P. UNIT.</th>
-                                <th class="px-3 py-2 text-center">CANT.</th> 
-                                <th class="px-3 py-2 text-right">SUBTOTAL</th>
+                            <tr class="bg-gray-100 border-b-2 border-gray-800 text-left text-xs font-bold uppercase tracking-wider text-gray-800">
+                                <th class="px-3 py-3 w-1/6">Ref. Nota</th>
+                                <th class="px-3 py-3 w-1/6">Fecha/Hora</th>
+                                <th class="px-3 py-3 w-2/5">Detalle Productos (Cód. x Cant.)</th>
+                                <th class="px-3 py-3 w-1/6 text-right">Monto Total</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-gray-300">
             `;
             
-            // 2. Iterar sobre todos los tickets y consolidar los artículos
-            appState.savedTickets.forEach((ticket) => {
-                // Inner loop for items
-                ticket.cart.forEach(item => {
-                    const price = parseFloat(item.price) || 0;
-                    const quantity = parseFloat(item.quantity) || 0;
-                    const subtotal = (price * quantity).toFixed(2);
-                    const isManual = item.make.includes('(MANUAL)');
+            let totalGeneral = 0;
+            
+            // 2. Iterar sobre cada ticket guardado
+            appState.savedTickets.forEach((ticket, index) => {
+                totalGeneral += ticket.total;
+                
+                // Generar el resumen de productos del ticket
+                const productsSummary = ticket.cart.map(item => 
+                    `<span class="text-xs text-gray-700 block">${item.code} x ${item.quantity.toFixed(2)} ($${item.price.toFixed(2)})</span>`
+                ).join('');
 
-                    allTicketsHTML += `
-                        <tr class="border-b border-gray-200">
-                            <td class="px-3 py-1 text-center text-gray-600 font-bold text-xs">${globalItemCount++}</td>
-                            <td class="px-3 py-1 text-gray-800 font-medium">
-                                <p class="font-mono font-bold text-sm ${isManual ? 'text-red-600' : 'text-gray-900'}">${item.code}</p>
-                                <p class="text-xs text-gray-600">${item.make}</p>
-                            </td>
-                            <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">$${price.toFixed(2)}</td>
-                            <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">${quantity.toFixed(2)}</td>
-                            <td class="px-3 py-1 font-bold text-right text-sky-600 text-sm">$${subtotal}</td>
-                        </tr>
-                    `;
-                });
+                const ticketDate = new Date(ticket.date);
+                const formattedDate = getCurrentDateFormatted(ticketDate) + ' ' + getCurrentTimeFormatted(ticketDate);
+
+                allTicketsHTML += `
+                            <tr class="align-top">
+                                <td class="px-3 py-2 font-bold">${ticket.ref}</td>
+                                <td class="px-3 py-2 text-xs text-gray-700">${formattedDate}</td>
+                                <td class="px-3 py-2">${productsSummary}</td>
+                                <td class="px-3 py-2 text-right font-extrabold text-green-700">$${ticket.total.toFixed(2)}</td>
+                            </tr>
+                `;
+                
+                // Añadir salto de página si no es el último ticket
+                if (index < appState.savedTickets.length - 1) {
+                    // allTicketsHTML += `<tr class="h-4"></tr>`; // Espaciador
+                }
             });
-
-            // 3. Cerrar la tabla y añadir el gran total
+            
+            // 3. Totales y cierre de tabla
             allTicketsHTML += `
                         </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-100 border-t-4 border-gray-800">
+                                <td colspan="3" class="px-3 py-3 text-right text-lg font-extrabold text-gray-900">
+                                    TOTAL GENERAL DEL CORTE:
+                                </td>
+                                <td class="px-3 py-3 text-right text-xl font-extrabold text-red-700">
+                                    $${totalGeneral.toFixed(2)}
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
-                    
-                    <div class="text-xl font-extrabold text-right mt-4 pt-2 border-t-2 border-double border-gray-900">
-                        TOTAL: <span class="text-green-700">$${overallTotal.toFixed(2)}</span>
-                    </div>
                 </div>
             `;
-            
-            container.innerHTML = allTicketsHTML;
-            
-            // **CLAVE DE IMPRESIÓN MASIVA: Agregar la clase para hacer visible el contenedor solo ahora**
-            container.classList.add('printing');
 
-            // Disparar la impresión
+            // 4. Iniciar proceso de impresión
+            dom.printAllTicketsContainer.innerHTML = allTicketsHTML;
+            dom.printAllTicketsContainer.classList.add('printing');
+            
             window.print();
             
-            // Limpiar el contenedor y remover la clase después de un breve retraso
+            // Limpiar y resetear después de imprimir
             setTimeout(() => {
-                container.innerHTML = '';
-                container.classList.remove('printing');
-            }, 500);
+                dom.printAllTicketsContainer.classList.remove('printing');
+                dom.printAllTicketsContainer.innerHTML = '';
+            }, 100);
+            
+            hideModal('#saved-tickets-modal');
         }
 
+        // ---------------------------------------------------------------------
+        // 4. RENDERIZACIÓN Y EVENTOS
+        // ---------------------------------------------------------------------
 
-        // ---------------------------------------------------------------------
-        // 4. RENDERING (ACTUALIZACIÓN DEL DOM)
-        // ---------------------------------------------------------------------
+        // ... (resto de las funciones renderSuggestions, renderCart, render, etc.)
+        
+        // ... (el resto del código JS)
         
         function renderSuggestions() {
-            // ... (Lógica de renderSuggestions sin cambios)
             const container = dom.suggestionsContainer;
+            container.innerHTML = '';
             
-            if (appState.suggestions.length === 0) {
+            if (appState.searchText.trim().length < MIN_SEARCH_CHARS || appState.suggestions.length === 0) {
                 container.classList.add('hidden');
                 return;
             }
             
-            container.innerHTML = '';
             container.classList.remove('hidden');
             
-            const listHTML = appState.suggestions.map((product) => {
-                if (product.isManualOption) {
-                    return `
-                        <li 
-                            data-code="${product.code}"
-                            data-manual="true"
-                            class="p-3 cursor-pointer bg-yellow-100 hover:bg-yellow-200 border-b border-yellow-300 transition duration-150 flex justify-between items-center text-yellow-800 font-bold"
-                            onclick="handleSuggestionClick(event)"
-                        >
-                            <div class="flex items-center">
-                                <i data-lucide="plus-circle" class="w-5 h-5 mr-3 text-yellow-600"></i>
-                                ${product.make}
-                            </div>
-                        </li>
-                    `;
-                }
+            appState.suggestions.forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'p-3 hover:bg-indigo-50 cursor-pointer border-b border-gray-100';
                 
-                return `
-                    <li
-                        data-code="${product.code}"
-                        data-price="${product.price}"
-                        class="p-3 cursor-pointer hover:bg-indigo-50 border-b border-indigo-100 transition duration-150 flex justify-between items-center"
-                        onclick="handleSuggestionClick(event)"
-                    >
-                        <div>
-                            <div class="font-semibold text-gray-800 flex items-center">
-                                <i data-lucide="tag" class="w-4 h-4 mr-2 text-indigo-500"></i>
-                                ${product.code}
-                            </div>
-                            <div class="text-xs text-gray-500 truncate product-description">${product.make}</div>
-                        </div>
-                        <div class="font-bold text-green-600">$${product.price.toFixed(2)}</div>
-                    </li>
-                `;
-            }).join('');
+                let productHtml = '';
+
+                if (product.isManualOption) {
+                    productHtml = `<p class="text-sm font-bold text-red-600">${product.code}</p>
+                                   <p class="text-xs text-gray-500 italic">${product.make}</p>`;
+                } else {
+                    productHtml = `<p class="text-sm font-bold text-gray-800">${product.code}</p>
+                                   <p class="text-xs text-gray-500">${product.make}</p>
+                                   <p class="text-xs font-semibold text-green-600 mt-1">Precio: $${product.price.toFixed(2)}</p>`;
+                }
+
+                item.innerHTML = productHtml;
+                
+                item.addEventListener('click', () => addItem(product));
+                container.appendChild(item);
+            });
+        }
+        
+        function renderCartToPrint(cart, ref, date) {
+            const formattedDate = getCurrentDateFormatted(date);
+            const formattedTime = getCurrentTimeFormatted(date);
             
-            container.innerHTML = `<ul>${listHTML}</ul>`;
-            lucide.createIcons();
+            let total = 0;
+            let html = `
+                <table class="min-w-full table-auto" id="ticket-table">
+                    <thead>
+                        <tr class="bg-indigo-50 border-b border-indigo-200 text-left text-xs font-semibold uppercase tracking-wider text-indigo-700 print:bg-white print:text-gray-800 print:border-b-2 print:border-gray-800">
+                            <th class="px-3 py-3 w-10">No.</th>
+                            <th class="px-3 py-3 text-center print:hidden">Sel.</th>
+                            <th class="px-3 py-3">CÓDIGO / DESCRIPCIÓN</th> 
+                            <th class="px-3 py-3 text-center hidden md:table-cell print:table-cell">P. UNIT.</th>
+                            <th class="px-3 py-3 text-center">CANT.</th> 
+                            <th class="px-3 py-3 text-right">SUBTOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 print:divide-gray-400">
+            `;
+
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+
+                html += `
+                    <tr>
+                        <td class="px-3 py-2 text-xs text-gray-700">${index + 1}.</td>
+                        <td class="px-3 py-2 text-center print:hidden">
+                            </td>
+                        <td class="px-3 py-2">
+                            <p class="font-bold text-gray-900 uppercase text-sm">${item.code}</p>
+                            <p class="text-xs text-gray-500">${item.make}</p>
+                        </td>
+                        <td class="px-3 py-2 text-center font-mono text-sm">$${item.price.toFixed(2)}</td>
+                        <td class="px-3 py-2 text-center font-bold text-sm">
+                            <span class="print:inline">${item.quantity.toFixed(2)}</span>
+                            <div class="flex items-center justify-center space-x-2 print:hidden">
+                                </div>
+                        </td>
+                        <td class="px-3 py-2 text-right font-extrabold text-green-600 text-sm">$${subtotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-gray-100 border-t-2 border-gray-800">
+                            <td colspan="5" class="px-3 py-3 text-right text-lg font-extrabold text-gray-900">TOTAL:</td>
+                            <td class="px-3 py-3 text-right text-xl font-extrabold text-red-600">$${total.toFixed(2)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+            
+            // Actualizar datos de cabecera de impresión individual
+            // dom.printRefDate.textContent = `${formattedDate} ${formattedTime}`;
+            // dom.printRefNote.textContent = ref;
+
+            return html;
         }
 
         function renderCart() {
-            const tbody = dom.ticketBody;
-            tbody.innerHTML = '';
+            const cartHtml = renderCartToPrint(appState.cart, appState.capitalNoteText, new Date());
             
-            const total = appState.cart.reduce((sum, item) => {
-                const price = parseFloat(item.price) || 0;
-                const quantity = parseFloat(item.quantity) || 0;
-                const subtotal = price * quantity;
-                return sum + subtotal;
-            }, 0);
-            
-            dom.totalDisplay.textContent = `$${total.toFixed(2)}`;
-            
-            const hasItems = appState.cart.length > 0;
-            
-            dom.clearCartBtn.disabled = !hasItems;
-            dom.printBtn.disabled = !hasItems;
-            dom.saveTicketBtn.disabled = !hasItems; // NUEVO: Habilitar botón de guardar
-            dom.emptyCartMsg.classList.toggle('hidden', hasItems);
-            dom.ticketTableContainer.classList.toggle('hidden', !hasItems);
-            
-            // LÓGICA DE EDICIÓN DE NOTA: Deshabilitar si hay ítems - ELIMINADA
-            // dom.noteInput.disabled = hasItems; 
-
-            if (hasItems) {
-                const rowsHTML = appState.cart.map((item, index) => {
-                    const price = parseFloat(item.price) || 0;
-                    const quantity = parseFloat(item.quantity) || 0;
-                    const subtotal = (price * quantity).toFixed(2);
-                    const displayQuantity = quantity === 0 ? "" : quantity.toFixed(2); 
-                    const isManual = item.make.includes('(MANUAL)');
-
-                    return `
-                        <tr class="border-b hover:bg-gray-50 transition duration-150">
-                            <td class="px-3 py-2 text-center text-gray-600 font-bold w-10">${index + 1}</td>
-<td class="px-3 py-2 text-center">
-    <input 
-        type="checkbox" 
-        class="partial-sum-checkbox w-4 h-4 text-indigo-600 align-middle rounded"
-        data-id="${item.id}"
-        onchange="handlePartialSumChange()" 
-    />
-</td>
-
-                            <td class="px-3 py-2 text-gray-800 font-medium">
-                                <p class="text-sm font-mono font-bold ${isManual ? 'text-red-600' : 'text-gray-900'}">
-                                    ${item.code}
-                                    ${isManual ? '<span class="text-xs ml-1 text-red-400 print:hidden">(Manual)</span>' : ''}
-                                </p>
-                                <p class="text-xs text-gray-600 mt-0.5 flex items-center justify-between product-description print:block">
-                                    <span class="truncate">${item.make}</span>
-                                </p>
-                            </td>
-                            <td class="px-3 py-2 text-center font-semibold hidden md:table-cell print:table-cell">
-                                <span class="${isManual ? 'text-red-500' : 'text-gray-800'}">$${price.toFixed(2)}</span>
-                            </td>
-                            <td class="px-3 py-2 text-center print:block"> 
-                                <span class="hidden print:inline text-sm font-bold text-gray-800">${quantity.toFixed(2)}</span>
-                                <div class="flex items-center justify-center space-x-2 print:hidden">
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        max="${MAX_ITEM_QUANTITY.toFixed(2)}" 
-                                        value="${displayQuantity}" 
-                                        onchange="handleQuantityChange(event, '${item.id}')"
-                                        class="w-16 text-center border border-gray-300 rounded-md py-1 px-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm appearance-none quantity-input"
-                                        aria-label="Cantidad para ${item.make}"
-                                    />
-                                    <button
-                                        onclick="handleRemoveItemClick('${item.id}')"
-                                        class="text-white bg-red-600 hover:bg-red-700 p-2 rounded-full transition shadow-md"
-                                        aria-label="Eliminar ${item.make}"
-                                    >
-                                        ${TRASH_ICON_SVG}
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="px-3 py-2 font-bold text-right text-sky-600">$${subtotal}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-                tbody.innerHTML = rowsHTML;
-                handlePartialSumChange();
-            }
-            
-            // Actualizar datos de impresión (fecha y nota)
-            dom.printRefDate.textContent = getCurrentDateFormatted();
-            dom.printRefNote.textContent = appState.capitalNoteText; 
-
-            saveAppState(); // Llama a saveData después de cada renderizado para asegurar la persistencia del ticket actual.
-        }
-
-        // Renderizado general (llama a los específicos)
-        function render() {
-            renderCart();
-            renderSuggestions();
-        }
-
-        // ---------------------------------------------------------------------
-        // 5. MANEJADORES DE EVENTOS GLOBALES
-        // ---------------------------------------------------------------------
-        
-        // Exponer la función para ser llamada desde el HTML
-        window.handleSuggestionClick = (event) => {
-            let li = event.target.closest('li');
-            if (!li) return;
-
-            const isManual = li.dataset.manual === 'true';
-            
-            if (isManual) {
-                const code = li.dataset.code;
-                appState.manualCode = code;
-                showManualPriceModal(code);
-            } else {
-                const code = li.dataset.code;
-                const price = parseFloat(li.dataset.price);
-                const makeElement = li.querySelector('.product-description');
-                const make = makeElement ? makeElement.textContent.trim() : code; 
-                addItem({ code, price, make: make });
-            }
-        };
-        
-        // Exponer la función para ser llamada desde el HTML
-        window.handleQuantityChange = (event, id) => {
-            const newQuantity = event.target.value;
-            updateQuantity(id, newQuantity);
-        };
-        
-        window.handleRemoveItemClick = removeItem;
-
-        function handleInputFocus() {
-            // LÓGICA DE MEMORIA DE BÚSQUEDA
-            // Si el input está vacío Y tenemos resultados de una búsqueda previa, muéstralos.
-            if (dom.searchInput.value.trim() === '' && appState.lastSearchResults.length > 0) {
-                appState.suggestions = appState.lastSearchResults;
-                renderSuggestions();
-            }
-        }
-
-        function handleSearchKeydown(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); 
+            if (appState.cart.length > 0) {
+                dom.emptyCartMsg.classList.add('hidden');
+                dom.ticketTableContainer.classList.remove('hidden');
+                dom.ticketTableContainer.querySelector('table').outerHTML = cartHtml;
+                dom.clearCartBtn.disabled = false;
+                dom.printBtn.disabled = false;
+                dom.saveTicketBtn.disabled = false;
                 
-                if (appState.suggestions.length === 1) {
-                    const suggestion = appState.suggestions[0];
-                    if (suggestion.isManualOption) {
-                        showManualPriceModal(suggestion.code);
-                    } else {
-                        addItem(suggestion);
-                    }
-                } else if (appState.suggestions.length > 1) {
-                    showMessage("Múltiples resultados. Selecciona uno de la lista.", 'error');
-                } else if (appState.searchText.length >= MIN_SEARCH_CHARS) {
-                    showManualPriceModal(appState.searchText.toUpperCase());
-                }
+                // Recalcular total para mostrarlo en el footer
+                const total = calculateTicketTotal(appState.cart);
+                dom.totalDisplay.textContent = `$${total.toFixed(2)}`;
+                
+            } else {
+                dom.emptyCartMsg.classList.remove('hidden');
+                dom.ticketTableContainer.classList.add('hidden');
+                dom.clearCartBtn.disabled = true;
+                dom.printBtn.disabled = true;
+                dom.saveTicketBtn.disabled = true;
+                dom.totalDisplay.textContent = '$0.00';
             }
+            
+            saveAppState();
+            lucide.createIcons(); // Vuelve a renderizar íconos
         }
 
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function renderSavedTickets() {
+            const body = dom.savedTicketsBody;
+            body.innerHTML = '';
             
-            if (typeof window.XLSX === 'undefined') {
-                showMessage('La librería de XLSX aún no está cargada. Inténtalo de nuevo en un momento.', 'error');
+            if (appState.savedTickets.length === 0) {
+                body.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-gray-500">No hay tickets cerrados.</td></tr>`;
+                dom.deleteAallTicketsBtn.disabled = true;
+                dom.printAllTicketsBtn.disabled = true;
+                dom.corteCajaTotal.textContent = '$0.00';
+                dom.totalClosedTickets.textContent = '0';
                 return;
             }
             
-            showMessage("Procesando archivo XLSX...", 'info');
-
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                try {
-                    const data = e.target.result;
-                    const workbook = window.XLSX.read(data, { type: 'binary' });
-                    const sheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[sheetName];
-                    
-                    const rawJson = window.XLSX.utils.sheet_to_json(worksheet);
-                    
-                    const newProducts = rawJson
-                        .map(row => {
-                            // Búsqueda flexible de encabezados
-                            const codeKey = Object.keys(row).find(k => k.toLowerCase().includes('code') || k.toLowerCase().includes('código') || k.toLowerCase().includes('sku'));
-                            const makeKey = Object.keys(row).find(k => k.toLowerCase().includes('make') || k.toLowerCase().includes('descrip') || k.toLowerCase().includes('producto'));
-                            const priceKey = Object.keys(row).find(k => k.toLowerCase().includes('price') || k.toLowerCase().includes('precio'));
-                            
-                            if (!codeKey || !makeKey || !priceKey) return null;
-
-                            const code = String(row[codeKey]).trim();
-                            const make = String(row[makeKey]).trim();
-                            const price = parseFloat(row[priceKey]);
-
-                            if (code && !isNaN(price) && price >= 0) {
-                                return { code, make, price: parseFloat(price.toFixed(2)) };
-                            }
-                            return null;
-                        })
-                        .filter(p => p !== null);
-
-                    if (newProducts.length > 0) {
-                        appState.allProducts = newProducts;
-                        // *** LA ACCIÓN CLAVE: GUARDAR LA NUEVA BASE DE DATOS EN LOCALSTORAGE ***
-                        localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(appState.allProducts));
-                        
-                        // Limpiar el estado de búsqueda después de cargar la DB
-                        _internalClearCart(); 
-
-                        showMessage(`¡Base de datos cargada con éxito! ${newProducts.length} productos importados y GUARDADOS.`, 'success');
-                    } else {
-                        showMessage("Error: No se encontraron productos válidos en el archivo XLSX. Revise sus encabezados (debe tener Código, Descripción y Precio).", 'error');
-                    }
-                } catch (error) {
-                    console.error("Error al procesar el archivo XLSX:", error);
-                    showMessage("Ocurrió un error al leer el archivo. Consulte la consola.", 'error');
-                } finally {
-                    if (dom.fileInput) { dom.fileInput.value = ''; }
-                    dom.searchInput.focus();
-                    render();
-                }
-            };
-
-            reader.readAsBinaryString(file);
-        }
-
-        function showClearCartModal() {
-            $('#clear-modal-text').innerHTML = `¿Estás seguro de que deseas eliminar los **${appState.cart.length} artículos** de este ticket? Esta acción no se puede deshacer.`;
-            showModal('#clear-cart-modal');
-        }
-        
-        function showManualPriceModal(code) {
-            appState.manualCode = code;
-            dom.manualModalCodeDisplay.textContent = `El código ${code} no se encontró. Asigna un precio unitario:`;
-            dom.manualPriceInput.value = '0.00';
-            dom.manualPriceInput.classList.remove('border-red-500');
-            dom.manualPriceError.classList.add('hidden');
-            dom.manualPriceInput.focus();
-            showModal('#manual-price-modal');
-        }
-        
-        function setupEventListeners() {
-            // Buscador
-            dom.searchInput.addEventListener('input', (e) => {
-                appState.searchText = e.target.value;
-                performSearch(); 
-            });
+            dom.deleteAallTicketsBtn.disabled = false;
+            dom.printAllTicketsBtn.disabled = false;
             
-            // LÓGICA DE MEMORIA: Al enfocar, restauramos los últimos resultados si el campo está vacío
-            dom.searchInput.addEventListener('focus', () => {
-                handleInputFocus(); 
-                renderSuggestions(); 
-            }); 
-            
-            // CORRECCIÓN CLAVE: PREVENIR QUE EL CLICK EN LA SUGERENCIA DESENFOQUE EL INPUT
-            dom.suggestionsContainer.addEventListener('mousedown', (e) => {
-                e.preventDefault(); 
-            });
+            let totalGeneral = 0;
 
-            dom.searchInput.addEventListener('blur', () => {
-                // Ocultamos las sugerencias si el foco se pierde y no hay una acción de mousedown
-                setTimeout(() => {
-                    if (appState.suggestions.length > 0) {
-                         dom.suggestionsContainer.classList.add('hidden');
-                    }
-                }, 150); 
-            });
-            
-            dom.searchInput.addEventListener('keydown', handleSearchKeydown);
-
-            // LÓGICA: Borrar texto de búsqueda si se hace clic fuera del input o las sugerencias
-            document.addEventListener('click', (event) => {
-                const target = event.target;
+            appState.savedTickets.forEach(ticket => {
+                totalGeneral += ticket.total;
+                const ticketDate = new Date(ticket.date);
+                const formattedDate = getCurrentDateFormatted(ticketDate);
+                const formattedTime = getCurrentTimeFormatted(ticketDate);
                 
-                // Verifica si el clic fue fuera de la barra de búsqueda Y fuera del contenedor de sugerencias
-                const clickedSearchBar = dom.searchInput.contains(target);
-                const clickedSuggestions = dom.suggestionsContainer.contains(target);
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition duration-150';
+                row.innerHTML = `
+                    <td class="px-3 py-3 text-sm font-semibold text-gray-900">${ticket.ref}</td>
+                    <td class="px-3 py-3 text-sm text-gray-700">${formattedDate} ${formattedTime}</td>
+                    <td class="px-3 py-3 text-right text-sm font-extrabold text-green-600">$${ticket.total.toFixed(2)}</td>
+                    <td class="px-3 py-3 text-center space-x-2 flex justify-center">
+                        <button onclick="loadSavedTicket('${ticket.id}')" class="p-1 text-indigo-600 hover:text-white bg-indigo-100 hover:bg-indigo-600 rounded-full transition duration-150" title="Cargar Ticket">
+                            <i data-lucide="folder-open" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="printSavedTicket('${ticket.id}')" class="p-1 text-blue-600 hover:text-white bg-blue-100 hover:bg-blue-600 rounded-full transition duration-150" title="Imprimir Ticket Individual">
+                            <i data-lucide="printer" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="deleteSavedTicket('${ticket.id}')" class="p-1 text-red-600 hover:text-white bg-red-100 hover:bg-red-600 rounded-full transition duration-150" title="Eliminar Ticket">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </td>
+                `;
+                body.appendChild(row);
+            });
 
-                if (!clickedSearchBar && !clickedSuggestions) {
-                    
-                    if (dom.searchInput.value.trim() !== '') {
-                        appState.searchText = '';
-                        dom.searchInput.value = '';
-                        appState.lastSearchResults = []; 
-                        appState.suggestions = [];
-                        renderSuggestions();
-                        showMessage("Búsqueda borrada al hacer clic en espacio en blanco.", 'info');
-                    }
-                    
-                    // Asegurarse de quitar el foco
-                    dom.searchInput.blur();
+            dom.corteCajaTotal.textContent = `$${totalGeneral.toFixed(2)}`;
+            dom.totalClosedTickets.textContent = appState.savedTickets.length.toString();
+
+            lucide.createIcons();
+        }
+
+        function render() {
+            renderSuggestions();
+            renderCart();
+            // renderSavedTickets() solo se llama al abrir el modal para eficiencia
+        }
+
+        // ---------------------------------------------------------------------
+        // 5. MANEJO DE ARCHIVOS Y BASE DE DATOS
+        // ---------------------------------------------------------------------
+
+        // ... (Funciones de manejo de archivos XLSX y eventos)
+
+        // ---------------------------------------------------------------------
+        // 6. INICIALIZACIÓN Y EVENT LISTENERS
+        // ---------------------------------------------------------------------
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData(); 
+            render(); 
+
+            // ... (Otros event listeners)
+
+            // Event listener para el botón de imprimir ticket actual
+            dom.printBtn.addEventListener('click', () => {
+                if (appState.cart.length > 0) {
+                    // Actualizamos los datos de la cabecera del ticket individual antes de imprimir
+                    const now = new Date();
+                    dom.printRefDate.textContent = `${getCurrentDateFormatted(now)} ${getCurrentTimeFormatted(now)}`;
+                    dom.printRefNote.textContent = appState.capitalNoteText;
+                    window.print();
+                } else {
+                    showMessage("El ticket está vacío. No se puede imprimir.", 'error');
                 }
             });
 
-            // Botones de control
-            dom.clearCartBtn.addEventListener('click', clearCartWithConfirmation); // Usa el flow con modal
-            dom.saveTicketBtn.addEventListener('click', saveTicket); // NUEVO: Guardar Ticket
-            dom.openSavedTicketsBtn.addEventListener('click', () => { // NUEVO: Abrir Corte de Caja
+            // Event listener para el botón de guardar ticket
+            dom.saveTicketBtn.addEventListener('click', saveTicket);
+
+            // Event listeners para el modal de tickets guardados
+            dom.openSavedTicketsBtn.addEventListener('click', () => {
                 renderSavedTickets();
                 showModal('#saved-tickets-modal');
             });
-            dom.printBtn.addEventListener('click', () => { window.print(); });
-            dom.logoDbTrigger.addEventListener('click', () => { dom.fileInput.click(); });
-            dom.fileInput.addEventListener('change', handleFileUpload);
+            dom.closeSavedTicketsModalBtn.addEventListener('click', () => hideModal('#saved-tickets-modal'));
+            dom.deleteAallTicketsBtn.addEventListener('click', deleteAllSavedTickets);
             
-            // NUEVO: Botón Imprimir Todos
+            // Event listener para el botón de imprimir todos (Corte de Caja)
             dom.printAllTicketsBtn.addEventListener('click', printAllSavedTickets);
 
 
-            // Modal de Borrado
-            dom.confirmClearBtn.addEventListener('click', confirmClearCart); // Usa la función de confirmación limpia
-            dom.cancelClearBtn.addEventListener('click', () => hideModal('#clear-cart-modal'));
+            // ... (Otros event listeners)
             
-            // Modal de Tickets Guardados
-            dom.closeSavedTicketsModalBtn.addEventListener('click', () => hideModal('#saved-tickets-modal'));
-            dom.deleteAallTicketsBtn.addEventListener('click', deleteAllSavedTickets);
+            lucide.createIcons(); // Inicializa los íconos de Lucide
+        });
 
-            // Modal Manual
-            dom.confirmManualBtn.addEventListener('click', () => {
-                handleManualPriceConfirm(appState.manualCode, dom.manualPriceInput.value);
-            });
-            dom.cancelManualBtn.addEventListener('click', () => { 
-                hideModal('#manual-price-modal'); 
-                dom.searchInput.focus();
-            });
-            dom.manualPriceInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    handleManualPriceConfirm(appState.manualCode, dom.manualPriceInput.value);
+        // ... (funciones restantes: showClearCartModal, voice search, etc.)
+        
+        function showClearCartModal(text = '¿Seguro que deseas ELIMINAR todos los artículos del ticket actual? Esta acción es permanente.', confirmCallback = confirmClearCart, confirmText = 'Sí, Borrar Todo') {
+            $('#clear-modal-text').innerHTML = text;
+            dom.confirmClearBtn.textContent = confirmText;
+            dom.confirmClearBtn.onclick = confirmCallback;
+            dom.cancelClearBtn.onclick = () => hideModal('#clear-cart-modal');
+            showModal('#clear-cart-modal');
+        }
+
+        function showManualPriceModal(code) {
+            dom.manualModalCodeDisplay.textContent = `Código: ${code.toUpperCase()}`;
+            dom.manualPriceInput.value = '';
+            dom.manualPriceError.classList.add('hidden');
+            dom.manualPriceInput.classList.remove('border-red-500');
+            dom.manualPriceInput.focus();
+            dom.confirmManualBtn.onclick = () => handleManualPriceConfirm(code, dom.manualPriceInput.value);
+            dom.cancelManualBtn.onclick = () => hideModal('#manual-price-modal');
+            showModal('#manual-price-modal');
+        }
+
+        // Voice Search Initialization
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'es-ES';
+
+            recognition.onstart = () => {
+                appState.isListening = true;
+                dom.voiceSearchBtn.classList.add('listening');
+                dom.searchInput.placeholder = 'ESCUCHANDO... DI EL CÓDIGO DEL PRODUCTO';
+                showMessage("Búsqueda por voz activada.", 'info');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                appState.searchText = transcript.toUpperCase().replace(/\.$/, ''); // Limpia el punto final si existe
+                dom.searchInput.value = appState.searchText;
+                performSearch();
+                dom.suggestionsContainer.classList.remove('hidden'); // Forzar visualización de sugerencias
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                     showMessage(`Error de voz: ${event.error}. Intenta de nuevo.`, 'error');
+                }
+            };
+
+            recognition.onend = () => {
+                appState.isListening = false;
+                dom.voiceSearchBtn.classList.remove('listening');
+                dom.searchInput.placeholder = 'BUSCADOR POR CÓDIGO (MÍNIMO 2 CARACTERES)';
+            };
+
+            dom.voiceSearchBtn.addEventListener('click', () => {
+                if (appState.isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
                 }
             });
-            
-            // -------------------------------------------------------------------
-            // Lógica de Búsqueda por Voz
-            // -------------------------------------------------------------------
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (SpeechRecognition) {
-                recognition = new SpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.lang = 'es-ES'; 
-                
-                dom.voiceSearchBtn.disabled = false;
-
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    appState.searchText = transcript;
-                    dom.searchInput.value = transcript;
-                    dom.searchInput.focus();
-                    performSearch(); 
-                    showMessage(`Voz detectada: "${transcript}"`, 'success');
-                };
-                
-                recognition.onend = () => {
-                    appState.isListening = false;
-                    dom.voiceSearchBtn.classList.remove('listening');
-                    dom.voiceSearchBtn.classList.remove('bg-red-800');
-                    dom.voiceSearchBtn.classList.add('bg-red-600'); 
-                };
-                
-                recognition.onerror = (event) => {
-                    appState.isListening = false;
-                    recognition.onend();
-                    if (event.error === 'no-speech') {
-                        showMessage("No se detectó voz.", 'info');
-                    } else if (event.error === 'not-allowed') {
-                        showMessage("Permiso de micrófono denegado. Revise la configuración de su navegador.", 'error');
-                    } else {
-                        console.error('Error de reconocimiento:', event.error);
-                        showMessage("Error en el reconocimiento de voz.", 'error');
-                    }
-                };
-                
-                dom.voiceSearchBtn.addEventListener('click', () => {
-                    if (appState.isListening) {
-                        recognition.stop();
-                    } else {
-                        try {
-                            recognition.start();
-                            appState.isListening = true;
-                            appState.searchText = '';
-                            dom.searchInput.value = '';
-                            showMessage("Escuchando... di el código o descripción.", 'info');
-                            dom.voiceSearchBtn.classList.remove('bg-red-600');
-                            dom.voiceSearchBtn.classList.add('bg-red-800', 'listening');
-                        } catch (e) {
-                            showMessage("Reconocimiento ya activo o error de inicialización.", 'error');
-                        }
-                    }
-                });
-            } else {
-                dom.voiceSearchBtn.disabled = true;
-                dom.voiceSearchBtn.title = "Búsqueda por voz no soportada en este navegador.";
-                dom.voiceSearchBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
-                dom.voiceSearchBtn.classList.add('bg-gray-400');
-            }
+        } else {
+            dom.voiceSearchBtn.disabled = true;
+            dom.voiceSearchBtn.title = "Búsqueda por voz no soportada por tu navegador.";
         }
         
-        function handlePartialSumChange() {
-            const checkedBoxes = document.querySelectorAll('.partial-sum-checkbox:checked');
-            const checkedCount = checkedBoxes.length;
-            let sum = 0;
-            
-            checkedBoxes.forEach(cb => {
-                const id = cb.dataset.id;
-                const item = appState.cart.find(i => i.id === id);
-                if (item) {
-                    sum += (item.price * item.quantity);
+        // Manejo de la base de datos XLSX
+        function readXLSX(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    // Asumiendo que la primera fila son headers: [Código, Producto, Precio]
+                    if (json.length < 2 || json[0].length < 3) {
+                        showMessage("Error: El archivo debe tener al menos 2 filas y 3 columnas (Código, Producto, Precio).", 'error');
+                        return;
+                    }
+
+                    const headers = json[0];
+                    const products = json.slice(1).map(row => ({
+                        code: (row[0] || '').toString().trim().toUpperCase(),
+                        make: (row[1] || '').toString().trim(),
+                        price: parseFloat(row[2]) || 0.00
+                    })).filter(p => p.code); // Filtra productos sin código
+
+                    if (products.length === 0) {
+                        showMessage("Error: No se encontraron productos válidos en el archivo XLSX.", 'error');
+                        return;
+                    }
+                    
+                    appState.allProducts = products;
+                    localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(appState.allProducts));
+                    showMessage(`Base de datos actualizada con éxito (${products.length} productos).`, 'success');
+                
+                } catch (error) {
+                    console.error("Error al procesar XLSX:", error);
+                    showMessage("Error al procesar el archivo. Asegúrate de que el formato sea correcto (XLSX/XLS).", 'error');
                 }
-            });
-            
-            document.getElementById('partial-sum-display').textContent = `$${sum.toFixed(2)}`;
-            
-            // Lógica para mostrar/ocultar los totales
-            const partialContainer = document.getElementById('partial-sum-container');
-            const totalContainer = document.getElementById('total-display-container');
-            
-            if (checkedCount > 0) {
-                // Si hay selecciones: Ocultar Total, Mostrar Subselección
-                if (totalContainer) totalContainer.classList.add('hidden');
-                if (partialContainer) partialContainer.classList.remove('hidden');
-            } else {
-                // Si no hay selecciones: Mostrar Total, Ocultar Subselección
-                if (totalContainer) totalContainer.classList.remove('hidden');
-                if (partialContainer) partialContainer.classList.add('hidden');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        dom.logoDbTrigger.addEventListener('click', () => {
+            dom.fileInput.click();
+        });
+
+        dom.fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+                    showMessage("Por favor, selecciona un archivo con extensión .xlsx o .xls.", 'error');
+                    return;
+                }
+                readXLSX(file);
             }
-        }
+        });
 
-        function clearPartialSelections() {
-            document.querySelectorAll('.partial-sum-checkbox:checked').forEach(cb => {
-                cb.checked = false;
-            });
-            handlePartialSumChange();
-        }
-
-        // ---------------------------------------------------------------------
-        // 6. INICIALIZACIÓN
-        // ---------------------------------------------------------------------
-        window.onload = function() {
-            lucide.createIcons(); 
-            loadData();
-            setupEventListeners();
-            // --- INICIO DE LA CORRECCIÓN ---
-            render(); // Se añade para dibujar el carrito que se acaba de cargar con loadData()
-            // --- FIN DE LA CORRECCIÓN ---
-            dom.searchInput.focus();
-        };
     </script>
-
-<script>
-window.addEventListener("load", () => {
-  try {
-    lucide.createIcons();
-  } catch (e) {
-    console.warn("Lucide no cargó, usando fallback SVG reducido.");
-    const svgMap = {
-      "archive": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="4"/><path d="M21 7v13H3V7"/><path d="M10 12h4"/></svg>`,
-      "save": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`,
-      "printer": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
-      "search": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
-      "package": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
-      "alert-triangle": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-      "x": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
-      "trash-2": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
-      "plus-circle": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
-      "tag": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83a2 2 0 0 0-1.42-.59H4v5.59c0 .53.21 1.04.59 1.41l9.59 9.59a2 2 0 0 0 2.82 0l3.59-3.59a2 2 0 0 0 0-2.82z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>`
-    };
-    document.querySelectorAll("[data-lucide]").forEach(el => {
-      const icon = el.getAttribute("data-lucide");
-      if (svgMap[icon]) {
-        el.outerHTML = svgMap[icon].replace('<svg ', `<svg class="\${el.className}" `);
-      }
-    });
-  }
-});
-</script>
-
 </body>
 </html>
