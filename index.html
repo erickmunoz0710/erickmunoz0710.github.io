@@ -1011,11 +1011,10 @@
             const overallTotal = appState.savedTickets.reduce((sum, t) => sum + t.total, 0);
             
             // 1. Cabecera general y estructura de la tabla consolidada
+            // ***** LÍNEAS ELIMINADAS: AriAuto APP y Fecha de Impresión *****
             let allTicketsHTML = `
                 <div class="p-4">
-                    <h1 class="text-xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
                     
-                    <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
                     
                     <table class="min-w-full table-auto border-collapse">
                         <thead>
@@ -1032,6 +1031,19 @@
             
             // 2. Iterar sobre todos los tickets y consolidar los artículos
             appState.savedTickets.forEach((ticket) => {
+                // Fila de encabezado para cada ticket (Ref, Fecha/Hora, Total Ticket)
+                allTicketsHTML += `
+                    <tr class="bg-gray-200 border-t-4 border-gray-800 font-bold text-gray-900">
+                        <td colspan="5" class="px-3 py-1">
+                            <div class="flex justify-between text-sm">
+                                <span>TICKET REF: ${ticket.ref}</span>
+                                <span>FECHA: ${new Date(ticket.date).toLocaleDateString('es-ES')} ${new Date(ticket.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
+                                <span class="text-green-700">TOTAL TICKET: $${ticket.total.toFixed(2)}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
                 // Inner loop for items
                 ticket.cart.forEach(item => {
                     const price = parseFloat(item.price) || 0;
@@ -1040,7 +1052,7 @@
                     const isManual = item.make.includes('(MANUAL)');
 
                     allTicketsHTML += `
-                        <tr class="border-b border-gray-200">
+                        <tr class="border-b border-gray-200 hover:bg-gray-50 text-sm text-gray-700">
                             <td class="px-3 py-1 text-center text-gray-600 font-bold text-xs">${globalItemCount++}</td>
                             <td class="px-3 py-1 text-gray-800 font-medium">
                                 <p class="font-mono font-bold text-sm ${isManual ? 'text-red-600' : 'text-gray-900'}">${item.code}</p>
@@ -1059,8 +1071,13 @@
                         </tbody>
                     </table>
                     
-                    <div class="text-xl font-extrabold text-right mt-4 pt-2 border-t-2 border-double border-gray-900">
-                        TOTAL: <span class="text-green-700">$${overallTotal.toFixed(2)}</span>
+                    <div class="mt-6 pt-4 border-t-4 border-gray-800 text-right">
+                        <p class="text-xl font-bold text-gray-700">
+                            TOTAL ACUMULADO DEL CORTE:
+                        </p>
+                        <p class="text-5xl font-extrabold text-green-700">
+                            $${overallTotal.toFixed(2)}
+                        </p>
                     </div>
                 </div>
             `;
@@ -1077,6 +1094,7 @@
             setTimeout(() => {
                 container.innerHTML = '';
                 container.classList.remove('printing');
+                showModal('#saved-tickets-modal'); // Mostrar el modal de nuevo
             }, 500);
         }
 
@@ -1608,7 +1626,7 @@ window.addEventListener("load", () => {
     document.querySelectorAll("[data-lucide]").forEach(el => {
       const icon = el.getAttribute("data-lucide");
       if (svgMap[icon]) {
-        el.outerHTML = svgMap[icon].replace('<svg ', `<svg class="\${el.className}" `);
+        el.outerHTML = svgMap[icon].replace('<svg ', `<svg class="${el.className}" `);
       }
     });
   }
