@@ -566,7 +566,7 @@
             savedTicketsBody: $('#saved-tickets-body'),
             corteCajaTotal: $('#corte-caja-total'),
             totalClosedTickets: $('#total-closed-tickets'),
-            deleteAallTicketsBtn: $('#delete-all-tickets-btn'),
+            deleteAllTicketsBtn: $('#delete-all-tickets-btn'),
             // NUEVO: Botón y Contenedor de impresión masiva
             printAllTicketsBtn: $('#print-all-tickets-btn'), 
             printAllTicketsContainer: $('#print-all-tickets-container'),
@@ -1031,7 +1031,7 @@ function confirmClearCart() {
             
             dom.corteCajaTotal.textContent = `$${totalAmount.toFixed(2)}`;
             dom.totalClosedTickets.textContent = totalCount;
-            dom.deleteAallTicketsBtn.disabled = totalCount === 0;
+            dom.deleteAllTicketsBtn.disabled = totalCount === 0;
             dom.printAllTicketsBtn.disabled = totalCount === 0; // Habilitar el nuevo botón
 
             if (totalCount === 0) {
@@ -1555,7 +1555,7 @@ function showClearCartModal() {
             
             // Modal de Tickets Guardados
             dom.closeSavedTicketsModalBtn.addEventListener('click', () => hideModal('#saved-tickets-modal'));
-            dom.deleteAallTicketsBtn.addEventListener('click', deleteAllSavedTickets);
+            dom.deleteAllTicketsBtn.addEventListener('click', deleteAllSavedTickets);
 
             // Modal Manual
             dom.confirmManualBtn.addEventListener('click', () => {
