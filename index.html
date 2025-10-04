@@ -261,19 +261,19 @@
             </div>
 
             <div class="overflow-y-auto flex-grow">
-                <table class="table-auto w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50 sticky top-0">
                         <tr>
-                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref.</th>
-                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha/Hora</th>
-<th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                            <th class="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
-                            <th class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref.</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha/Hora</th>
+<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                            <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="saved-tickets-body" class="bg-white divide-y divide-gray-200 text-sm">
+                    <tbody id="saved-tickets-body" class="bg-white divide-y divide-gray-200">
                         <tr id="empty-saved-tickets-row">
-                            <td colspan="4" class="py-4 text-center text-gray-500">No hay tickets cerrados.</div></td>
+                            <td colspan="4" class="py-4 text-center text-gray-500">No hay tickets cerrados.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -292,28 +292,7 @@
         </div>
     </div>
 
-    
-    <!-- XLSX WARNING MODAL (INSERTED) -->
-    <div id="xlsx-warning-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm border-t-4 border-red-600">
-            <div class="flex items-center text-red-600 mb-4">
-                <i data-lucide="alert-circle" class="w-8 h-8 mr-3"></i>
-                <h3 class="text-lg font-bold">La base de datos no se ha actualizado correctamente.</h3>
-            </div>
-            <p class="text-gray-700 mb-6">¿Deseas continuar con la base actual o actualizar?</p>
-            <div class="flex justify-end space-x-3">
-                <button id="xlsx-update-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
-                    Actualizar
-                </button>
-                <button id="xlsx-continue-btn" class="px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150">
-                    Continuar con la actual
-                </button>
-            </div>
-        </div>
-    </div>
-    <!-- /XLSX WARNING MODAL -->
-
-<div id="toast-message" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden"></div>
+    <div id="toast-message" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden"></div>
 
     <input type="file" id="xlsx-upload-hidden" accept=".xlsx, .xls" class="hidden print:hidden" />
 
@@ -404,7 +383,7 @@
         </header>
         
         <div class="hidden print-header">
-            <h1 class="text-2xl font-extrabold text-gray-900">ARIAUTORECYCLING</h1>
+            <h1 class="text-2xl font-extrabold text-gray-900">AriAuto App - Ticket de Venta</h1>
             <p class="text-sm text-gray-600">Fecha: <span id="print-ref-date"></span></p>
             <div class="text-sm font-semibold text-gray-700 mt-2">
                 NOTA DE VENTA: <span id="print-ref-note" class="font-normal text-gray-900"></span>
@@ -416,14 +395,8 @@
             
             <div id="empty-cart-message" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner hidden">
                 <i data-lucide="package" class="w-16 h-16 text-gray-400 mx-auto mb-3"></i>
-                <p class="text-gray-500 text-lg">EL TICKET ESTÁ VACÍO.</p>
-    <button 
-        id="create-ticket-btn"
-        class="mt-4 px-5 py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition"
-    >
-        CREAR NUEVO TICKET
-    </button>
-    <p class="text-sm text-gray-400 mt-4">(Si no creas ticket, el buscador funcionará solo como consulta.)</p>
+                <p class="text-gray-500 text-lg">EL TICKET ESTÁ VACÍO. USA EL BUSCADOR PARA AGREGAR ARTÍCULOS.</p>
+                <p class="text-sm text-gray-400 mt-2">(La base de datos actual se guarda automáticamente en la memoria de este navegador.)</p>
             </div>
 
             <div id="ticket-table-container" class="overflow-x-auto bg-white rounded-lg shadow-xl hidden">
@@ -520,7 +493,6 @@
             dbStatus: "Cargando...",
             isListening: false,
             savedTickets: [], // NUEVO: LISTA DE TICKETS CERRADOS
-            ticketActive: false, // NUEVO FLAG PARA ACTIVAR TICKET
         };
         
         let recognition = null; // Para la API de SpeechRecognition
@@ -566,7 +538,7 @@
             savedTicketsBody: $('#saved-tickets-body'),
             corteCajaTotal: $('#corte-caja-total'),
             totalClosedTickets: $('#total-closed-tickets'),
-            deleteAllTicketsBtn: $('#delete-all-tickets-btn'),
+            deleteAallTicketsBtn: $('#delete-all-tickets-btn'),
             // NUEVO: Botón y Contenedor de impresión masiva
             printAllTicketsBtn: $('#print-all-tickets-btn'), 
             printAllTicketsContainer: $('#print-all-tickets-container'),
@@ -745,10 +717,6 @@
         }
         
         function addItem(product, manualPrice = null) {
-    if (!appState.ticketActive) {
-        showMessage("Actualmente no hay ticket abierto. Usa el botón 'CREAR NUEVO TICKET'.", 'error');
-        return;
-    }
             
             if (product.isManualOption) {
                 appState.manualCode = product.code;
@@ -839,7 +807,6 @@ function removeItem(id) {
             }
 
             render();
-            appState.ticketActive = false;
         }
 
         
@@ -874,7 +841,6 @@ function confirmClearCart() {
             hideModal('#clear-cart-modal');
             showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
             render();
-            appState.ticketActive = false;
         }
 
 
@@ -963,7 +929,6 @@ function confirmClearCart() {
             
             showMessage(`${message} Nuevo ticket iniciado: ${newRef}.`, 'success');
             render(); // Rerenderiza el estado limpio
-            appState.ticketActive = false;
         }
         
         window.loadSavedTicket = (ticketId) => {
@@ -1031,7 +996,7 @@ function confirmClearCart() {
             
             dom.corteCajaTotal.textContent = `$${totalAmount.toFixed(2)}`;
             dom.totalClosedTickets.textContent = totalCount;
-            dom.deleteAllTicketsBtn.disabled = totalCount === 0;
+            dom.deleteAallTicketsBtn.disabled = totalCount === 0;
             dom.printAllTicketsBtn.disabled = totalCount === 0; // Habilitar el nuevo botón
 
             if (totalCount === 0) {
@@ -1045,18 +1010,18 @@ function confirmClearCart() {
                     
                     return `
                         <tr class="hover:bg-gray-50 transition duration-150">
-                            <td class="px-2 py-2 text-sm font-bold text-gray-800">${ticket.ref}</td>
-                            <td class="px-2 py-2 text-sm text-gray-600 whitespace-nowrap">${dateStr} ${timeStr}</td>
-                            <td class="px-2 py-2 text-sm text-gray-700 uppercase">${customerName}</td>
-<td class="px-2 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
-                            <td class="px-2 py-2 text-center"><div class="flex flex-wrap justify-center gap-1">
+                            <td class="px-3 py-2 text-sm font-bold text-gray-800">${ticket.ref}</td>
+                            <td class="px-3 py-2 text-sm text-gray-600 whitespace-nowrap">${dateStr} ${timeStr}</td>
+                            <td class="px-3 py-2 text-sm text-gray-700 uppercase">${customerName}</td>
+<td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
+                            <td class="px-3 py-2 text-center flex justify-center space-x-2">
                                 <button onclick="loadSavedTicket('${ticket.id}')" class="text-white bg-indigo-500 hover:bg-indigo-600 p-1 rounded-md shadow-sm text-xs font-semibold">
                                     CARGAR
                                 </button>
                                 <button onclick="deleteSavedTicket('${ticket.id}')" class="text-white bg-red-500 hover:bg-red-600 p-1 rounded-md shadow-sm text-xs font-semibold">
                                     X
                                 </button>
-                            </div></td>
+                            </td>
                         </tr>
                     `;
                 }).join('');
@@ -1085,18 +1050,18 @@ function confirmClearCart() {
             // 1. Cabecera general y estructura de la tabla consolidada
             let allTicketsHTML = `
                 <div class="p-4">
-                    <h1 class="text-xl font-extrabold text-gray-900 text-center mb-2">ARIAUTO APP</h1>
+                    <h1 class="text-xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
                     
                     <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
                     
                     <table class="min-w-full table-auto border-collapse">
                         <thead>
                             <tr class="bg-gray-100 border-b-2 border-gray-800 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                <th class="px-2 py-2 w-10">No.</th>
-                                <th class="px-2 py-2">CÓDIGO</th> 
-                                <th class="px-2 py-2 text-center">P. UNIT.</th>
-                                <th class="px-2 py-2 text-center">CANT.</th> 
-                                <th class="px-2 py-2 text-right">SUBTOTAL</th>
+                                <th class="px-3 py-2 w-10">No.</th>
+                                <th class="px-3 py-2">CÓDIGO</th> 
+                                <th class="px-3 py-2 text-center">P. UNIT.</th>
+                                <th class="px-3 py-2 text-center">CANT.</th> 
+                                <th class="px-3 py-2 text-right">SUBTOTAL</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1120,7 +1085,7 @@ function confirmClearCart() {
                             </td>
                             <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">$${price.toFixed(2)}</td>
                             <td class="px-3 py-1 text-center font-semibold text-gray-800 text-sm">${quantity.toFixed(2)}</td>
-                            <td class="px-3 py-1 font-bold text-right text-sky-600 text-sm">$${subtotal}</div></td>
+                            <td class="px-3 py-1 font-bold text-right text-sky-600 text-sm">$${subtotal}</td>
                         </tr>
                     `;
                 });
@@ -1251,8 +1216,8 @@ function confirmClearCart() {
 
                     return `
                         <tr class="border-b hover:bg-gray-50 transition duration-150">
-                            <td class="px-2 py-2 text-center text-gray-600 font-bold w-10">${index + 1}</td>
-<td class="px-2 py-2 text-center">
+                            <td class="px-3 py-2 text-center text-gray-600 font-bold w-10">${index + 1}</td>
+<td class="px-3 py-2 text-center">
     <input 
         type="checkbox" 
         class="partial-sum-checkbox w-4 h-4 text-indigo-600 align-middle rounded"
@@ -1261,7 +1226,7 @@ function confirmClearCart() {
     />
 </td>
 
-                            <td class="px-2 py-2 text-gray-800 font-medium">
+                            <td class="px-3 py-2 text-gray-800 font-medium">
                                 <p class="text-sm font-mono font-bold ${isManual ? 'text-red-600' : 'text-gray-900'}">
                                     ${item.code}
                                     ${isManual ? '<span class="text-xs ml-1 text-red-400 print:hidden">(Manual)</span>' : ''}
@@ -1270,10 +1235,10 @@ function confirmClearCart() {
                                     <span class="truncate">${item.make}</span>
                                 </p>
                             </td>
-                            <td class="px-2 py-2 text-center font-semibold hidden md:table-cell print:table-cell">
+                            <td class="px-3 py-2 text-center font-semibold hidden md:table-cell print:table-cell">
                                 <span class="${isManual ? 'text-red-500' : 'text-gray-800'}">$${price.toFixed(2)}</span>
                             </td>
-                            <td class="px-2 py-2 text-center print:block"> 
+                            <td class="px-3 py-2 text-center print:block"> 
                                 <span class="hidden print:inline text-sm font-bold text-gray-800">${quantity.toFixed(2)}</span>
                                 <div class="flex items-center justify-center space-x-2 print:hidden">
                                     <input
@@ -1295,7 +1260,7 @@ function confirmClearCart() {
                                     </button>
                                 </div>
                             </td>
-                            <td class="px-2 py-2 font-bold text-right text-sky-600">$${subtotal}</div></td>
+                            <td class="px-3 py-2 font-bold text-right text-sky-600">$${subtotal}</td>
                         </tr>
                     `;
                 }).join('');
@@ -1381,28 +1346,14 @@ function confirmClearCart() {
             const file = event.target.files[0];
             if (!file) return;
             const fileName = file.name.replace(/\.[^/.]+$/, "");
-            // Formato esperado: dd-mm-yyyy
-            const d = new Date();
-            const todayFileName = `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
-
-            // Guardar el nombre subido (siempre) para referencia
             localStorage.setItem('lastFileName', fileName);
 
-            // Si el nombre no coincide, mostrar modal y NO procesar el archivo
-            if (fileName !== todayFileName) {
-                // Mostrar modal de advertencia
-                showModal('#xlsx-warning-modal');
-                // limpiar el input para evitar que el otro listener procese el archivo inmediatamente
-                try { event.target.value = ''; } catch(e) {}
-                return;
-            }
-
-            // Si coincide, proceder con la carga original
+            
             if (typeof window.XLSX === 'undefined') {
                 showMessage('La librería de XLSX aún no está cargada. Inténtalo de nuevo en un momento.', 'error');
                 return;
             }
-
+            
             showMessage("Procesando archivo XLSX...", 'info');
 
             const reader = new FileReader();
@@ -1413,16 +1364,16 @@ function confirmClearCart() {
                     const workbook = window.XLSX.read(data, { type: 'binary' });
                     const sheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[sheetName];
-
+                    
                     const rawJson = window.XLSX.utils.sheet_to_json(worksheet);
-
+                    
                     const newProducts = rawJson
                         .map(row => {
                             // Búsqueda flexible de encabezados
                             const codeKey = Object.keys(row).find(k => k.toLowerCase().includes('code') || k.toLowerCase().includes('código') || k.toLowerCase().includes('sku'));
                             const makeKey = Object.keys(row).find(k => k.toLowerCase().includes('make') || k.toLowerCase().includes('descrip') || k.toLowerCase().includes('producto'));
                             const priceKey = Object.keys(row).find(k => k.toLowerCase().includes('price') || k.toLowerCase().includes('precio'));
-
+                            
                             if (!codeKey || !makeKey || !priceKey) return null;
 
                             const code = String(row[codeKey]).trim();
@@ -1440,7 +1391,7 @@ function confirmClearCart() {
                         appState.allProducts = newProducts;
                         // *** LA ACCIÓN CLAVE: GUARDAR LA NUEVA BASE DE DATOS EN LOCALSTORAGE ***
                         localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(appState.allProducts));
-
+                        
                         // Limpiar el estado de búsqueda después de cargar la DB
                         _internalClearCart(); 
 
@@ -1460,7 +1411,8 @@ function confirmClearCart() {
 
             reader.readAsBinaryString(file);
         }
-function showClearCartModal() {
+
+        function showClearCartModal() {
             $('#clear-modal-text').innerHTML = `¿Estás seguro de que deseas eliminar los **${appState.cart.length} artículos** de este ticket? Esta acción no se puede deshacer.`;
             showModal('#clear-cart-modal');
         }
@@ -1528,13 +1480,6 @@ function showClearCartModal() {
                 }
             });
 
-            document.getElementById('create-ticket-btn').addEventListener('click', () => {
-    appState.ticketActive = true;
-    _internalClearCart();
-    render();
-    showMessage("Nuevo ticket creado. Ya puedes agregar productos.", 'success');
-});
-
             // Botones de control
             dom.clearCartBtn.addEventListener('click', clearCartWithConfirmation); // Usa el flow con modal
             dom.saveTicketBtn.addEventListener('click', saveTicket); // NUEVO: Guardar Ticket
@@ -1555,7 +1500,7 @@ function showClearCartModal() {
             
             // Modal de Tickets Guardados
             dom.closeSavedTicketsModalBtn.addEventListener('click', () => hideModal('#saved-tickets-modal'));
-            dom.deleteAllTicketsBtn.addEventListener('click', deleteAllSavedTickets);
+            dom.deleteAallTicketsBtn.addEventListener('click', deleteAllSavedTickets);
 
             // Modal Manual
             dom.confirmManualBtn.addEventListener('click', () => {
@@ -1723,61 +1668,6 @@ window.addEventListener("load", () => {
     });
   }
 });
-
-
-// --- XLSX WARNING MODAL LOGIC (inserted) ---
-(function(){
-    // Buttons
-    const updateBtn = document.getElementById('xlsx-update-btn');
-    const continueBtn = document.getElementById('xlsx-continue-btn');
-    const fileInput = document.getElementById('xlsx-upload-hidden');
-
-    function hideXlsxModal() {
-        // reuse existing hideModal util if available
-        try { hideModal('#xlsx-warning-modal'); } catch(e) {
-            const m = document.getElementById('xlsx-warning-modal');
-            if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
-        }
-    }
-
-    function showXlsxModal() {
-        try { showModal('#xlsx-warning-modal'); } catch(e) {
-            const m = document.getElementById('xlsx-warning-modal');
-            if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
-        }
-    }
-
-    // update -> abrir selector
-    if (updateBtn) {
-        updateBtn.addEventListener('click', function(){
-            hideXlsxModal();
-            // trigger file picker
-            if (fileInput) fileInput.click();
-        });
-    }
-
-    // continue -> solo cerrar modal y seguir con DB actual
-    if (continueBtn) {
-        continueBtn.addEventListener('click', function(){
-            hideXlsxModal();
-        });
-    }
-
-    // Al iniciar la app, comprobar lastFileName vs fecha actual
-    document.addEventListener('DOMContentLoaded', function(){
-        try {
-            const lastFile = localStorage.getItem('lastFileName');
-            const d = new Date();
-            const todayFileName = `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
-            if (lastFile && lastFile !== todayFileName) {
-                // mostrar modal con estilo coherente
-                showXlsxModal();
-            }
-        } catch(e) {
-            console.error('Error checking lastFileName for xlsx modal', e);
-        }
-    });
-})();
 </script>
 
 </body>
