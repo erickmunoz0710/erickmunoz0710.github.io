@@ -397,6 +397,16 @@
                 <i data-lucide="package" class="w-16 h-16 text-gray-400 mx-auto mb-3"></i>
                 <p class="text-gray-500 text-lg">EL TICKET ESTÁ VACÍO. USA EL BUSCADOR PARA AGREGAR ARTÍCULOS.</p>
                 <p class="text-sm text-gray-400 mt-2">(La base de datos actual se guarda automáticamente en la memoria de este navegador.)</p>
+
+    <div class="mt-4 flex justify-center">
+        <button
+            id="new-ticket-btn"
+            class="mt-4 px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg shadow hover:bg-yellow-600 transition"
+            title="Generar un nuevo ticket N+1"
+        >
+            Generar ticket
+        </button>
+    </div>
             </div>
 
             <div id="ticket-table-container" class="overflow-x-auto bg-white rounded-lg shadow-xl hidden">
@@ -588,7 +598,13 @@
         function saveAppState() {
             localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(appState.cart));
             localStorage.setItem(STORAGE_KEYS.CAPITAL_NOTE, JSON.stringify(appState.capitalNoteText)); 
-        }
+        
+    try { console.debug('saveAppState -> saving cart length:', (appState.cart||[]).length); localStorage.setItem('salesTicketLastSavedAt', new Date().toISOString()); } catch(e) { console.warn('saveAppState debug failed', e); }
+}
+// Guarda el estado justo antes de cerrar o recargar la página
+window.addEventListener('beforeunload', function(){ try{ saveAppState(); } catch(e){} });
+
+
 
         // Helper para guardar solo la lista de tickets cerrados
         function saveSavedTicketsData() {
@@ -657,7 +673,7 @@
                     appState.capitalNoteText = `#${maxRefNumber + 1}`;
                 }
                 
-                if (storedCart) { appState.cart = JSON.parse(storedCart); }
+                if (storedCart) { appState.cart = JSON.parse(storedCart); console.debug('loadData -> loaded cart length from localStorage:', (appState.cart||[]).length, 'storedNote:', storedNote); }
                 
                 dom.currentDate.textContent = getCurrentDateFormatted();
                 // dom.noteInput.value = appState.capitalNoteText; // ELIMINADO
@@ -948,7 +964,7 @@ function confirmClearCart() {
                 hideModal('#saved-tickets-modal');
                 showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
                 render();
-            } else if (appState.cart.length === 0) {
+                saveAppState();} else if (appState.cart.length === 0) {
                  // Si el carrito está vacío, se carga sin preguntar
                  appState.cart = [...ticketToLoad.cart];
                  appState.capitalNoteText = ticketToLoad.ref;
@@ -957,7 +973,7 @@ function confirmClearCart() {
                  hideModal('#saved-tickets-modal');
                  showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
                  render();
-            }
+                saveAppState();}
         }
         
         window.deleteSavedTicket = (ticketId) => {
@@ -1758,6 +1774,182 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <!-- FIN: Modal y validación de nombre de XLSX -->
+
+
+<script>
+(function(){
+  function computeNextRef(){
+    const allRefs = (appState.savedTickets || []).map(t=>parseInt(String(t.ref || "").replace('#',''))).filter(n=>!isNaN(n));
+    const maxRefNumber = allRefs.length>0?Math.max(...allRefs):0;
+    return `#${maxRefNumber+1}`;
+  }
+
+  function setTicketActive(active){
+    appState.ticketActive = !!active;
+    if (dom) {
+      if (dom.ticketTableContainer) dom.ticketTableContainer.classList.toggle('hidden', !appState.ticketActive);
+      if (dom.emptyCartMsg) dom.emptyCartMsg.classList.toggle('hidden', appState.ticketActive);
+      if (dom.saveTicketBtn) dom.saveTicketBtn.disabled = !appState.ticketActive;
+      // 🔍 No se deshabilita la barra de búsqueda: siempre activa para consultas
+    }
+  }
+
+  function createNewTicket(){
+    const newRef = computeNextRef();
+    appState.capitalNoteText = newRef;
+    appState.cart = [];
+    setTicketActive(true);
+    render();
+    try { dom.searchInput.focus(); } catch(e){}
+  }
+  window.createNewTicket = createNewTicket;
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const btn = document.getElementById('new-ticket-btn');
+    if (btn) btn.addEventListener('click', createNewTicket);
+    if (!('ticketActive' in appState)) {
+      appState.ticketActive = (appState.cart && appState.cart.length>0)?true:false;
+    }
+    // ✅ Activar automáticamente el ticket si hay carrito o número activo (mejora: evitar ticket en blanco)
+    try {
+      let shouldActivate = false;
+
+      // 1) Si el carrito tiene items -> activar
+      if (appState.cart && appState.cart.length > 0) {
+        shouldActivate = true;
+      } else {
+        // 2) Si hay una referencia (capitalNoteText), verificar si corresponde a un ticket guardado con items
+        const ref = appState.capitalNoteText;
+        if (ref && Array.isArray(appState.savedTickets) && appState.savedTickets.length > 0) {
+          const saved = appState.savedTickets.find(t => t.ref === ref);
+          if (saved && Array.isArray(saved.cart) && saved.cart.length > 0) {
+            // Cargar el ticket guardado (mantener compatibilidad y permitir editar/guardar)
+            appState.cart = JSON.parse(JSON.stringify(saved.cart));
+            shouldActivate = true;
+          }
+        }
+      }
+
+      appState.ticketActive = !!shouldActivate;
+    } catch(e) {
+      // en caso de error, no activar ticket por seguridad
+      appState.ticketActive = false;
+    }
+    // ✅ Activar automáticamente el ticket si hay carrito (aunque no esté guardado) o si la referencia corresponde a un ticket guardado
+const hasCart = appState.cart && appState.cart.length > 0;
+const hasSavedRef = Array.isArray(appState.savedTickets) && appState.savedTickets.some(t => t.ref === appState.capitalNoteText);
+if (hasCart || hasSavedRef) {
+  appState.ticketActive = true;
+} else {
+  appState.ticketActive = false;
+}
+setTicketActive(appState.ticketActive);
+render(); // 👈 Asegurar re-render al iniciar para habilitar botones
+  });
+
+  // 🚫 Impide agregar artículos sin ticket activo, muestra mensaje rojo
+  if (typeof window.addItem === 'function') {
+    const oldAdd = window.addItem;
+    window.addItem = function(product, manualPrice){
+      if (!appState.ticketActive) {
+        try { showMessage("Genera un ticket o carga uno guardado primero.", "error"); } catch(e){}
+        return;
+      }
+      return oldAdd(product, manualPrice);
+    };
+  }
+
+  // 💾 Guardar: guarda ticket y lo cierra
+  if (typeof window.saveTicket === 'function') {
+    window.saveTicket = function(){
+      if (appState.cart.length === 0) {
+        try { showMessage("El ticket está vacío. No se puede guardar.", 'error'); } catch(e){}
+        return;
+      }
+
+      const currentRef = appState.capitalNoteText || computeNextRef();
+      const existingIndex = (appState.savedTickets||[]).findIndex(t => t.ref === currentRef);
+
+      let customerName = "";
+      if (existingIndex === -1) {
+        try {
+          customerName = prompt("Ingresa el nombre del cliente para este ticket:") || "SIN NOMBRE";
+        } catch(e){
+          customerName = "SIN NOMBRE";
+        }
+      } else {
+        customerName = appState.savedTickets[existingIndex].customer || "SIN NOMBRE";
+      }
+
+      const ticketToSave = {
+        customer: customerName,
+        id: crypto.randomUUID ? crypto.randomUUID() : ('id-'+Date.now()),
+        ref: currentRef,
+        date: new Date().toISOString(),
+        cart: JSON.parse(JSON.stringify(appState.cart || [])),
+        total: (typeof calculateTicketTotal === 'function') ? calculateTicketTotal(appState.cart) : (appState.cart.reduce((s,i)=>s+((parseFloat(i.price)||0)*(parseFloat(i.quantity)||0)),0))
+      };
+
+      if (!Array.isArray(appState.savedTickets)) appState.savedTickets = [];
+      if (existingIndex !== -1) {
+        appState.savedTickets[existingIndex] = ticketToSave;
+      } else {
+        appState.savedTickets.unshift(ticketToSave);
+      }
+
+      if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
+      if (typeof renderSavedTickets === 'function') renderSavedTickets();
+
+      // Cerrar ticket después de guardar
+      appState.cart = [];
+      setTicketActive(false);
+      render();
+    };
+  }
+
+  // Cuando se carga un ticket guardado, activar
+  if (typeof window.loadSavedTicket === 'function') {
+    const oldLoad = window.loadSavedTicket;
+    window.loadSavedTicket = function(ticketId){
+      oldLoad(ticketId);
+      const ticket = (appState.savedTickets||[]).find(t => t.id === ticketId);
+      if (ticket) {
+        appState.cart = JSON.parse(JSON.stringify(ticket.cart || []));
+        appState.capitalNoteText = ticket.ref;
+        setTicketActive(true);
+        render();
+                try { saveAppState(); } catch(e){ console.warn('saveAppState failed in wrapper', e); }
+      }
+    };
+  }
+
+  // Limpiar ticket → marcar inactivo
+  if (typeof window._internalClearCart === 'function') {
+    const oldClear = window._internalClearCart;
+    window._internalClearCart = function(){
+      oldClear();
+      setTicketActive(false);
+      render();
+    };
+  }
+
+  // Actualizar renderCart para reflejar ticketActive
+  if (typeof window.renderCart === 'function') {
+    const oldRenderCart = window.renderCart;
+    window.renderCart = function(){
+      oldRenderCart();
+      try {
+        const hasItems = (appState.cart && appState.cart.length>0);
+        const showTable = appState.ticketActive || hasItems;
+        if (dom && dom.ticketTableContainer) dom.ticketTableContainer.classList.toggle('hidden', !showTable);
+        if (dom && dom.emptyCartMsg) dom.emptyCartMsg.classList.toggle('hidden', showTable);
+        if (dom && dom.saveTicketBtn) dom.saveTicketBtn.disabled = !appState.ticketActive;
+        // 🔍 no se deshabilita buscador
+      } catch(e){}
+    };
+  }
+})();
+</script>
 
 </body>
 </html>
