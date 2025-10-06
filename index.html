@@ -854,22 +854,22 @@ function removeItem(id) {
         }
 
         
-function confirmClearCart() {
-            // Antes de limpiar, eliminar también el ticket guardado (si existe) con la misma ref
-            const currentRef = appState.capitalNoteText;
-            const idx = appState.savedTickets.findIndex(t => t.ref === currentRef);
-            if (idx !== -1) {
-                appState.savedTickets.splice(idx, 1);
-                if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
-                showMessage(`Se eliminó el ticket guardado ${currentRef} porque se borró todo su contenido.`, 'error');
-            }
 
-            _internalClearCart();
-            
-    render(); // 🔹 Refrescar UI para mostrar 'Ticket vacío'hideModal('#clear-cart-modal');
-            showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
-            render();
-        }
+function confirmClearCart() {
+    const currentRef = appState.capitalNoteText;
+    const idx = appState.savedTickets.findIndex(t => t.ref === currentRef);
+    if (idx !== -1) {
+        appState.savedTickets.splice(idx, 1);
+        if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
+        showMessage(`Se eliminó el ticket guardado ${currentRef} porque se borró todo su contenido.`, 'error');
+    }
+
+    _internalClearCart();
+    render(); // 🔹 Refrescar UI
+    hideModal('#clear-cart-modal'); // ✅ Cierra el modal correctamente
+    showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
+}
+
 
         function handleManualPriceConfirm(code, price) {
             const validatedPrice = parseFloat(price);
@@ -2020,5 +2020,576 @@ setTicketActive(appState.ticketActive);
     });
   })();
 </script>
+
+<!-- ========================================
+     MÓDULO DE CITAS CON RECORDATORIO (MODAL)
+======================================== -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const headerRight = document.querySelector("header .flex.items-center.space-x-3");
+  if (headerRight) {
+    const citasBtn = document.createElement("button");
+    citasBtn.id = "open-citas-modal-btn";
+    citasBtn.title = "Citas / Recordatorios";
+    citasBtn.className = "p-2 text-indigo-600 hover:text-white bg-indigo-100 hover:bg-indigo-600 rounded-full transition duration-200 shadow-md";
+    citasBtn.innerHTML = '<i data-lucide="clock" class="w-6 h-6"></i>';
+    headerRight.insertBefore(citasBtn, headerRight.children[1]);
+  }
+});
+</script>
+
+<div id="citas-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
+  <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md transform transition-all">
+    <div class="flex justify-between items-center border-b pb-3 mb-4">
+      <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+        <i data-lucide="clock" class="w-8 h-8 mr-3 text-indigo-600"></i>
+        Citas / Recordatorios
+      </h3>
+      <button id="close-citas-modal-btn" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition duration-200">
+        <i data-lucide="x" class="w-8 h-8"></i>
+      </button>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Cliente</label>
+      <input id="cita-nombre" type="text" placeholder="Ej. Juan Pérez"
+        class="w-full border rounded-md p-2 mb-2 focus:ring-indigo-500 focus:border-indigo-500"/>
+
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha y Hora</label>
+      <input id="cita-fecha" type="datetime-local"
+        class="w-full border rounded-md p-2 mb-2 focus:ring-indigo-500 focus:border-indigo-500"/>
+
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Recordarme antes de (minutos):</label>
+      <input id="cita-anticipacion" type="number" value="10" min="1"
+        class="w-full border rounded-md p-2 mb-3 focus:ring-indigo-500 focus:border-indigo-500"/>
+
+      <button id="crear-cita-btn"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg shadow-md mb-3">
+        Guardar Cita
+      </button>
+    </div>
+
+    <div class="border-t pt-2 text-sm text-gray-700 max-h-64 overflow-y-auto" id="lista-citas">
+      <p class="text-gray-400 italic text-center">No hay citas programadas</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const citasKey = "ariAutoCitas";
+let citas = JSON.parse(localStorage.getItem(citasKey)) || [];
+
+function solicitarPermisoNotificaciones() {
+  if (Notification.permission !== "granted") Notification.requestPermission();
+}
+
+function guardarCita(nombre, fechaHora, minutosAnticipacion) {
+  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
+  citas.push(cita);
+  localStorage.setItem(citasKey, JSON.stringify(citas));
+  programarNotificacion(cita);
+  renderCitas();
+  alert(`Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
+}
+
+function programarNotificacion(cita) {
+  const citaHora = new Date(cita.fechaHora);
+  const msRestantes = citaHora.getTime() - Date.now() - (cita.minutosAnticipacion * 60000);
+  if (msRestantes > 0) {
+    setTimeout(() => {
+      new Notification("📅 Recordatorio de Cita", {
+        body: `Cita con ${cita.nombre} a las ${citaHora.toLocaleTimeString()}`,
+        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
+      });
+      // Vibración o sonido adicional
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+      audio.play().catch(()=>{});
+    }, msRestantes);
+  }
+}
+
+function eliminarCita(id) {
+  citas = citas.filter(c => c.id !== id);
+  localStorage.setItem(citasKey, JSON.stringify(citas));
+  renderCitas();
+}
+
+function calcularTiempoRestante(fechaHora) {
+  const diffMin = Math.floor((new Date(fechaHora).getTime() - Date.now()) / 60000);
+  if (diffMin <= 0) return "⏰ Ya pasó";
+  if (diffMin < 60) return `Faltan ${diffMin} min";
+  const h = Math.floor(diffMin / 60), m = diffMin % 60;
+  return `Faltan ${h}h ${m}m`;
+}
+
+function renderCitas() {
+  const cont = document.getElementById("lista-citas");
+  cont.innerHTML = "";
+  if (citas.length === 0) {
+    cont.innerHTML = '<p class="text-gray-400 italic text-center">No hay citas programadas</p>';
+    return;
+  }
+  citas.sort((a,b)=>new Date(a.fechaHora)-new Date(b.fechaHora));
+  citas.forEach(cita => {
+    const fecha = new Date(cita.fechaHora);
+    const div = document.createElement("div");
+    div.className = "p-2 border-b flex justify-between items-start";
+    div.innerHTML = `
+      <div>
+        <p class='font-semibold'>${cita.nombre}</p>
+        <p class='text-xs text-gray-500'>${fecha.toLocaleString()}</p>
+        <p class='text-xs text-indigo-600 font-bold'>${calcularTiempoRestante(cita.fechaHora)}</p>
+      </div>
+      <button onclick="eliminarCita('${cita.id}')" class='text-red-500 hover:text-red-700 font-bold text-lg leading-none'>×</button>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+window.addEventListener("load",()=>{
+  solicitarPermisoNotificaciones();
+  citas.forEach(programarNotificacion);
+  renderCitas();
+});
+
+document.addEventListener("click",(e)=>{
+  if(e.target.id==="open-citas-modal-btn") showModal("#citas-modal");
+  if(e.target.id==="close-citas-modal-btn") hideModal("#citas-modal");
+});
+
+document.addEventListener("click",(e)=>{
+  if(e.target.id==="crear-cita-btn"){
+    const n=document.getElementById("cita-nombre").value.trim();
+    const f=document.getElementById("cita-fecha").value;
+    const m=parseInt(document.getElementById("cita-anticipacion").value)||10;
+    if(!n||!f){alert("Completa todos los campos.");return;}
+    guardarCita(n,f,m);
+    document.getElementById("cita-nombre").value="";
+    document.getElementById("cita-fecha").value="";
+    document.getElementById("cita-anticipacion").value="10";
+  }
+});
+</script>
+
+
+<script>
+// --- Fix para abrir/cerrar modal de Citas si showModal/hideModal no existen ---
+function showModal(selector) {
+  const modal = document.querySelector(selector);
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+}
+function hideModal(selector) {
+  const modal = document.querySelector(selector);
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+</script>
+
+
+<script>
+// --- Fix definitivo para abrir/cerrar el modal de Citas ---
+document.addEventListener("click", (e) => {
+  const openBtn = e.target.closest("#open-citas-modal-btn");
+  const closeBtn = e.target.closest("#close-citas-modal-btn");
+
+  // Abrir modal
+  if (openBtn) {
+    const modal = document.querySelector("#citas-modal");
+    if (modal) {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+  }
+
+  // Cerrar modal
+  if (closeBtn) {
+    const modal = document.querySelector("#citas-modal");
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+  }
+});
+</script>
+
+
+<script>
+// --- Fix para que el botón "Guardar Cita" siempre funcione ---
+document.addEventListener("click", (e) => {
+  const saveBtn = e.target.closest("#crear-cita-btn");
+  if (!saveBtn) return;
+
+  const nombre = document.getElementById("cita-nombre").value.trim();
+  const fechaHora = document.getElementById("cita-fecha").value;
+  const minutosAnticipacion = parseInt(document.getElementById("cita-anticipacion").value) || 10;
+
+  if (!nombre || !fechaHora) {
+    alert("Por favor completa todos los campos.");
+    return;
+  }
+
+  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
+  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+  citas.push(cita);
+  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+
+  // Mostrar confirmación
+  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
+
+  // Reprogramar notificación
+  const citaHora = new Date(fechaHora);
+  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
+  if (msRestantes > 0) {
+    setTimeout(() => {
+      new Notification("📅 Recordatorio de Cita", {
+        body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
+        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
+      });
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+      audio.play().catch(()=>{});
+    }, msRestantes);
+  }
+
+  // Limpiar campos
+  document.getElementById("cita-nombre").value = "";
+  document.getElementById("cita-fecha").value = "";
+  document.getElementById("cita-anticipacion").value = "10";
+});
+</script>
+
+
+<script>
+// --- Fix final: mostrar la cita recién guardada en la lista al instante ---
+document.addEventListener("click", (e) => {
+  const saveBtn = e.target.closest("#crear-cita-btn");
+  if (!saveBtn) return;
+
+  const nombre = document.getElementById("cita-nombre").value.trim();
+  const fechaHora = document.getElementById("cita-fecha").value;
+  const minutosAnticipacion = parseInt(document.getElementById("cita-anticipacion").value) || 10;
+
+  if (!nombre || !fechaHora) {
+    alert("Por favor completa todos los campos.");
+    return;
+  }
+
+  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
+  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+  citas.push(cita);
+  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+
+  // Mostrar confirmación
+  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
+
+  // Reprogramar notificación
+  const citaHora = new Date(fechaHora);
+  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
+  if (msRestantes > 0) {
+    setTimeout(() => {
+      new Notification("📅 Recordatorio de Cita", {
+        body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
+        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
+      });
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+      audio.play().catch(()=>{});
+    }, msRestantes);
+  }
+
+  // Actualizar lista visual sin recargar
+  if (typeof renderCitas === "function") renderCitas();
+
+  // Limpiar campos
+  document.getElementById("cita-nombre").value = "";
+  document.getElementById("cita-fecha").value = "";
+  document.getElementById("cita-anticipacion").value = "10";
+});
+</script>
+
+
+<script>
+// --- Fix final para mostrar las citas en la lista ---
+if (typeof renderCitas !== "function") {
+  window.renderCitas = function() {
+    const citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+    const cont = document.getElementById("lista-citas");
+    if (!cont) return;
+    cont.innerHTML = "";
+    if (citas.length === 0) {
+      cont.innerHTML = '<p class="text-gray-400 italic text-center">No hay citas programadas</p>';
+      return;
+    }
+
+    citas.sort((a,b)=>new Date(a.fechaHora)-new Date(b.fechaHora));
+    citas.forEach(cita => {
+      const fecha = new Date(cita.fechaHora);
+      const div = document.createElement("div");
+      div.className = "p-2 border-b flex justify-between items-start";
+      div.innerHTML = `
+        <div>
+          <p class='font-semibold'>${cita.nombre}</p>
+          <p class='text-xs text-gray-500'>${fecha.toLocaleString()}</p>
+          <p class='text-xs text-indigo-600 font-bold'>Faltan ${Math.max(0, Math.floor((fecha.getTime() - Date.now()) / 60000))} min</p>
+        </div>
+        <button onclick="eliminarCita('${cita.id}')" class='text-red-500 hover:text-red-700 font-bold text-lg leading-none'>×</button>
+      `;
+      cont.appendChild(div);
+    });
+  };
+}
+
+// Actualizar lista apenas se guarda una cita
+document.addEventListener("click", (e) => {
+  const saveBtn = e.target.closest("#crear-cita-btn");
+  if (saveBtn) setTimeout(() => renderCitas(), 200);
+});
+</script>
+
+
+<script>
+// --- Fix para que el botón "X" elimine la cita correctamente ---
+window.eliminarCita = function(id) {
+  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+  citas = citas.filter(c => c.id !== id);
+  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+  if (typeof renderCitas === "function") renderCitas();
+};
+
+// --- Mostrar citas guardadas automáticamente al cargar la app ---
+window.addEventListener("load", () => {
+  if (typeof renderCitas === "function") {
+    renderCitas();
+  } else {
+    setTimeout(() => {
+      if (typeof renderCitas === "function") renderCitas();
+    }, 1000);
+  }
+});
+</script>
+
+
+<script>
+// --- Fix para evitar doble mensaje al guardar cita (Android/iPhone compatible) ---
+document.addEventListener("click", (e) => {
+  const saveBtn = e.target.closest("#crear-cita-btn");
+  if (!saveBtn) return;
+
+  const nombre = document.getElementById("cita-nombre").value.trim();
+  const fechaInput = document.getElementById("cita-fecha");
+  const fechaHora = fechaInput?.value?.trim() || "";
+  const minutosAnticipacion = parseInt(document.getElementById("cita-anticipacion").value) || 10;
+
+  // Validar campos correctamente
+  if (!nombre || !fechaHora || isNaN(Date.parse(fechaHora))) {
+    alert("Por favor completa todos los campos correctamente (asegúrate de confirmar la fecha y hora).");
+    return;
+  }
+
+  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
+  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+  citas.push(cita);
+  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+
+  // Mostrar confirmación
+  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
+
+  // Programar notificación
+  const citaHora = new Date(fechaHora);
+  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
+  if (msRestantes > 0) {
+    setTimeout(() => {
+      new Notification("📅 Recordatorio de Cita", {
+        body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
+        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
+      });
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+      audio.play().catch(()=>{});
+    }, msRestantes);
+  }
+
+  // Actualizar lista visual inmediatamente
+  if (typeof renderCitas === "function") renderCitas();
+
+  // Limpiar campos
+  document.getElementById("cita-nombre").value = "";
+  fechaInput.value = "";
+  document.getElementById("cita-anticipacion").value = "10";
+});
+</script>
+
+
+<script>
+/*
+  Interceptor en fase 'capture' para el botón "Guardar Cita".
+  Ejecuta el guardado y bloquea otros handlers que causaban mensajes dobles.
+*/
+document.addEventListener('click', function (e) {
+  const saveBtn = e.target.closest('#crear-cita-btn');
+  if (!saveBtn) return;
+
+  // Ejecutar en fase captura: evitar que otros listeners (bubble/target) se ejecuten.
+  e.preventDefault();
+  try { e.stopImmediatePropagation(); } catch (err) {}
+  try { e.stopPropagation(); } catch (err) {}
+
+  const nombreEl = document.getElementById('cita-nombre');
+  const fechaEl = document.getElementById('cita-fecha');
+  const anticipacionEl = document.getElementById('cita-anticipacion');
+
+  const nombre = nombreEl ? nombreEl.value.trim() : '';
+  const fechaHoraRaw = fechaEl ? fechaEl.value.trim() : '';
+  const minutosAnticipacion = anticipacionEl ? parseInt(anticipacionEl.value) || 10 : 10;
+
+  // Validación robusta de la fecha: asegurarnos de que sea un ISO o un valor parseable.
+  if (!nombre || !fechaHoraRaw || isNaN(Date.parse(fechaHoraRaw))) {
+    alert("Por favor completa todos los campos correctamente (asegúrate de confirmar la fecha y hora).");
+    return;
+  }
+
+  // Guardar cita en localStorage (evita duplicados exactos por id)
+  const cita = { id: crypto.randomUUID(), nombre, fechaHora: fechaHoraRaw, minutosAnticipacion };
+  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+  citas.push(cita);
+  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+
+  // Confirmación única
+  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHoraRaw).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
+
+  // Programar notificación (si aplica)
+  const citaHora = new Date(fechaHoraRaw);
+  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
+  if (msRestantes > 0) {
+    setTimeout(() => {
+      try {
+        new Notification("📅 Recordatorio de Cita", {
+          body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
+          icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
+        });
+      } catch (err) {}
+      if (navigator.vibrate) try { navigator.vibrate([300,100,300]); } catch(e){}
+      try {
+        const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+        audio.play().catch(()=>{});
+      } catch (err) {}
+    }, msRestantes);
+  }
+
+  // Actualizar lista visual
+  if (typeof renderCitas === 'function') {
+    try { renderCitas(); } catch (err) { console.warn('renderCitas() fallo', err); }
+  }
+
+  // Limpiar campos
+  if (nombreEl) nombreEl.value = '';
+  if (fechaEl) fechaEl.value = '';
+  if (anticipacionEl) anticipacionEl.value = '10';
+
+}, true); // <-- El 'true' fuerza fase de captura
+</script>
+
+
+<script>
+// --- Solicitar permiso de notificación al cargar la app ---
+window.addEventListener("load", async () => {
+  if ("Notification" in window) {
+    let perm = Notification.permission;
+    if (perm !== "granted") {
+      try {
+        const result = await Notification.requestPermission();
+        console.log("Permiso de notificación:", result);
+        if (result !== "granted") {
+          alert("⚠️ Las notificaciones están bloqueadas. Se usarán alertas, sonido y vibración como recordatorio.");
+        }
+      } catch (e) {
+        alert("⚠️ No se pudo solicitar permiso de notificación. Se usará un recordatorio alternativo.");
+      }
+    }
+  } else {
+    alert("⚠️ Tu navegador no soporta notificaciones. Se usará un recordatorio alternativo.");
+  }
+});
+
+// --- Función robusta de notificación con fallback ---
+function lanzarNotificacion(nombre, citaHora) {
+  const titulo = "📅 Recordatorio de Cita";
+  const cuerpo = `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`;
+
+  // Intentar notificación nativa
+  if ("Notification" in window && Notification.permission === "granted") {
+    try {
+      new Notification(titulo, {
+        body: cuerpo,
+        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
+      });
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+      audio.play().catch(() => {});
+      return;
+    } catch (e) {
+      console.warn("Fallo notificación, se usa fallback:", e);
+    }
+  }
+
+  // Fallback visual + vibración + sonido
+  alert(`🔔 ${titulo}\n${cuerpo}`);
+  if (navigator.vibrate) navigator.vibrate([400, 150, 400]);
+  try {
+    const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+    audio.play().catch(() => {});
+  } catch (e) {}
+}
+
+// --- Integración en el guardado de citas ---
+document.addEventListener('click', function (e) {
+  const saveBtn = e.target.closest('#crear-cita-btn');
+  if (!saveBtn) return;
+  e.preventDefault();
+  try { e.stopImmediatePropagation(); } catch (err) {}
+  try { e.stopPropagation(); } catch (err) {}
+
+  const nombreEl = document.getElementById('cita-nombre');
+  const fechaEl = document.getElementById('cita-fecha');
+  const anticipacionEl = document.getElementById('cita-anticipacion');
+
+  const nombre = nombreEl ? nombreEl.value.trim() : '';
+  const fechaHoraRaw = fechaEl ? fechaEl.value.trim() : '';
+  const minutosAnticipacion = anticipacionEl ? parseInt(anticipacionEl.value) || 10 : 10;
+
+  if (!nombre || !fechaHoraRaw || isNaN(Date.parse(fechaHoraRaw))) {
+    alert("Por favor completa todos los campos correctamente (asegúrate de confirmar la fecha y hora).");
+    return;
+  }
+
+  const cita = { id: crypto.randomUUID(), nombre, fechaHora: fechaHoraRaw, minutosAnticipacion };
+  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+  citas.push(cita);
+  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+
+  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHoraRaw).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
+
+  const citaHora = new Date(fechaHoraRaw);
+  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
+  if (msRestantes > 0) {
+    setTimeout(() => lanzarNotificacion(nombre, citaHora), msRestantes);
+  }
+
+  if (typeof renderCitas === 'function') {
+    try { renderCitas(); } catch (err) { console.warn('renderCitas() fallo', err); }
+  }
+
+  if (nombreEl) nombreEl.value = '';
+  if (fechaEl) fechaEl.value = '';
+  if (anticipacionEl) anticipacionEl.value = '10';
+}, true);
+</script>
+
 </body>
 </html>
