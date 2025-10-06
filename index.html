@@ -395,8 +395,7 @@
             
             <div id="empty-cart-message" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner hidden">
                 <i data-lucide="package" class="w-16 h-16 text-gray-400 mx-auto mb-3"></i>
-                <p class="text-gray-500 text-lg">EL TICKET ESTÁ VACÍO. USA EL BUSCADOR PARA AGREGAR ARTÍCULOS.</p>
-                <p class="text-sm text-gray-400 mt-2">(La base de datos actual se guarda automáticamente en la memoria de este navegador.)</p>
+                <p class="text-gray-500 text-lg">EL TICKET ESTÁ VACÍO.</p>
 
     <div class="mt-4 flex justify-center">
         <button
@@ -598,13 +597,7 @@
         function saveAppState() {
             localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(appState.cart));
             localStorage.setItem(STORAGE_KEYS.CAPITAL_NOTE, JSON.stringify(appState.capitalNoteText)); 
-        
-    try { console.debug('saveAppState -> saving cart length:', (appState.cart||[]).length); localStorage.setItem('salesTicketLastSavedAt', new Date().toISOString()); } catch(e) { console.warn('saveAppState debug failed', e); }
-}
-// Guarda el estado justo antes de cerrar o recargar la página
-window.addEventListener('beforeunload', function(){ try{ saveAppState(); } catch(e){} });
-
-
+        }
 
         // Helper para guardar solo la lista de tickets cerrados
         function saveSavedTicketsData() {
@@ -615,10 +608,22 @@ window.addEventListener('beforeunload', function(){ try{ saveAppState(); } catch
          * Normaliza el texto de búsqueda para ser indiferente a 'o', 'O' y '0'.
          */
         function normalizeSearchText(text) {
-            if (!text) return "";
-            // Convertir a minúsculas y reemplazar 'o' (letra) y '0' (número) por 'x'
-            return text.toLowerCase().replace(/[o0]/g, 'x');
-        }
+    if (!text) return "";
+
+    // 🔹 Pasar todo a minúsculas y quitar espacios
+    text = text.toLowerCase().trim();
+
+    // 🔹 Sustituir acentos y variantes visuales de "o"
+    text = text
+        .replace(/[óòôö]/g, "o") // letras minúsculas acentuadas
+        .replace(/[ÓÒÔÖ]/g, "o") // mayúsculas acentuadas
+        .replace(/[º°]/g, "o");   // símbolos parecidos a "o"
+
+    // 🔹 Hacer equivalentes "o" y "0" (pero sin tocar la "x")
+    text = text.replace(/0/g, "o");
+
+    return text;
+}
 
         function generateMockData() {
             const products = [];
@@ -673,7 +678,9 @@ window.addEventListener('beforeunload', function(){ try{ saveAppState(); } catch
                     appState.capitalNoteText = `#${maxRefNumber + 1}`;
                 }
                 
-                if (storedCart) { appState.cart = JSON.parse(storedCart); console.debug('loadData -> loaded cart length from localStorage:', (appState.cart||[]).length, 'storedNote:', storedNote); }
+                if (storedCart) { appState.cart = JSON.parse(storedCart); }
+
+    render(); // 🔹 Renderiza el estado cargado al iniciar
                 
                 dom.currentDate.textContent = getCurrentDateFormatted();
                 // dom.noteInput.value = appState.capitalNoteText; // ELIMINADO
@@ -701,15 +708,19 @@ window.addEventListener('beforeunload', function(){ try{ saveAppState(); } catch
 
             const normalizedSearchText = normalizeSearchText(text);
             
-            const filtered = appState.allProducts.filter(product => {
-                const normalizedProductCode = normalizeSearchText(product.code);
-                const normalizedProductMake = normalizeSearchText(product.make);
+            
+const filtered = appState.allProducts.filter(product => {
+    const normalizedProductCode = normalizeSearchText(product.code);
+    const normalizedProductMake = normalizeSearchText(product.make);
+    const combined = `${normalizedProductMake} ${normalizedProductCode}`; // 🔹 Marca + Código
 
-                const codeMatch = normalizedProductCode.includes(normalizedSearchText);
-                const makeMatch = normalizedProductMake.includes(normalizedSearchText); 
-                
-                return codeMatch || makeMatch;
-            });
+    const codeMatch = normalizedProductCode.includes(normalizedSearchText);
+    const makeMatch = normalizedProductMake.includes(normalizedSearchText);
+    const comboMatch = normalizeSearchText(combined).includes(normalizedSearchText); // 🔹 Nueva coincidencia
+
+    return codeMatch || makeMatch || comboMatch;
+});
+
             
             let finalSuggestions = filtered.slice(0, 14); 
 
@@ -854,7 +865,8 @@ function confirmClearCart() {
             }
 
             _internalClearCart();
-            hideModal('#clear-cart-modal');
+            
+    render(); // 🔹 Refrescar UI para mostrar 'Ticket vacío'hideModal('#clear-cart-modal');
             showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
             render();
         }
@@ -934,7 +946,8 @@ function confirmClearCart() {
             // 3. Limpiar ticket actual e iniciar uno nuevo
             _internalClearCart(); 
             
-            // 4. Actualizar la nota para el nuevo ticket (#N + 1)
+            
+    render(); // 🔹 Refrescar UI para mostrar 'Ticket vacío'// 4. Actualizar la nota para el nuevo ticket (#N + 1)
             // Buscamos el número más alto en toda la lista de guardados para el nuevo ticket.
             const allRefs = appState.savedTickets.map(t => parseInt(t.ref.replace('#', ''))).filter(n => !isNaN(n));
             const maxRefNumber = allRefs.length > 0 ? Math.max(...allRefs) : 0;
@@ -964,7 +977,7 @@ function confirmClearCart() {
                 hideModal('#saved-tickets-modal');
                 showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
                 render();
-                saveAppState();} else if (appState.cart.length === 0) {
+            } else if (appState.cart.length === 0) {
                  // Si el carrito está vacío, se carga sin preguntar
                  appState.cart = [...ticketToLoad.cart];
                  appState.capitalNoteText = ticketToLoad.ref;
@@ -973,7 +986,7 @@ function confirmClearCart() {
                  hideModal('#saved-tickets-modal');
                  showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
                  render();
-                saveAppState();}
+            }
         }
         
         window.deleteSavedTicket = (ticketId) => {
@@ -1030,9 +1043,15 @@ function confirmClearCart() {
                             <td class="px-3 py-2 text-sm text-gray-700 uppercase">${customerName}</td>
 <td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
                             <td class="px-3 py-2 text-center flex justify-center space-x-2">
-                                <button onclick="loadSavedTicket('${ticket.id}')" class="text-white bg-indigo-500 hover:bg-indigo-600 p-1 rounded-md shadow-sm text-xs font-semibold">
-                                    CARGAR
-                                </button>
+                                <button
+    onclick="loadSavedTicket('${ticket.id}')"
+    class="text-white p-1 rounded-md shadow-sm text-xs font-semibold 
+           ${appState.cart.length > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-600'}"
+    ${appState.cart.length > 0 ? 'disabled' : ''}
+    title="${appState.cart.length > 0 ? 'No se puede cargar mientras haya un ticket activo' : 'Cargar ticket guardado'}"
+>
+    CARGAR
+</button>
                                 <button onclick="deleteSavedTicket('${ticket.id}')" class="text-white bg-red-500 hover:bg-red-600 p-1 rounded-md shadow-sm text-xs font-semibold">
                                     X
                                 </button>
@@ -1410,7 +1429,8 @@ function confirmClearCart() {
                         // Limpiar el estado de búsqueda después de cargar la DB
                         _internalClearCart(); 
 
-                        showMessage(`¡Base de datos cargada con éxito! ${newProducts.length} productos importados y GUARDADOS.`, 'success');
+                        
+    render(); // 🔹 Refrescar UI para mostrar 'Ticket vacío'showMessage(`¡Base de datos cargada con éxito! ${newProducts.length} productos importados y GUARDADOS.`, 'success');
                     } else {
                         showMessage("Error: No se encontraron productos válidos en el archivo XLSX. Revise sus encabezados (debe tener Código, Descripción y Precio).", 'error');
                     }
@@ -1646,13 +1666,31 @@ function confirmClearCart() {
         // ---------------------------------------------------------------------
         // 6. INICIALIZACIÓN
         // ---------------------------------------------------------------------
+        // Inicialización principal: cargar datos y asegurar que el estado 'ticketActive'
+        // refleje correctamente el carrito restaurado (evita bloqueo de addItem tras refresh).
         window.onload = function() {
             lucide.createIcons(); 
             loadData();
             setupEventListeners();
-            // --- INICIO DE LA CORRECCIÓN ---
-            render(); // Se añade para dibujar el carrito que se acaba de cargar con loadData()
-            // --- FIN DE LA CORRECCIÓN ---
+
+            // Garantizar que ticketActive se calcule según el carrito/restaurados
+            try {
+                const hasCart = appState.cart && appState.cart.length > 0;
+                const hasSavedRef = Array.isArray(appState.savedTickets) && appState.savedTickets.some(t => t.ref === appState.capitalNoteText);
+                appState.ticketActive = hasCart || hasSavedRef;
+
+                // Sin la función setTicketActive (está en un IIFE), replicamos su efecto en el DOM
+                if (dom.ticketTableContainer) dom.ticketTableContainer.classList.toggle('hidden', !appState.ticketActive);
+                if (dom.emptyCartMsg) dom.emptyCartMsg.classList.toggle('hidden', appState.ticketActive);
+                if (dom.saveTicketBtn) dom.saveTicketBtn.disabled = !appState.ticketActive;
+            } catch(e) {
+                console.warn('No se pudo recalcular ticketActive tras loadData():', e);
+            }
+
+            // Dibujar estado cargado (carrito, sugerencias, totales)
+            render();
+
+            // Asegurar foco en búsqueda para UX
             dom.searchInput.focus();
         };
     </script>
@@ -1844,7 +1882,6 @@ if (hasCart || hasSavedRef) {
   appState.ticketActive = false;
 }
 setTicketActive(appState.ticketActive);
-render(); // 👈 Asegurar re-render al iniciar para habilitar botones
   });
 
   // 🚫 Impide agregar artículos sin ticket activo, muestra mensaje rojo
@@ -1918,7 +1955,6 @@ render(); // 👈 Asegurar re-render al iniciar para habilitar botones
         appState.capitalNoteText = ticket.ref;
         setTicketActive(true);
         render();
-                try { saveAppState(); } catch(e){ console.warn('saveAppState failed in wrapper', e); }
       }
     };
   }
@@ -1951,5 +1987,38 @@ render(); // 👈 Asegurar re-render al iniciar para habilitar botones
 })();
 </script>
 
+
+<!-- FIX: Forzar estado del botón GUARDAR según contenido del carrito al final del cargado de la página -->
+<script>
+  (function(){
+    function forceUpdateSaveButton(){
+      try {
+        const hasItems = Array.isArray(appState.cart) && appState.cart.length > 0;
+        if (typeof dom !== 'undefined' && dom) {
+          if (dom.saveTicketBtn) dom.saveTicketBtn.disabled = !hasItems;
+          if (dom.ticketTableContainer) dom.ticketTableContainer.classList.toggle('hidden', !hasItems);
+          if (dom.emptyCartMsg) dom.emptyCartMsg.classList.toggle('hidden', hasItems);
+          if (dom.totalDisplay) {
+            const total = (Array.isArray(appState.cart) ? appState.cart.reduce((s,i)=>s + (parseFloat(i.price||0) * parseFloat(i.quantity||0)),0) : 0);
+            dom.totalDisplay.textContent = `$${total.toFixed(2)}`;
+          }
+        }
+      } catch(e){
+        console.error("forceUpdateSaveButton error:", e);
+      }
+    }
+
+    // Ejecutar inmediatamente por si ya se cargó todo
+    try { forceUpdateSaveButton(); } catch(e){}
+
+    // Ejecutar en load y con un pequeño retardo para sobreescribir cualquier otro handler que cambie el botón
+    window.addEventListener('load', () => {
+      try {
+        forceUpdateSaveButton();
+        setTimeout(forceUpdateSaveButton, 300); // pequeño retardo para garantizar que sea la última actualización
+      } catch(e){}
+    });
+  })();
+</script>
 </body>
 </html>
