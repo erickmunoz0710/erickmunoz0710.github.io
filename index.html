@@ -2591,5 +2591,39 @@ document.addEventListener('click', function (e) {
 }, true);
 </script>
 
+
+<script>
+// --- Actualizar citas automáticamente cada 30 segundos y lanzar recordatorios ---
+setInterval(() => {
+  // Actualizar la lista visual
+  if (typeof renderCitas === "function") {
+    try { renderCitas(); } catch (e) { console.warn("Error al actualizar citas:", e); }
+  }
+
+  // Revisar y lanzar notificaciones si corresponde
+  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
+  const ahora = Date.now();
+
+  citas.forEach(cita => {
+    const citaHora = new Date(cita.fechaHora).getTime();
+    const tiempoAnt = (cita.minutosAnticipacion || 10) * 60000;
+    const momentoNoti = citaHora - tiempoAnt;
+
+    // Si ya pasó el momento de la notificación y no se ha lanzado
+    if (ahora >= momentoNoti && !cita.notificada) {
+      try {
+        lanzarNotificacion(cita.nombre, new Date(citaHora));
+        cita.notificada = true;
+      } catch (err) {
+        console.warn("Error lanzando notificación:", err);
+      }
+    }
+  });
+
+  // Guardar estado actualizado (para evitar notificaciones repetidas)
+  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+}, 30000); // cada 30 segundos
+</script>
+
 </body>
 </html>
