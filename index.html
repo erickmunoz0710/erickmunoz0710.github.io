@@ -367,6 +367,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- Botón para abrir citas -->
                     <button
+                        id="open-saved-tickets-btn"
+                        class="p-2 text-indigo-600 hover:text-white bg-indigo-100 hover:bg-indigo-600 rounded-full transition duration-200 shadow-md"
+                        title="Tickets Guardados / Corte de Caja"
+                    >
+                        <i data-lucide="archive" class="w-6 h-6"></i>
+                    </button>
+<button
                         id="open-appointment-btn"
                         class="p-2 text-pink-600 hover:text-white bg-pink-100 hover:bg-pink-600 rounded-full transition duration-200 shadow-md"
                         title="Citas de Clientes"
@@ -374,13 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i data-lucide="calendar" class="w-6 h-6"></i>
                     </button>
 
-                    <button
-                        id="open-saved-tickets-btn"
-                        class="p-2 text-indigo-600 hover:text-white bg-indigo-100 hover:bg-indigo-600 rounded-full transition duration-200 shadow-md"
-                        title="Tickets Guardados / Corte de Caja"
-                    >
-                        <i data-lucide="archive" class="w-6 h-6"></i>
-                    </button>
+                    
                     
                     <button
                         id="clear-cart-btn"
@@ -2383,4 +2384,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 </body>
-                    </html>
+</html>
