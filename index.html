@@ -4,9 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AriAuto App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com">
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
+</script>
+    <script src="https://unpkg.com/lucide@latest">
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
+</script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
+</script>
     <style>
         /* Estilos personalizados para la animación del logo y impresión */
         @keyframes flameRise {
@@ -292,7 +328,7 @@
         </div>
     </div>
 
-    <div id="toast-message" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden"></div>
+    <div id="toast-message" class="fixed top-3 left-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden"></div>
 
     <input type="file" id="xlsx-upload-hidden" accept=".xlsx, .xls" class="hidden print:hidden" />
 
@@ -328,6 +364,15 @@
                             FECHA: <span id="current-date" class="text-indigo-600"></span>
                         </p>
                     </div>
+
+                    <!-- Botón para abrir citas -->
+                    <button
+                        id="open-appointment-btn"
+                        class="p-2 text-pink-600 hover:text-white bg-pink-100 hover:bg-pink-600 rounded-full transition duration-200 shadow-md"
+                        title="Citas de Clientes"
+                    >
+                        <i data-lucide="calendar" class="w-6 h-6"></i>
+                    </button>
 
                     <button
                         id="open-saved-tickets-btn"
@@ -426,7 +471,53 @@
             </div>
         </main>
         
-        <footer class="sticky bottom-0 bg-blue-900 text-white shadow-2xl print:hidden">
+        
+<!-- Modal Citas / Recordatorios (azul violeta estilo app) -->
+<div id="appointment-modal" class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 p-4 hidden">
+  <div id="appointment-modal-card" class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all scale-95 opacity-0">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="flex items-center justify-center w-10 h-10 rounded-md bg-violet-600 text-white">
+        <i data-lucide="calendar" class="w-5 h-5"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-800">Citas / Recordatorios</h3>
+      <div class="ml-auto">
+        <button id="cancel-appointment-btn" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario compacto -->
+    <div class="space-y-3 mb-4 border-b border-gray-100 pb-4">
+      <div>
+        <label for="client-name" class="block text-sm font-medium text-gray-700">Nombre del cliente</label>
+        <input id="client-name" type="text" class="w-full border border-gray-200 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:border-violet-500" placeholder="Ej: Juan Pérez">
+      </div>
+
+      <div>
+        <label for="appointment-datetime" class="block text-sm font-medium text-gray-700">Fecha y hora</label>
+        <input id="appointment-datetime" type="datetime-local" class="w-full border border-gray-200 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+      </div>
+
+      <div class="flex flex-col items-center space-y-2 mt-2">
+        <button id="save-appointment-btn" class="w-full px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition shadow">
+          Guardar Cita
+        </button>
+        <p id="appointment-message" class="text-green-600 text-sm font-semibold text-center opacity-0 transition-opacity duration-300">
+          ✅ Cita guardada correctamente
+        </p>
+      </div>
+    </div>
+
+    <!-- Lista compacta (estilo app) -->
+    <div id="appointments-list-container" class="mt-3">
+      <div id="no-appointments-text" class="text-sm text-gray-500 text-center py-6">No hay citas programadas</div>
+      <ul id="appointments-body" class="space-y-2"></ul>
+    </div>
+  </div>
+</div>
+
+<footer class="sticky bottom-0 bg-blue-900 text-white shadow-2xl print:hidden">
             <div class="container mx-auto p-2 flex justify-between items-center text-sm">
                 
                 <div class="flex items-center space-x-6 flex-shrink-0">
@@ -555,7 +646,7 @@
 
         function showMessage(text, type = 'success') {
             dom.toastMessage.textContent = text;
-            dom.toastMessage.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 print:hidden ${
+            dom.toastMessage.className = `fixed top-3 left-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 print:hidden ${
                 type === 'success' ? 'bg-green-500' : 
                 type === 'error' ? 'bg-red-500' :
                 'bg-indigo-500' 
@@ -595,9 +686,17 @@
         
         // Helper para guardar el estado del ticket actual (cart y note)
         function saveAppState() {
-            localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(appState.cart));
-            localStorage.setItem(STORAGE_KEYS.CAPITAL_NOTE, JSON.stringify(appState.capitalNoteText)); 
-        }
+    // 🚫 Evitar guardar si el ticket está vacío
+    if (!appState.cart || appState.cart.length === 0) {
+        localStorage.removeItem(STORAGE_KEYS.CART);
+        localStorage.removeItem(STORAGE_KEYS.CAPITAL_NOTE);
+        return;
+    }
+
+    // Guardar solo si hay items
+    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(appState.cart));
+    localStorage.setItem(STORAGE_KEYS.CAPITAL_NOTE, JSON.stringify(appState.capitalNoteText)); 
+}
 
         // Helper para guardar solo la lista de tickets cerrados
         function saveSavedTicketsData() {
@@ -678,7 +777,17 @@
                     appState.capitalNoteText = `#${maxRefNumber + 1}`;
                 }
                 
-                if (storedCart) { appState.cart = JSON.parse(storedCart); }
+                if (storedCart) {
+    const parsedCart = JSON.parse(storedCart);
+    if (Array.isArray(parsedCart) && parsedCart.length > 0) {
+        appState.cart = parsedCart;
+    } else {
+        localStorage.removeItem(STORAGE_KEYS.CART);
+        localStorage.removeItem(STORAGE_KEYS.CAPITAL_NOTE);
+        appState.cart = [];
+        appState.capitalNoteText = '#1';
+    }
+}
 
     render(); // 🔹 Renderiza el estado cargado al iniciar
                 
@@ -827,6 +936,11 @@ function removeItem(id) {
                 if (idx !== -1) {
                     appState.savedTickets.splice(idx, 1);
                     if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
+
+            // ✅ Mostrar mensaje verde de confirmación
+            setTimeout(() => {
+    showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
+}, 300);
                     showMessage(`El ticket ${currentRef} quedó vacío y se eliminó de tickets guardados.`, 'error');
                 }
                 // Reiniciar la nota del ticket actual
@@ -861,6 +975,11 @@ function confirmClearCart() {
     if (idx !== -1) {
         appState.savedTickets.splice(idx, 1);
         if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
+
+            // ✅ Mostrar mensaje verde de confirmación
+            setTimeout(() => {
+    showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
+}, 300);
         showMessage(`Se eliminó el ticket guardado ${currentRef} porque se borró todo su contenido.`, 'error');
     }
 
@@ -943,6 +1062,11 @@ function confirmClearCart() {
             // 2. Guardar la lista de tickets
             saveSavedTicketsData();
 
+            // ✅ Mostrar mensaje verde de confirmación
+            setTimeout(() => {
+    showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
+}, 300);
+
             // 3. Limpiar ticket actual e iniciar uno nuevo
             _internalClearCart(); 
             
@@ -975,7 +1099,7 @@ function confirmClearCart() {
                 // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
                 
                 hideModal('#saved-tickets-modal');
-                showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
+                showMessage(`TICKET ${ticketToLoad.ref} CARGADO. PUEDES EDITAR EL TICKET DE ${ticketToLoad.customer?.toUpperCase() || 'CLIENTE'}.`, 'info');
                 render();
             } else if (appState.cart.length === 0) {
                  // Si el carrito está vacío, se carga sin preguntar
@@ -984,7 +1108,7 @@ function confirmClearCart() {
                  // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
                  
                  hideModal('#saved-tickets-modal');
-                 showMessage(`Ticket Ref. ${ticketToLoad.ref} cargado en el sistema. Ahora puedes editarlo y guardarlo (reemplazar) o limpiarlo.`, 'info');
+                 showMessage(`TICKET ${ticketToLoad.ref} CARGADO. PUEDES EDITAR EL TICKET DE ${ticketToLoad.customer?.toUpperCase() || 'CLIENTE'}.`, 'info');
                  render();
             }
         }
@@ -994,6 +1118,11 @@ function confirmClearCart() {
             if (confirm(`¿Estás seguro de que deseas eliminar el ${ticketRef} de la lista de tickets cerrados?`)) {
                 appState.savedTickets = appState.savedTickets.filter(t => t.id !== ticketId);
                 saveSavedTicketsData();
+
+            // ✅ Mostrar mensaje verde de confirmación
+            setTimeout(() => {
+    showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
+}, 300);
                 renderSavedTickets();
                 showMessage(`${ticketRef} eliminado.`, 'error');
             }
@@ -1010,6 +1139,11 @@ function confirmClearCart() {
             if (confirmDelete) {
                 appState.savedTickets = [];
                 saveSavedTicketsData();
+
+            // ✅ Mostrar mensaje verde de confirmación
+            setTimeout(() => {
+    showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
+}, 300);
                 renderSavedTickets();
                 showMessage(`Eliminación total realizada. ${total} tickets (${totalAmount.toFixed(2)}) eliminados.`, 'success');
             }
@@ -1033,7 +1167,10 @@ function confirmClearCart() {
                 const rowsHTML = appState.savedTickets.map(ticket => {
                     const customerName = ticket.customer || "SIN NOMBRE";
                     const date = new Date(ticket.date);
-                    const dateStr = date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                    const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = months[date.getMonth()];
+            const dateStr = `${day} ${month}`;
                     const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
                     
                     return `
@@ -1693,7 +1830,19 @@ function confirmClearCart() {
             // Asegurar foco en búsqueda para UX
             dom.searchInput.focus();
         };
-    </script>
+    
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
+</script>
 
 <script>
 window.addEventListener("load", () => {
@@ -1721,6 +1870,18 @@ window.addEventListener("load", () => {
     });
   }
 });
+
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
 </script>
 
 
@@ -1810,6 +1971,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
 </script>
 <!-- FIN: Modal y validación de nombre de XLSX -->
 
@@ -1935,6 +2108,11 @@ setTicketActive(appState.ticketActive);
       }
 
       if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
+
+            // ✅ Mostrar mensaje verde de confirmación
+            setTimeout(() => {
+    showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
+}, 300);
       if (typeof renderSavedTickets === 'function') renderSavedTickets();
 
       // Cerrar ticket después de guardar
@@ -1985,6 +2163,18 @@ setTicketActive(appState.ticketActive);
     };
   }
 })();
+
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
 </script>
 
 
@@ -2019,611 +2209,178 @@ setTicketActive(appState.ticketActive);
       } catch(e){}
     });
   })();
-</script>
 
-<!-- ========================================
-     MÓDULO DE CITAS CON RECORDATORIO (MODAL)
-======================================== -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const headerRight = document.querySelector("header .flex.items-center.space-x-3");
-  if (headerRight) {
-    const citasBtn = document.createElement("button");
-    citasBtn.id = "open-citas-modal-btn";
-    citasBtn.title = "Citas / Recordatorios";
-    citasBtn.className = "p-2 text-indigo-600 hover:text-white bg-indigo-100 hover:bg-indigo-600 rounded-full transition duration-200 shadow-md";
-    citasBtn.innerHTML = '<i data-lucide="clock" class="w-6 h-6"></i>';
-    headerRight.insertBefore(citasBtn, headerRight.children[1]);
-  }
-});
-</script>
+// ----------------------- Citas / Recordatorios (Modal violeta) -----------------------
+(function(){
+  const APPOINTMENT_KEY = "ariAutoAppointments_v2";
+  let appointments = JSON.parse(localStorage.getItem(APPOINTMENT_KEY)) || [];
 
-<div id="citas-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
-  <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md transform transition-all">
-    <div class="flex justify-between items-center border-b pb-3 mb-4">
-      <h3 class="text-2xl font-bold text-gray-800 flex items-center">
-        <i data-lucide="clock" class="w-8 h-8 mr-3 text-indigo-600"></i>
-        Citas / Recordatorios
-      </h3>
-      <button id="close-citas-modal-btn" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition duration-200">
-        <i data-lucide="x" class="w-8 h-8"></i>
-      </button>
-    </div>
+  const modal = document.getElementById("appointment-modal");
+  const modalCard = document.getElementById("appointment-modal-card");
+  const openBtn = document.getElementById("open-appointment-btn");
+  const cancelBtn = document.getElementById("cancel-appointment-btn");
+  const saveBtn = document.getElementById("save-appointment-btn");
+  const listBody = document.getElementById("appointments-body");
+  const noText = document.getElementById("no-appointments-text");
+  const msg = document.getElementById("appointment-message");
+  const nameInput = document.getElementById("client-name");
+  const datetimeInput = document.getElementById("appointment-datetime");
 
-    <div class="mb-4">
-      <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Cliente</label>
-      <input id="cita-nombre" type="text" placeholder="Ej. Juan Pérez"
-        class="w-full border rounded-md p-2 mb-2 focus:ring-indigo-500 focus:border-indigo-500"/>
-
-      <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha y Hora</label>
-      <input id="cita-fecha" type="datetime-local"
-        class="w-full border rounded-md p-2 mb-2 focus:ring-indigo-500 focus:border-indigo-500"/>
-
-      <label class="block text-sm font-semibold text-gray-700 mb-1">Recordarme antes de (minutos):</label>
-      <input id="cita-anticipacion" type="number" value="10" min="1"
-        class="w-full border rounded-md p-2 mb-3 focus:ring-indigo-500 focus:border-indigo-500"/>
-
-      <button id="crear-cita-btn"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg shadow-md mb-3">
-        Guardar Cita
-      </button>
-    </div>
-
-    <div class="border-t pt-2 text-sm text-gray-700 max-h-64 overflow-y-auto" id="lista-citas">
-      <p class="text-gray-400 italic text-center">No hay citas programadas</p>
-    </div>
-  </div>
-</div>
-
-<script>
-const citasKey = "ariAutoCitas";
-let citas = JSON.parse(localStorage.getItem(citasKey)) || [];
-
-function solicitarPermisoNotificaciones() {
-  if (Notification.permission !== "granted") Notification.requestPermission();
-}
-
-function guardarCita(nombre, fechaHora, minutosAnticipacion) {
-  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
-  citas.push(cita);
-  localStorage.setItem(citasKey, JSON.stringify(citas));
-  programarNotificacion(cita);
-  renderCitas();
-  alert(`Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
-}
-
-function programarNotificacion(cita) {
-  const citaHora = new Date(cita.fechaHora);
-  const msRestantes = citaHora.getTime() - Date.now() - (cita.minutosAnticipacion * 60000);
-  if (msRestantes > 0) {
-    setTimeout(() => {
-      new Notification("📅 Recordatorio de Cita", {
-        body: `Cita con ${cita.nombre} a las ${citaHora.toLocaleTimeString()}`,
-        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
-      });
-      // Vibración o sonido adicional
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
-      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-      audio.play().catch(()=>{});
-    }, msRestantes);
-  }
-}
-
-function eliminarCita(id) {
-  citas = citas.filter(c => c.id !== id);
-  localStorage.setItem(citasKey, JSON.stringify(citas));
-  renderCitas();
-}
-
-function calcularTiempoRestante(fechaHora) {
-  const diffMin = Math.floor((new Date(fechaHora).getTime() - Date.now()) / 60000);
-  if (diffMin <= 0) return "⏰ Ya pasó";
-  if (diffMin < 60) return `Faltan ${diffMin} min";
-  const h = Math.floor(diffMin / 60), m = diffMin % 60;
-  return `Faltan ${h}h ${m}m`;
-}
-
-function renderCitas() {
-  const cont = document.getElementById("lista-citas");
-  cont.innerHTML = "";
-  if (citas.length === 0) {
-    cont.innerHTML = '<p class="text-gray-400 italic text-center">No hay citas programadas</p>';
-    return;
-  }
-  citas.sort((a,b)=>new Date(a.fechaHora)-new Date(b.fechaHora));
-  citas.forEach(cita => {
-    const fecha = new Date(cita.fechaHora);
-    const div = document.createElement("div");
-    div.className = "p-2 border-b flex justify-between items-start";
-    div.innerHTML = `
-      <div>
-        <p class='font-semibold'>${cita.nombre}</p>
-        <p class='text-xs text-gray-500'>${fecha.toLocaleString()}</p>
-        <p class='text-xs text-indigo-600 font-bold'>${calcularTiempoRestante(cita.fechaHora)}</p>
-      </div>
-      <button onclick="eliminarCita('${cita.id}')" class='text-red-500 hover:text-red-700 font-bold text-lg leading-none'>×</button>
-    `;
-    cont.appendChild(div);
-  });
-}
-
-window.addEventListener("load",()=>{
-  solicitarPermisoNotificaciones();
-  citas.forEach(programarNotificacion);
-  renderCitas();
-});
-
-document.addEventListener("click",(e)=>{
-  if(e.target.id==="open-citas-modal-btn") showModal("#citas-modal");
-  if(e.target.id==="close-citas-modal-btn") hideModal("#citas-modal");
-});
-
-document.addEventListener("click",(e)=>{
-  if(e.target.id==="crear-cita-btn"){
-    const n=document.getElementById("cita-nombre").value.trim();
-    const f=document.getElementById("cita-fecha").value;
-    const m=parseInt(document.getElementById("cita-anticipacion").value)||10;
-    if(!n||!f){alert("Completa todos los campos.");return;}
-    guardarCita(n,f,m);
-    document.getElementById("cita-nombre").value="";
-    document.getElementById("cita-fecha").value="";
-    document.getElementById("cita-anticipacion").value="10";
-  }
-});
-</script>
-
-
-<script>
-// --- Fix para abrir/cerrar modal de Citas si showModal/hideModal no existen ---
-function showModal(selector) {
-  const modal = document.querySelector(selector);
-  if (modal) {
+  // helper: show modal with fade+scale
+  function openModal() {
     modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  }
-}
-function hideModal(selector) {
-  const modal = document.querySelector(selector);
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  }
-}
-</script>
-
-
-<script>
-// --- Fix definitivo para abrir/cerrar el modal de Citas ---
-document.addEventListener("click", (e) => {
-  const openBtn = e.target.closest("#open-citas-modal-btn");
-  const closeBtn = e.target.closest("#close-citas-modal-btn");
-
-  // Abrir modal
-  if (openBtn) {
-    const modal = document.querySelector("#citas-modal");
-    if (modal) {
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-    }
-  }
-
-  // Cerrar modal
-  if (closeBtn) {
-    const modal = document.querySelector("#citas-modal");
-    if (modal) {
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-    }
-  }
-});
-</script>
-
-
-<script>
-// --- Fix para que el botón "Guardar Cita" siempre funcione ---
-document.addEventListener("click", (e) => {
-  const saveBtn = e.target.closest("#crear-cita-btn");
-  if (!saveBtn) return;
-
-  const nombre = document.getElementById("cita-nombre").value.trim();
-  const fechaHora = document.getElementById("cita-fecha").value;
-  const minutosAnticipacion = parseInt(document.getElementById("cita-anticipacion").value) || 10;
-
-  if (!nombre || !fechaHora) {
-    alert("Por favor completa todos los campos.");
-    return;
-  }
-
-  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
-  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-  citas.push(cita);
-  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
-
-  // Mostrar confirmación
-  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
-
-  // Reprogramar notificación
-  const citaHora = new Date(fechaHora);
-  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
-  if (msRestantes > 0) {
-    setTimeout(() => {
-      new Notification("📅 Recordatorio de Cita", {
-        body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
-        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
-      });
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
-      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-      audio.play().catch(()=>{});
-    }, msRestantes);
-  }
-
-  // Limpiar campos
-  document.getElementById("cita-nombre").value = "";
-  document.getElementById("cita-fecha").value = "";
-  document.getElementById("cita-anticipacion").value = "10";
-});
-</script>
-
-
-<script>
-// --- Fix final: mostrar la cita recién guardada en la lista al instante ---
-document.addEventListener("click", (e) => {
-  const saveBtn = e.target.closest("#crear-cita-btn");
-  if (!saveBtn) return;
-
-  const nombre = document.getElementById("cita-nombre").value.trim();
-  const fechaHora = document.getElementById("cita-fecha").value;
-  const minutosAnticipacion = parseInt(document.getElementById("cita-anticipacion").value) || 10;
-
-  if (!nombre || !fechaHora) {
-    alert("Por favor completa todos los campos.");
-    return;
-  }
-
-  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
-  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-  citas.push(cita);
-  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
-
-  // Mostrar confirmación
-  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
-
-  // Reprogramar notificación
-  const citaHora = new Date(fechaHora);
-  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
-  if (msRestantes > 0) {
-    setTimeout(() => {
-      new Notification("📅 Recordatorio de Cita", {
-        body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
-        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
-      });
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
-      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-      audio.play().catch(()=>{});
-    }, msRestantes);
-  }
-
-  // Actualizar lista visual sin recargar
-  if (typeof renderCitas === "function") renderCitas();
-
-  // Limpiar campos
-  document.getElementById("cita-nombre").value = "";
-  document.getElementById("cita-fecha").value = "";
-  document.getElementById("cita-anticipacion").value = "10";
-});
-</script>
-
-
-<script>
-// --- Fix final para mostrar las citas en la lista ---
-if (typeof renderCitas !== "function") {
-  window.renderCitas = function() {
-    const citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-    const cont = document.getElementById("lista-citas");
-    if (!cont) return;
-    cont.innerHTML = "";
-    if (citas.length === 0) {
-      cont.innerHTML = '<p class="text-gray-400 italic text-center">No hay citas programadas</p>';
-      return;
-    }
-
-    citas.sort((a,b)=>new Date(a.fechaHora)-new Date(b.fechaHora));
-    citas.forEach(cita => {
-      const fecha = new Date(cita.fechaHora);
-      const div = document.createElement("div");
-      div.className = "p-2 border-b flex justify-between items-start";
-      div.innerHTML = `
-        <div>
-          <p class='font-semibold'>${cita.nombre}</p>
-          <p class='text-xs text-gray-500'>${fecha.toLocaleString()}</p>
-          <p class='text-xs text-indigo-600 font-bold'>Faltan ${Math.max(0, Math.floor((fecha.getTime() - Date.now()) / 60000))} min</p>
-        </div>
-        <button onclick="eliminarCita('${cita.id}')" class='text-red-500 hover:text-red-700 font-bold text-lg leading-none'>×</button>
-      `;
-      cont.appendChild(div);
+    // animate card
+    requestAnimationFrame(()=>{
+      modalCard.classList.remove("scale-95","opacity-0");
+      modalCard.classList.add("scale-100","opacity-100");
     });
-  };
-}
-
-// Actualizar lista apenas se guarda una cita
-document.addEventListener("click", (e) => {
-  const saveBtn = e.target.closest("#crear-cita-btn");
-  if (saveBtn) setTimeout(() => renderCitas(), 200);
-});
-</script>
-
-
-<script>
-// --- Fix para que el botón "X" elimine la cita correctamente ---
-window.eliminarCita = function(id) {
-  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-  citas = citas.filter(c => c.id !== id);
-  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
-  if (typeof renderCitas === "function") renderCitas();
-};
-
-// --- Mostrar citas guardadas automáticamente al cargar la app ---
-window.addEventListener("load", () => {
-  if (typeof renderCitas === "function") {
-    renderCitas();
-  } else {
-    setTimeout(() => {
-      if (typeof renderCitas === "function") renderCitas();
-    }, 1000);
+    setTimeout(()=> nameInput.focus(), 150);
   }
-});
-</script>
-
-
-<script>
-// --- Fix para evitar doble mensaje al guardar cita (Android/iPhone compatible) ---
-document.addEventListener("click", (e) => {
-  const saveBtn = e.target.closest("#crear-cita-btn");
-  if (!saveBtn) return;
-
-  const nombre = document.getElementById("cita-nombre").value.trim();
-  const fechaInput = document.getElementById("cita-fecha");
-  const fechaHora = fechaInput?.value?.trim() || "";
-  const minutosAnticipacion = parseInt(document.getElementById("cita-anticipacion").value) || 10;
-
-  // Validar campos correctamente
-  if (!nombre || !fechaHora || isNaN(Date.parse(fechaHora))) {
-    alert("Por favor completa todos los campos correctamente (asegúrate de confirmar la fecha y hora).");
-    return;
+  function closeModal() {
+    // reverse animation then hide
+    modalCard.classList.add("scale-95","opacity-0");
+    modalCard.classList.remove("scale-100","opacity-100");
+    setTimeout(()=> modal.classList.add("hidden"), 180);
   }
 
-  const cita = { id: crypto.randomUUID(), nombre, fechaHora, minutosAnticipacion };
-  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-  citas.push(cita);
-  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
+  function saveAppointmentsToStorage(){ localStorage.setItem(APPOINTMENT_KEY, JSON.stringify(appointments)); }
 
-  // Mostrar confirmación
-  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHora).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
-
-  // Programar notificación
-  const citaHora = new Date(fechaHora);
-  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
-  if (msRestantes > 0) {
-    setTimeout(() => {
-      new Notification("📅 Recordatorio de Cita", {
-        body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
-        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
-      });
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
-      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-      audio.play().catch(()=>{});
-    }, msRestantes);
+  function formatAppDisplay(dtStr){
+    // display like app: DD/MM HH:mm (no year)
+    const d = new Date(dtStr);
+    const day = String(d.getDate()).padStart(2,"0");
+    const month = String(d.getMonth()+1).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    return `${day}/${month} ${hh}:${mm}`;
   }
 
-  // Actualizar lista visual inmediatamente
-  if (typeof renderCitas === "function") renderCitas();
-
-  // Limpiar campos
-  document.getElementById("cita-nombre").value = "";
-  fechaInput.value = "";
-  document.getElementById("cita-anticipacion").value = "10";
-});
-</script>
-
-
-<script>
-/*
-  Interceptor en fase 'capture' para el botón "Guardar Cita".
-  Ejecuta el guardado y bloquea otros handlers que causaban mensajes dobles.
-*/
-document.addEventListener('click', function (e) {
-  const saveBtn = e.target.closest('#crear-cita-btn');
-  if (!saveBtn) return;
-
-  // Ejecutar en fase captura: evitar que otros listeners (bubble/target) se ejecuten.
-  e.preventDefault();
-  try { e.stopImmediatePropagation(); } catch (err) {}
-  try { e.stopPropagation(); } catch (err) {}
-
-  const nombreEl = document.getElementById('cita-nombre');
-  const fechaEl = document.getElementById('cita-fecha');
-  const anticipacionEl = document.getElementById('cita-anticipacion');
-
-  const nombre = nombreEl ? nombreEl.value.trim() : '';
-  const fechaHoraRaw = fechaEl ? fechaEl.value.trim() : '';
-  const minutosAnticipacion = anticipacionEl ? parseInt(anticipacionEl.value) || 10 : 10;
-
-  // Validación robusta de la fecha: asegurarnos de que sea un ISO o un valor parseable.
-  if (!nombre || !fechaHoraRaw || isNaN(Date.parse(fechaHoraRaw))) {
-    alert("Por favor completa todos los campos correctamente (asegúrate de confirmar la fecha y hora).");
-    return;
-  }
-
-  // Guardar cita en localStorage (evita duplicados exactos por id)
-  const cita = { id: crypto.randomUUID(), nombre, fechaHora: fechaHoraRaw, minutosAnticipacion };
-  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-  citas.push(cita);
-  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
-
-  // Confirmación única
-  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHoraRaw).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
-
-  // Programar notificación (si aplica)
-  const citaHora = new Date(fechaHoraRaw);
-  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
-  if (msRestantes > 0) {
-    setTimeout(() => {
-      try {
-        new Notification("📅 Recordatorio de Cita", {
-          body: `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`,
-          icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
-        });
-      } catch (err) {}
-      if (navigator.vibrate) try { navigator.vibrate([300,100,300]); } catch(e){}
-      try {
-        const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-        audio.play().catch(()=>{});
-      } catch (err) {}
-    }, msRestantes);
-  }
-
-  // Actualizar lista visual
-  if (typeof renderCitas === 'function') {
-    try { renderCitas(); } catch (err) { console.warn('renderCitas() fallo', err); }
-  }
-
-  // Limpiar campos
-  if (nombreEl) nombreEl.value = '';
-  if (fechaEl) fechaEl.value = '';
-  if (anticipacionEl) anticipacionEl.value = '10';
-
-}, true); // <-- El 'true' fuerza fase de captura
-</script>
-
-
-<script>
-// --- Solicitar permiso de notificación al cargar la app ---
-window.addEventListener("load", async () => {
-  if ("Notification" in window) {
-    let perm = Notification.permission;
-    if (perm !== "granted") {
-      try {
-        const result = await Notification.requestPermission();
-        console.log("Permiso de notificación:", result);
-        if (result !== "granted") {
-          alert("⚠️ Las notificaciones están bloqueadas. Se usarán alertas, sonido y vibración como recordatorio.");
-        }
-      } catch (e) {
-        alert("⚠️ No se pudo solicitar permiso de notificación. Se usará un recordatorio alternativo.");
-      }
+  function diffTextFor(dtStr){
+    const now = new Date();
+    const target = new Date(dtStr);
+    const diffMs = target - now;
+    const absMin = Math.floor(Math.abs(diffMs) / 60000);
+    if (Math.abs(diffMs) < 60000) return "Ahora";
+    // Express as hours + minutes if >= 60
+    if (absMin >= 60){
+      const h = Math.floor(absMin/60);
+      const m = absMin % 60;
+      const mh = m>0 ? `${m} min` : "";
+      return diffMs > 0 ? `Faltan ${h} h ${mh}`.trim() : `Hace ${h} h ${mh}`.trim();
+    } else {
+      return diffMs > 0 ? `Faltan ${absMin} min` : `Hace ${absMin} min`;
     }
-  } else {
-    alert("⚠️ Tu navegador no soporta notificaciones. Se usará un recordatorio alternativo.");
   }
-});
 
-// --- Función robusta de notificación con fallback ---
-function lanzarNotificacion(nombre, citaHora) {
-  const titulo = "📅 Recordatorio de Cita";
-  const cuerpo = `Cita con ${nombre} a las ${citaHora.toLocaleTimeString()}`;
-
-  // Intentar notificación nativa
-  if ("Notification" in window && Notification.permission === "granted") {
-    try {
-      new Notification(titulo, {
-        body: cuerpo,
-        icon: "https://cdn-icons-png.flaticon.com/512/747/747310.png"
-      });
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
-      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-      audio.play().catch(() => {});
+  function renderList(){
+    // sort by datetime
+    appointments.sort((a,b)=> new Date(a.datetime) - new Date(b.datetime));
+    if (appointments.length === 0){
+      listBody.innerHTML = "";
+      noText.classList.remove("hidden");
       return;
-    } catch (e) {
-      console.warn("Fallo notificación, se usa fallback:", e);
     }
+    noText.classList.add("hidden");
+    listBody.innerHTML = "";
+    appointments.forEach((a, i) => {
+      const li = document.createElement("li");
+      li.className = "p-3 bg-white border border-gray-100 rounded-md shadow-sm hover:bg-gray-50 flex items-center justify-between";
+      const left = document.createElement("div");
+      left.className = "flex flex-col";
+      const nameEl = document.createElement("div");
+      nameEl.className = "font-medium text-gray-800";
+      nameEl.textContent = a.name;
+      const dateEl = document.createElement("div");
+      dateEl.className = "text-xs text-gray-500";
+      dateEl.textContent = formatAppDisplay(a.datetime);
+      left.appendChild(nameEl);
+      left.appendChild(dateEl);
+
+      const right = document.createElement("div");
+      right.className = "flex items-center gap-3";
+      const diff = document.createElement("div");
+      diff.className = "text-sm text-gray-600";
+      diff.textContent = diffTextFor(a.datetime);
+      const del = document.createElement("button");
+      del.className = "text-red-500 hover:text-red-700 font-bold text-lg";
+      del.innerHTML = "×";
+      del.title = "Eliminar cita";
+      del.addEventListener("click", ()=>{
+        appointments.splice(i,1);
+        saveAppointmentsToStorage();
+        renderList();
+        showMessage("🗑️ Cita eliminada","error");
+      });
+
+      right.appendChild(diff);
+      right.appendChild(del);
+
+      li.appendChild(left);
+      li.appendChild(right);
+      listBody.appendChild(li);
+    });
   }
 
-  // Fallback visual + vibración + sonido
-  alert(`🔔 ${titulo}\n${cuerpo}`);
-  if (navigator.vibrate) navigator.vibrate([400, 150, 400]);
-  try {
-    const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-    audio.play().catch(() => {});
-  } catch (e) {}
-}
-
-// --- Integración en el guardado de citas ---
-document.addEventListener('click', function (e) {
-  const saveBtn = e.target.closest('#crear-cita-btn');
-  if (!saveBtn) return;
-  e.preventDefault();
-  try { e.stopImmediatePropagation(); } catch (err) {}
-  try { e.stopPropagation(); } catch (err) {}
-
-  const nombreEl = document.getElementById('cita-nombre');
-  const fechaEl = document.getElementById('cita-fecha');
-  const anticipacionEl = document.getElementById('cita-anticipacion');
-
-  const nombre = nombreEl ? nombreEl.value.trim() : '';
-  const fechaHoraRaw = fechaEl ? fechaEl.value.trim() : '';
-  const minutosAnticipacion = anticipacionEl ? parseInt(anticipacionEl.value) || 10 : 10;
-
-  if (!nombre || !fechaHoraRaw || isNaN(Date.parse(fechaHoraRaw))) {
-    alert("Por favor completa todos los campos correctamente (asegúrate de confirmar la fecha y hora).");
-    return;
+  // message fade in/out
+  let msgTimeout = null;
+  function showSaveMessage(text="✅ Cita guardada correctamente"){
+    if (!msg) return;
+    msg.textContent = text;
+    msg.classList.remove("opacity-0");
+    msg.classList.add("opacity-100");
+    if (msgTimeout) clearTimeout(msgTimeout);
+    msgTimeout = setTimeout(()=>{
+      msg.classList.remove("opacity-100");
+      msg.classList.add("opacity-0");
+    }, 3000);
   }
 
-  const cita = { id: crypto.randomUUID(), nombre, fechaHora: fechaHoraRaw, minutosAnticipacion };
-  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-  citas.push(cita);
-  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
-
-  alert(`✅ Cita guardada con ${nombre} el ${new Date(fechaHoraRaw).toLocaleString()} (recordar ${minutosAnticipacion} min antes).`);
-
-  const citaHora = new Date(fechaHoraRaw);
-  const msRestantes = citaHora.getTime() - Date.now() - (minutosAnticipacion * 60000);
-  if (msRestantes > 0) {
-    setTimeout(() => lanzarNotificacion(nombre, citaHora), msRestantes);
-  }
-
-  if (typeof renderCitas === 'function') {
-    try { renderCitas(); } catch (err) { console.warn('renderCitas() fallo', err); }
-  }
-
-  if (nombreEl) nombreEl.value = '';
-  if (fechaEl) fechaEl.value = '';
-  if (anticipacionEl) anticipacionEl.value = '10';
-}, true);
-</script>
-
-
-<script>
-// --- Actualizar citas automáticamente cada 30 segundos y lanzar recordatorios ---
-setInterval(() => {
-  // Actualizar la lista visual
-  if (typeof renderCitas === "function") {
-    try { renderCitas(); } catch (e) { console.warn("Error al actualizar citas:", e); }
-  }
-
-  // Revisar y lanzar notificaciones si corresponde
-  let citas = JSON.parse(localStorage.getItem("ariAutoCitas")) || [];
-  const ahora = Date.now();
-
-  citas.forEach(cita => {
-    const citaHora = new Date(cita.fechaHora).getTime();
-    const tiempoAnt = (cita.minutosAnticipacion || 10) * 60000;
-    const momentoNoti = citaHora - tiempoAnt;
-
-    // Si ya pasó el momento de la notificación y no se ha lanzado
-    if (ahora >= momentoNoti && !cita.notificada) {
-      try {
-        lanzarNotificacion(cita.nombre, new Date(citaHora));
-        cita.notificada = true;
-      } catch (err) {
-        console.warn("Error lanzando notificación:", err);
-      }
+  // events
+  openBtn && openBtn.addEventListener("click", ()=>{ renderList(); openModal(); });
+  cancelBtn && cancelBtn.addEventListener("click", ()=>{ closeModal(); });
+  // close modal on background click (but not on card click)
+  modal.addEventListener("click", (e)=>{ if (e.target === modal) closeModal(); });
+  saveBtn && saveBtn.addEventListener("click", ()=>{
+    const name = nameInput.value.trim();
+    const dt = datetimeInput.value;
+    if (!name || !dt){
+      alert("Por favor completa nombre y fecha/hora.");
+      return;
     }
+    appointments.push({ name, datetime: dt });
+    saveAppointmentsToStorage();
+    renderList();
+    nameInput.value = "";
+    datetimeInput.value = "";
+    nameInput.focus();
+    showSaveMessage();
   });
 
-  // Guardar estado actualizado (para evitar notificaciones repetidas)
-  localStorage.setItem("ariAutoCitas", JSON.stringify(citas));
-}, 30000); // cada 30 segundos
-</script>
+  // live update every 30s
+  setInterval(()=>{ renderList(); }, 30000);
 
+  // initial render
+  renderList();
+
+  // expose for debugging if needed
+  window._appointments = appointments;
+
+  // ensure icons render
+  if (typeof lucide !== "undefined") setTimeout(()=>{ try{ lucide.createIcons(); }catch(e){} }, 50);
+})(); 
+// ----------------------- FIN Citas -----------------------
+
+// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+document.addEventListener('DOMContentLoaded', () => {
+    const newTicketBtn = document.getElementById('new-ticket-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (newTicketBtn && clearCartBtn) {
+        newTicketBtn.addEventListener('click', () => {
+            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+        });
+    }
+});
+
+</script>
 </body>
-</html>
+                    </html>
