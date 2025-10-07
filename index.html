@@ -1285,7 +1285,19 @@ function confirmClearCart() {
         fixedHeaderParent.removeChild(fixedHeader);
     }
 
-    window.print();
+    setTimeout(() => {
+        window.print();
+
+        setTimeout(() => {
+            container.innerHTML = '';
+            container.classList.remove('printing');
+
+            // 🔵 Restaurar encabezado fijo después
+            if (fixedHeader && fixedHeaderParent) {
+                fixedHeaderParent.insertBefore(fixedHeader, fixedHeaderParent.firstChild);
+            }
+        }, 500);
+    }, 600); // <-- Espera 600ms antes de imprimir
 
     setTimeout(() => {
         container.innerHTML = '';
