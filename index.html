@@ -212,7 +212,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .print-all-tickets-container {
             display: none;
         }
-    </style>
+    
+/* Animación de cierre suave para el ticket */
+.ticket-fade-out { animation: ticketFadeOut 0.35s ease forwards; }
+@keyframes ticketFadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.97); }
+}
+
+</style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
     
@@ -454,7 +462,16 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
             </div>
 
-            <div id="ticket-table-container" class="overflow-x-auto bg-white rounded-lg shadow-xl hidden">
+            <div id="ticket-table-container" class="relative overflow-x-auto bg-white rounded-lg shadow-xl hidden">
+<!-- Botón X para cerrar ticket -->
+<button
+    id="close-ticket-btn"
+    class="absolute top-2 right-2 text-gray-400 hover:text-red-600 bg-gray-100 hover:bg-red-100 rounded-full p-1.5 shadow-md transition duration-200"
+    title="Cerrar ticket actual"
+>
+    <i data-lucide="x" class="w-6 h-6"></i>
+</button>
+
                 <table class="min-w-full table-auto" id="ticket-table">
                     <thead>
                         <tr class="bg-indigo-50 border-b border-indigo-200 text-left text-xs font-semibold uppercase tracking-wider text-indigo-700 print:bg-white print:text-gray-800 print:border-b-2 print:border-gray-800">
@@ -541,15 +558,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 
                 <div class="flex items-center space-x-3">
+                    <span id="current-ticket-client" class="ml-2 text-white font-semibold truncate max-w-[180px] hidden"></span>
                     <button
                         id="save-ticket-btn"
+                        
                         disabled
                         class="flex items-center p-2 bg-green-500 text-white text-sm font-bold rounded-md shadow hover:bg-green-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                         title="Cerrar y guardar ticket (Nuevo Ticket)."
                     >
                         <i data-lucide="save" class="w-8 h-8"></i>
                     </button>
-                    
+                    <!-- NUEVO: Nombre de cliente actual -->
+                    <span id="current-ticket-client" class="ml-2 text-white font-semibold truncate max-w-[180px] hidden"></span>
                     <button
                         id="print-btn"
                         disabled
@@ -989,7 +1009,6 @@ function confirmClearCart() {
     hideModal('#clear-cart-modal'); // ✅ Cierra el modal correctamente
     showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
 }
-
 
         function handleManualPriceConfirm(code, price) {
             const validatedPrice = parseFloat(price);
@@ -1885,7 +1904,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 
-
 <!-- INICIO: Modal y validación de nombre de XLSX (dd-mm-yyyy sin extensión) -->
 <div id="wrong-db-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 hidden print:hidden">
   <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm transform transition-all">
@@ -1986,7 +2004,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 <!-- FIN: Modal y validación de nombre de XLSX -->
-
 
 <script>
 (function(){
@@ -2177,7 +2194,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
-
 
 <!-- FIX: Forzar estado del botón GUARDAR según contenido del carrito al final del cargado de la página -->
 <script>
@@ -2383,5 +2399,124 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const closeBtn = document.getElementById('close-ticket-btn');
+    const ticketContainer = document.getElementById('ticket-table-container');
+
+    if (closeBtn && ticketContainer) {
+        closeBtn.addEventListener('click', () => {
+            if (appState.cart.length === 0) {
+                animateCloseTicket();
+                return;
+            }
+
+            const existingTicket = appState.savedTickets.find(t => t.ref === appState.capitalNoteText);
+            const cartString = JSON.stringify(appState.cart);
+            const savedCartString = existingTicket ? JSON.stringify(existingTicket.cart) : null;
+            const hasChanges = existingTicket && savedCartString !== cartString;
+
+            let message = '';
+            if (!existingTicket) {
+                message = "¿Deseas guardar este ticket antes de cerrarlo?";
+            } else if (hasChanges) {
+                message = "Este ticket tiene cambios no guardados. ¿Deseas guardarlos antes de cerrar?";
+            } else {
+                animateCloseTicket();
+                return;
+            }
+
+            if (confirm(message)) {
+                saveTicket();
+                setTimeout(() => animateCloseTicket(), 200);
+            } else {
+                animateCloseTicket();
+            }
+        });
+    }
+
+    function animateCloseTicket() {
+        ticketContainer.classList.add('ticket-fade-out');
+        setTimeout(() => {
+            _internalClearCart();
+            render();
+            ticketContainer.classList.remove('ticket-fade-out');
+        }, 350);
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const clientNameDisplay = document.getElementById('current-ticket-client');
+
+  function updateClientNameDisplay() {
+    const ref = appState.capitalNoteText;
+    let name = "EN PROCESO";
+
+    if (ref && Array.isArray(appState.savedTickets)) {
+      const saved = appState.savedTickets.find(t => t.ref === ref);
+      if (saved && saved.customer) {
+        name = saved.customer.toUpperCase();
+      }
+    }
+
+    clientNameDisplay.textContent = name || "EN PROCESO";
+  }
+
+  const originalRender = window.render;
+  window.render = function() {
+    if (typeof originalRender === "function") originalRender();
+    updateClientNameDisplay();
+  };
+
+  const originalSave = window.saveTicket;
+  window.saveTicket = function() {
+    if (typeof originalSave === "function") originalSave();
+    updateClientNameDisplay();
+  };
+
+  window.addEventListener('newTicketCreated', updateClientNameDisplay);
+
+  updateClientNameDisplay();
+});
+</script>
+
+
+
+
+<script>
+function updateClientNameDisplay() {
+    const clientSpan = document.getElementById('current-ticket-client');
+    const ticketContainer = document.getElementById('ticket-table-container');
+    const isTicketVisible = !ticketContainer.classList.contains('hidden');
+    const ticketRef = appState.capitalNoteText;
+    let customerName = '';
+
+    if (isTicketVisible) {
+        const existingTicket = appState.savedTickets.find(t => t.ref === ticketRef);
+        if (existingTicket) {
+            customerName = existingTicket.customer || 'SIN NOMBRE';
+        } else {
+            customerName = 'EN PROCESO';
+        }
+        clientSpan.textContent = customerName.toUpperCase();
+        clientSpan.classList.remove('hidden');
+    } else {
+        clientSpan.textContent = '';
+        clientSpan.classList.add('hidden');
+    }
+}
+
+const originalRender = render;
+render = function() {
+    originalRender();
+    updateClientNameDisplay();
+};
+</script>
+
 </body>
+
 </html>
