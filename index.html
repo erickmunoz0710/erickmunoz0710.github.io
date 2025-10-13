@@ -381,6 +381,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     >
                         <i data-lucide="archive" class="w-6 h-6"></i>
                     </button>
+                    <button
+                        id="open-debts-modal-btn"
+                        class="p-2 text-amber-600 hover:text-white bg-amber-100 hover:bg-amber-600 rounded-full transition duration-200 shadow-md"
+                        title="Registrar Deudas"
+                    >
+                        <i data-lucide="wallet" class="w-6 h-6"></i>
+                    </button>
+
 <button
                         id="open-appointment-btn"
                         class="p-2 text-pink-600 hover:text-white bg-pink-100 hover:bg-pink-600 rounded-full transition duration-200 shadow-md"
@@ -487,7 +495,71 @@ document.addEventListener('DOMContentLoaded', () => {
                         </tbody>
                 </table>
             </div>
-        </main>
+        
+<!-- Modal Deudas / Deudores (Neutro, compacto) -->
+<div id="debts-modal" class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 p-4 hidden">
+  <div id="debts-modal-card" class="bg-white rounded-xl shadow-xl w-full max-w-xl">
+    <div class="p-5">
+      <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-4">
+        <h3 class="text-lg font-semibold text-gray-700">Deudas y Deudores</h3>
+        <button id="close-debts-modal" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex border-b mb-3 text-sm font-medium">
+        <button id="debts-tab-active" class="flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600">Activas</button>
+        <button id="debts-tab-history" class="flex-1 py-2 text-center text-gray-500 hover:text-amber-600">Historial</button>
+      </div>
+
+      <div id="debts-active-content" class="space-y-4">
+        <div class="space-y-3">
+          <input id="debtor-name" type="text" placeholder="Nombre del deudor" class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+          <input id="debtor-amount" type="number" placeholder="Cantidad" class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+          <select id="debtor-type" class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+            <option value="nosDebe">Nos debe</option>
+            <option value="leDebemos">Le debemos</option>
+          </select>
+          <button id="save-debt-btn" class="w-full py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition">Guardar Deuda</button>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-200 rounded-md">
+          <table class="min-w-full text-sm text-gray-700">
+            <thead class="bg-gray-100 border-b">
+              <tr>
+                <th class="px-3 py-2 text-left font-semibold">Nombre</th>
+                <th class="px-3 py-2 text-right font-semibold">Monto</th>
+                <th class="px-3 py-2 text-center font-semibold">Tipo</th>
+                <th class="px-3 py-2 text-center font-semibold">Fecha</th>
+                <th class="px-3 py-2 text-center font-semibold">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="debts-active-body" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="debts-history-content" class="hidden">
+        <div class="overflow-x-auto border border-gray-200 rounded-md">
+          <table class="min-w-full text-sm text-gray-700">
+            <thead class="bg-gray-100 border-b">
+              <tr>
+                <th class="px-3 py-2 text-left font-semibold">Nombre</th>
+                <th class="px-3 py-2 text-right font-semibold">Monto</th>
+                <th class="px-3 py-2 text-center font-semibold">Tipo</th>
+                <th class="px-3 py-2 text-center font-semibold">Fecha Liquidación</th>
+                <th class="px-3 py-2 text-center font-semibold">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="debts-history-body" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
         
         
 <!-- Modal Citas / Recordatorios (azul violeta estilo app) -->
@@ -2515,6 +2587,155 @@ render = function() {
     originalRender();
     updateClientNameDisplay();
 };
+</script>
+
+
+<!-- Deudas JS - funcional (integrado) -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const openBtn = document.getElementById('open-debts-modal-btn');
+  const modal = document.getElementById('debts-modal');
+  const card = document.getElementById('debts-modal-card');
+  const closeBtn = document.getElementById('close-debts-modal');
+  const tabActive = document.getElementById('debts-tab-active');
+  const tabHistory = document.getElementById('debts-tab-history');
+  const activeContent = document.getElementById('debts-active-content');
+  const historyContent = document.getElementById('debts-history-content');
+
+  const nameInput = document.getElementById('debtor-name');
+  const amountInput = document.getElementById('debtor-amount');
+  const typeSelect = document.getElementById('debtor-type');
+  const saveBtn = document.getElementById('save-debt-btn');
+
+  const activeBody = document.getElementById('debts-active-body');
+  const historyBody = document.getElementById('debts-history-body');
+
+  const STORAGE_KEY = 'salesTicketDebts';
+  let debts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"active":[],"history":[]}');
+  if (!debts.active) debts.active = [];
+  if (!debts.history) debts.history = [];
+
+  function saveToStorage(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(debts)); }
+  function fmtMoney(n){ return '$' + Number(n).toFixed(2); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function render(){
+    if(!activeBody) return;
+    // Activas
+    if(!debts.active.length){
+      activeBody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-3">Sin deudas activas</td></tr>';
+    } else {
+      activeBody.innerHTML = debts.active.map(d => {
+        return '<tr class="hover:bg-gray-50">' +
+          '<td class="px-3 py-2">'+esc(d.name)+'</td>' +
+          '<td class="px-3 py-2 text-right font-bold">'+fmtMoney(d.amount)+'</td>' +
+          '<td class="px-3 py-2 text-center">'+(d.type==='nosDebe'?'Nos debe':'Le debemos')+'</td>' +
+          '<td class="px-3 py-2 text-center text-xs text-gray-600">'+new Date(d.date).toLocaleString()+'</td>' +
+          '<td class="px-3 py-2 text-center">' +
+            '<button class="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs" data-id="'+d.id+'" data-action="liquidar">Liquidar</button> ' +
+            '<button class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-xs ml-2" data-id="'+d.id+'" data-action="remove">Eliminar</button>' +
+          '</td></tr>';
+      }).join('');
+    }
+
+    // Historial
+    if(!debts.history.length){
+      historyBody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-3">Historial vacío</td></tr>';
+    } else {
+      historyBody.innerHTML = debts.history.map(d => {
+        return '<tr class="hover:bg-gray-50">' +
+          '<td class="px-3 py-2">'+esc(d.name)+'</td>' +
+          '<td class="px-3 py-2 text-right font-bold">'+fmtMoney(d.amount)+'</td>' +
+          '<td class="px-3 py-2 text-center">'+(d.type==='nosDebe'?'Nos debe':'Le debemos')+'</td>' +
+          '<td class="px-3 py-2 text-center text-xs text-gray-600">'+new Date(d.liquidatedAt).toLocaleString()+'</td>' +
+          '<td class="px-3 py-2 text-center">' +
+            '<button class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-xs" data-id="'+d.id+'" data-action="restore">Restaurar</button> ' +
+            '<button class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-xs ml-2" data-id="'+d.id+'" data-action="remove-history">Eliminar</button>' +
+          '</td></tr>';
+      }).join('');
+    }
+  }
+
+  function handleTableClick(e){
+    const btn = e.target.closest('button[data-action]');
+    if(!btn) return;
+    const id = btn.getAttribute('data-id');
+    const action = btn.getAttribute('data-action');
+    if(action === 'liquidar'){
+      const idx = debts.active.findIndex(x => x.id === id);
+      if(idx === -1) return;
+      const item = debts.active.splice(idx,1)[0];
+      item.liquidatedAt = new Date().toISOString();
+      item.status = 'liquidada';
+      debts.history.unshift(item);
+    } else if(action === 'remove'){
+      debts.active = debts.active.filter(x => x.id !== id);
+    } else if(action === 'restore'){
+      const idx = debts.history.findIndex(x => x.id === id);
+      if(idx === -1) return;
+      const item = debts.history.splice(idx,1)[0];
+      delete item.liquidatedAt;
+      item.status = 'activa';
+      item.date = new Date().toISOString();
+      debts.active.unshift(item);
+    } else if(action === 'remove-history'){
+      debts.history = debts.history.filter(x => x.id !== id);
+    }
+    saveToStorage();
+    render();
+  }
+
+  if(activeBody) activeBody.addEventListener('click', handleTableClick);
+  if(historyBody) historyBody.addEventListener('click', handleTableClick);
+
+  if(saveBtn) saveBtn.addEventListener('click', function(){
+    const name = nameInput.value.trim();
+    const amount = parseFloat(amountInput.value);
+    const type = typeSelect.value;
+    if(!name || isNaN(amount) || amount <= 0){
+      alert('Por favor completa todos los campos correctamente.');
+      return;
+    }
+    debts.active.unshift({ id: crypto.randomUUID(), name: name, amount: Number(amount), type: type, date: new Date().toISOString(), status: 'activa' });
+    saveToStorage();
+    render();
+    nameInput.value = '';
+    amountInput.value = '';
+    typeSelect.value = 'nosDebe';
+  });
+
+  if(tabActive) tabActive.addEventListener('click', function(){
+    tabActive.classList.add('border-b-2','border-amber-500','text-amber-600');
+    tabHistory.classList.remove('border-b-2','border-amber-500','text-amber-600');
+    activeContent.classList.remove('hidden');
+    historyContent.classList.add('hidden');
+  });
+
+  if(tabHistory) tabHistory.addEventListener('click', function(){
+    tabHistory.classList.add('border-b-2','border-amber-500','text-amber-600');
+    tabActive.classList.remove('border-b-2','border-amber-500','text-amber-600');
+    historyContent.classList.remove('hidden');
+    activeContent.classList.add('hidden');
+  });
+
+  if(openBtn) openBtn.addEventListener('click', function(){
+    if(modal) modal.classList.remove('hidden');
+  });
+
+  // close when clicking outside the card
+  if(modal){
+    modal.addEventListener('click', function(e){
+      if(e.target === modal) modal.classList.add('hidden');
+    });
+  }
+
+  if(closeBtn) closeBtn.addEventListener('click', function(){
+    if(modal) modal.classList.add('hidden');
+  });
+
+  // initial render
+  render();
+});
 </script>
 
 </body>
