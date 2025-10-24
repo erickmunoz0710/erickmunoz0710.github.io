@@ -1,50 +1,51 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AriAuto App</title>
-    <script src="https://cdn.tailwindcss.com">
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AriAuto App</title>
+<script src="https://cdn.tailwindcss.com">
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-    <script src="https://unpkg.com/lucide@latest">
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+<script src="https://unpkg.com/lucide@latest">
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-    <style>
-        /* Estilos personalizados para la animación del logo y impresión */
+<style>
+        /* Estilos personalizados para la animaciÃ³n del logo y impresiÃ³n */
         @keyframes flameRise {
             0% { transform: translateY(0px) scaleX(1); opacity: 0.8; }
             50% { transform: translateY(-2px) scaleX(1.1); opacity: 1.0; }
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             -moz-appearance: textfield; /* Firefox */
         }
 
-        /* ESTILO PARA EL BOTÓN DE VOZ ACTIVO (PULSO ROJO) */
+        /* ESTILO PARA EL BOTÃ“N DE VOZ ACTIVO (PULSO ROJO) */
         .listening {
             animation: pulse-red 1.5s infinite;
         }
@@ -92,9 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        /* Estilos de Impresión */
+        /* Estilos de ImpresiÃ³n */
         @media print {
-            /* 1. OCULTAR TODOS LOS CONTROLES Y NAVEGACIÓN (HEADER, FOOTER, MODALES) */
+            /* 1. OCULTAR TODOS LOS CONTROLES Y NAVEGACIÃ“N (HEADER, FOOTER, MODALES) */
             .print\:hidden, 
             header, footer, #empty-cart-message, 
             #partial-sum-container, #total-display-container,
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 visibility: hidden !important; 
             }
             
-            /* 2. REGLAS PARA IMPRESIÓN INDIVIDUAL (DEFAULT) */
+            /* 2. REGLAS PARA IMPRESIÃ“N INDIVIDUAL (DEFAULT) */
             body {
                 background-color: transparent !important;
                 box-shadow: none !important;
@@ -114,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 font-size: 10pt;
             }
             
-            /* OCULTAR MAIN POR DEFECTO. (Se hace visible para la impresión individual más adelante) */
+            /* OCULTAR MAIN POR DEFECTO. (Se hace visible para la impresiÃ³n individual mÃ¡s adelante) */
             main { 
                 display: none; 
                 visibility: hidden; 
@@ -133,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             /* 3. ESTILOS DE TABLA Y TICKET INDIVIDUAL */
             #ticket-table-container {
-                /* Para impresión individual: forzamos a que el main y el contenedor se muestren */
+                /* Para impresiÃ³n individual: forzamos a que el main y el contenedor se muestren */
                 display: block !important;
                 visibility: visible !important;
                 width: 100%;
@@ -147,12 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* HACK: Cuando imprimimos un ticket individual, hacemos visible el contenedor main */
             #ticket-table-container, .print-header {
-                /* Si alguno de estos está siendo impreso, su padre 'main' debe ser visible. */
+                /* Si alguno de estos estÃ¡ siendo impreso, su padre 'main' debe ser visible. */
                 display: block !important;
                 visibility: visible !important;
             }
             main { 
-                /* Se hace visible el main cuando el contenedor del ticket está visible */
+                /* Se hace visible el main cuando el contenedor del ticket estÃ¡ visible */
                 display: block !important; 
                 visibility: visible !important;
             }
@@ -160,13 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
             table { width: 100%; border-collapse: collapse; }
             .bg-white, .shadow-xl, .shadow-md, .shadow-2xl { box-shadow: none !important; background-color: transparent !important; }
 
-            /* Ocultar la columna de selección (checkbox) */
+            /* Ocultar la columna de selecciÃ³n (checkbox) */
             #ticket-table thead th:nth-child(2), 
             #ticket-table tbody td:nth-child(2) {
                 display: none !important; 
             }
 
-            /* Mostrar todas las columnas relevantes (Ajuste de anchos en impresión) */
+            /* Mostrar todas las columnas relevantes (Ajuste de anchos en impresiÃ³n) */
             th:nth-child(1), td:nth-child(1) { width: 5%; }
             th:nth-child(3), td:nth-child(3) { display: table-cell; width: auto; text-align: left; }
             th:nth-child(4), td:nth-child(4) { display: table-cell; width: 15%; text-align: center; } 
@@ -181,13 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 font-size: 10pt;
             }
             
-            /* 4. REGLAS PARA IMPRESIÓN MASIVA (OCULTA EL MAIN DE LA PÁGINA) */
+            /* 4. REGLAS PARA IMPRESIÃ“N MASIVA (OCULTA EL MAIN DE LA PÃGINA) */
             .print-all-tickets-container { 
                 display: none !important; 
                 visibility: hidden !important;
             }
 
-            /* Cuando se está imprimiendo el corte de caja, forzamos la ocultación del main */
+            /* Cuando se estÃ¡ imprimiendo el corte de caja, forzamos la ocultaciÃ³n del main */
             .print-all-tickets-container.printing {
                 display: block !important;
                 visibility: visible !important;
@@ -198,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 font-size: 10pt; 
             }
             
-            /* CLAVE DEL ARREGLO CONTRA EL EMPALME: Ocultamos el main que es hermano del contenedor de impresión masiva */
+            /* CLAVE DEL ARREGLO CONTRA EL EMPALME: Ocultamos el main que es hermano del contenedor de impresiÃ³n masiva */
             .print-all-tickets-container.printing ~ .min-h-screen > main {
                 display: none !important;
                 visibility: hidden !important;
@@ -208,12 +209,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .ticket-break:last-child { page-break-after: auto; }
         }
         
-        /* Oculta el contenedor de impresión masiva por defecto */
+        /* Oculta el contenedor de impresiÃ³n masiva por defecto */
         .print-all-tickets-container {
             display: none;
         }
     
-/* Animación de cierre suave para el ticket */
+/* AnimaciÃ³n de cierre suave para el ticket */
 .ticket-fade-out { animation: ticketFadeOut 0.35s ease forwards; }
 @keyframes ticketFadeOut {
     from { opacity: 1; transform: scale(1); }
@@ -223,441 +224,341 @@ document.addEventListener('DOMContentLoaded', () => {
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased">
-    
-    <div id="print-all-tickets-container" class="print-all-tickets-container"></div>
-
-    <div id="clear-cart-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
-            <div class="flex items-center text-red-600 mb-4">
-                <i data-lucide="x" class="w-8 h-8 mr-3 flex-shrink-0"></i>
-                <h3 class="text-lg font-bold">Confirmar Eliminación</h3>
-            </div>
-            <p id="clear-modal-text" class="text-gray-700 mb-6"></p>
-            <div class="flex justify-end space-x-3">
-                <button id="cancel-clear-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+<div class="print-all-tickets-container" id="print-all-tickets-container"></div>
+<div class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden" id="clear-cart-modal">
+<div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
+<div class="flex items-center text-red-600 mb-4">
+<i class="w-8 h-8 mr-3 flex-shrink-0" data-lucide="x"></i>
+<h3 class="text-lg font-bold">Confirmar EliminaciÃ³n</h3>
+</div>
+<p class="text-gray-700 mb-6" id="clear-modal-text"></p>
+<div class="flex justify-end space-x-3">
+<button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150" id="cancel-clear-btn">
                     Cancelar
                 </button>
-                <button id="confirm-clear-btn" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150 shadow-md">
-                    Sí, Borrar Todo
+<button class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150 shadow-md" id="confirm-clear-btn">
+                    SÃ­, Borrar Todo
                 </button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="manual-price-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all">
-            <div class="flex items-center text-indigo-600 mb-4 border-b pb-2">
-                <i data-lucide="alert-triangle" class="w-8 h-8 mr-3 flex-shrink-0 text-yellow-500"></i>
-                <h3 class="text-lg font-bold text-gray-800">Producto No Encontrado</h3>
-            </div>
-            <p id="manual-modal-code" class="text-gray-700 mb-6 font-semibold"></p>
-            <div class="mb-4">
-                <label for="manual-price-input" class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario</label>
-                <div class="relative rounded-md shadow-sm">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-gray-500 font-bold">$</span>
-                    </div>
-                    <input
-                      type="text" 
-                      id="manual-price-input"
-                      placeholder="0.00"
-                      class="block w-full rounded-md border border-gray-300 py-2 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 text-lg font-mono"
-                      aria-describedby="price-currency"
-                    />
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <span class="text-gray-500 sm:text-sm" id="price-currency">MXN</span>
-                    </div>
-                </div>
-                <p id="manual-price-error" class="mt-2 text-sm text-red-600 hidden">Por favor, ingresa un precio válido (número positivo o cero).</p>
-            </div>
-            <div class="flex justify-end space-x-3 pt-4">
-                <button id="cancel-manual-btn" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+</div>
+</div>
+</div>
+<div class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden" id="manual-price-modal">
+<div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all">
+<div class="flex items-center text-indigo-600 mb-4 border-b pb-2">
+<i class="w-8 h-8 mr-3 flex-shrink-0 text-yellow-500" data-lucide="alert-triangle"></i>
+<h3 class="text-lg font-bold text-gray-800">Producto No Encontrado</h3>
+</div>
+<p class="text-gray-700 mb-6 font-semibold" id="manual-modal-code"></p>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-1" for="manual-price-input">Precio Unitario</label>
+<div class="relative rounded-md shadow-sm">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="text-gray-500 font-bold">$</span>
+</div>
+<input aria-describedby="price-currency" class="block w-full rounded-md border border-gray-300 py-2 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 text-lg font-mono" id="manual-price-input" placeholder="0.00" type="text"/>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="text-gray-500 sm:text-sm" id="price-currency">MXN</span>
+</div>
+</div>
+<p class="mt-2 text-sm text-red-600 hidden" id="manual-price-error">Por favor, ingresa un precio vÃ¡lido (nÃºmero positivo o cero).</p>
+</div>
+<div class="flex justify-end space-x-3 pt-4">
+<button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150" id="cancel-manual-btn">
                     Cancelar
                 </button>
-                <button id="confirm-manual-btn" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-150 shadow-md">
+<button class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-150 shadow-md" id="confirm-manual-btn">
                     Agregar con Precio
                 </button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="saved-tickets-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 print:hidden hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center border-b pb-3 mb-4">
-                <h3 class="text-2xl font-bold text-gray-800 flex items-center">
-                    <i data-lucide="archive" class="w-8 h-8 mr-3 text-indigo-600"></i>
-                    Tickets Guardados
-                </h3>
-                <button id="close-saved-tickets-modal-btn" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition duration-200">
-                    <i data-lucide="x" class="w-8 h-8"></i>
-                </button>
-            </div>
-            
-            <div class="mb-4 p-3 bg-indigo-50 rounded-lg flex justify-between items-center shadow-inner">
-                <div class="text-gray-700">
-                    <p class="text-lg font-semibold">Total de Tickets Cerrados:</p>
-                    <p class="text-3xl font-extrabold text-indigo-700" id="total-closed-tickets">0</p>
-                </div>
-                <div class="text-gray-700 text-right">
-                    <p class="text-lg font-semibold">Total Acumulado:</p>
-                    <p class="text-4xl font-extrabold text-green-600" id="corte-caja-total">$0.00</p>
-                </div>
-            </div>
-
-            <div class="overflow-y-auto flex-grow">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50 sticky top-0">
-                        <tr>
-                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref.</th>
-                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha/Hora</th>
-<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
-                            <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="saved-tickets-body" class="bg-white divide-y divide-gray-200">
-                        <tr id="empty-saved-tickets-row">
-                            <td colspan="4" class="py-4 text-center text-gray-500">No hay tickets cerrados.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="pt-4 border-t mt-4 flex justify-end">
-                <button id="print-all-tickets-btn" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-150 shadow-md flex items-center disabled:bg-gray-400 mr-3">
-                    <i data-lucide="printer" class="w-6 h-6 mr-2"></i>
-                    IMPRIMIR TODOS
-                </button>
-                <button id="delete-all-tickets-btn" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150 shadow-md flex items-center disabled:bg-gray-400">
-                    <i data-lucide="trash-2" class="w-6 h-6 mr-2"></i>
-                    ELIMINAR TODOS
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast-message" class="fixed top-3 left-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden"></div>
-
-    <input type="file" id="xlsx-upload-hidden" accept=".xlsx, .xls" class="hidden print:hidden" />
-
-    <div class="min-h-screen flex flex-col">
-        <header class="bg-white shadow-md p-4 sticky top-0 z-10 print:hidden">
-            <div class="flex justify-between items-center mb-4">
-                <div 
-                    id="logo-db-trigger" 
-                    class="flex items-center group space-x-0 cursor-pointer hover:opacity-80 transition duration-200 p-1 -ml-1 rounded-lg"
-                    title="Haga click para Cargar Base de Datos (XLSX). Su DB está guardada localmente."
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none"
-                        class="w-8 h-8 text-gray-700 transition transform duration-200 -mr-1"
-                        title="Icono de Catalizador/Mofle con Flujo de Escape Animado"
-                    >
-                        <rect x="35" y="25" width="30" height="50" rx="8" fill="#374151" stroke="#4b5563" strokeWidth="2"/>
-                        <rect x="42" y="75" width="16" height="10" fill="#4b5563" stroke="#4b5563" strokeWidth="2"/>
-                        <rect x="42" y="15" width="16" height="10" fill="#4b5563" stroke="#4b5563" strokeWidth="2"/>
-                        <circle cx="50" cy="50" r="3" fill="#9ca3af"/>
-                        <path class="flame-path" d="M 40 10 C 35 5, 45 0, 50 5" stroke="#FF6347" strokeWidth="2.5" strokeOpacity="0.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path class="flame-path-delay-1" d="M 50 10 C 50 5, 55 0, 60 5" stroke="#FFA500" strokeWidth="3" strokeOpacity="1.0" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path class="flame-path-delay-2" d="M 60 10 C 65 5, 65 0, 70 5" stroke="#FF6347" strokeWidth="2" strokeOpacity="0.6" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                        <line x1="45" y1="25" x2="45" y2="75" stroke="white" strokeOpacity="0.2" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    <h1 class="text-xl font-extrabold"> 
-                        <span class="elegant-logo">ARI AUTO APP</span>
-                    </h1>
-                </div>
-
-                <div class="flex items-center space-x-3">
-                    <div class="px-3 py-1 bg-white rounded-md border border-gray-300 shadow-sm transition duration-150">
-                        <p class="text-xs font-bold text-gray-700">
-                            FECHA: <span id="current-date" class="text-indigo-600"></span>
-                        </p>
-                    </div>
-
-                    <!-- Botón para abrir citas -->
-                    <button
-                        id="open-saved-tickets-btn"
-                        class="p-2 text-indigo-600 hover:text-white bg-indigo-100 hover:bg-indigo-600 rounded-full transition duration-200 shadow-md"
-                        title="Tickets Guardados / Corte de Caja"
-                    >
-                        <i data-lucide="archive" class="w-6 h-6"></i>
-                    </button>
-                    <button
-                        id="open-debts-modal-btn"
-                        class="p-2 text-amber-600 hover:text-white bg-amber-100 hover:bg-amber-600 rounded-full transition duration-200 shadow-md"
-                        title="Registrar Deudas"
-                    >
-                        <i data-lucide="wallet" class="w-6 h-6"></i>
-                    </button>
-
-<button
-                        id="open-appointment-btn"
-                        class="p-2 text-pink-600 hover:text-white bg-pink-100 hover:bg-pink-600 rounded-full transition duration-200 shadow-md"
-                        title="Citas de Clientes"
-                    >
-                        <i data-lucide="calendar" class="w-6 h-6"></i>
-                    </button>
-
-                    
-                    
-                    <button
-                        id="clear-cart-btn"
-                        disabled
-                        class="p-1.5 text-red-600 hover:text-white bg-red-100 hover:bg-red-600 rounded-full transition duration-200 shadow-md disabled:bg-gray-200 disabled:text-gray-400"
-                        title="BORRAR TODO EL TICKET"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
-                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-3"> 
-                
-                <div class="relative flex-grow">
-                    <div class="flex items-center border border-gray-300 rounded-full bg-gray-50 focus-within:ring-2 focus-within:ring-indigo-500 transition duration-150">
-                        <i data-lucide="search" class="w-7 h-7 ml-3 text-gray-400"></i>
-                        <input
-                            id="search-input"
-                            type="text"
-                            placeholder="BUSCADOR POR CÓDIGO (MÍNIMO 2 CARACTERES)"
-                            class="w-full p-3 pr-4 bg-transparent outline-none text-gray-800 placeholder-gray-400 uppercase"
-                            title="LA BÚSQUEDA COMIENZA A PARTIR DE 2 CARACTERES."
-                        />
-                    </div>
-                    
-                    <div id="suggestions-container" class="absolute top-full mt-1 w-full bg-white border border-indigo-200 rounded-lg shadow-2xl z-20 max-h-80 overflow-y-auto hidden">
-                        </div>
-                </div>
-                
-                <button
-                    id="voice-search-btn"
-                    class="mic-button flex-shrink-0 bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    title="BÚSQUEDA POR VOZ"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" x2="12" y1="19" y2="22"/>
-                    </svg>
-                </button>
-            </div>
-        </header>
-        
-        <div class="hidden print-header">
-            <h1 class="text-2xl font-extrabold text-gray-900">AriAuto App - Ticket de Venta</h1>
-            <p class="text-sm text-gray-600">Fecha: <span id="print-ref-date"></span></p>
-            <div class="text-sm font-semibold text-gray-700 mt-2">
-                NOTA DE VENTA: <span id="print-ref-note" class="font-normal text-gray-900"></span>
-            </div>
-            <hr class="my-2 border-gray-400"/>
-        </div>
-
-        <main class="container mx-auto p-4 flex-grow">
-            
-            <div id="empty-cart-message" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner hidden">
-                <i data-lucide="package" class="w-16 h-16 text-gray-400 mx-auto mb-3"></i>
-                <p class="text-gray-500 text-lg">EL TICKET ESTÁ VACÍO.</p>
-
-    <div class="mt-4 flex justify-center">
-        <button
-            id="new-ticket-btn"
-            class="mt-4 px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg shadow hover:bg-yellow-600 transition"
-            title="Generar un nuevo ticket N+1"
-        >
+</div>
+</div>
+</div>
+<div class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-2 print:hidden hidden" id="saved-tickets-modal">
+<div class="bg-white rounded-lg shadow-xl p-3 w-full max-w-3xl max-h-[85vh] flex flex-col scale-90">
+<div class="flex justify-between items-center border-b pb-2 mb-2">
+<h3 class="text-lg font-bold text-gray-800 flex items-center">
+<i class="w-5 h-5 mr-2 text-indigo-600" data-lucide="archive"></i> Tickets Guardados
+      </h3>
+<button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition duration-200" id="close-saved-tickets-modal-btn">
+<i class="w-5 h-5" data-lucide="x"></i>
+</button>
+</div>
+<div class="mb-2 p-2 bg-indigo-50 rounded-md flex justify-between items-center shadow-inner text-sm">
+<div class="text-gray-700">
+<p class="font-semibold">Tickets Cerrados:</p>
+<p class="text-xl font-extrabold text-indigo-700" id="total-closed-tickets">0</p>
+</div>
+<div class="text-gray-700 text-right">
+<p class="font-semibold">Total Acumulado:</p>
+<p class="text-2xl font-extrabold text-green-600" id="corte-caja-total">$0.00</p>
+</div>
+</div>
+<div class="overflow-y-auto flex-grow">
+<table class="min-w-full divide-y divide-gray-200 text-xs">
+<thead class="bg-gray-50 sticky top-0">
+<tr>
+<th class="px-1 py-1 text-center font-medium text-gray-500 uppercase tracking-wider">Sel.</th>
+<th class="px-1 py-1 text-left font-medium text-gray-500 uppercase tracking-wider">Ref.</th>
+<th class="px-1 py-1 text-left font-medium text-gray-500 uppercase tracking-wider">Fecha/Hora</th>
+<th class="px-1 py-1 text-left font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+<th class="px-1 py-1 text-right font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+<th class="px-1 py-1 text-center font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200" id="saved-tickets-body">
+<tr id="empty-saved-tickets-row">
+<td class="py-2 text-center text-gray-500" colspan="6">No hay tickets cerrados.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="pt-2 border-t mt-2 grid grid-cols-4 gap-2 w-full">
+<button class="py-2 text-xs font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition duration-150 shadow flex items-center justify-center disabled:bg-gray-400" id="print-all-tickets-btn">
+<i class="w-4 h-4 mr-1" data-lucide="printer"></i> IMPRIMIR
+      </button>
+<button class="py-2 text-xs font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition duration-150 shadow flex items-center justify-center disabled:bg-gray-400" id="export-xlsx-btn" title="Exportar seleccionados a XLSX">
+<i class="w-4 h-4 mr-1" data-lucide="file-spreadsheet"></i> XLSX
+      </button>
+<button class="py-2 text-xs font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition duration-150 shadow flex items-center justify-center disabled:bg-gray-400" id="export-txt-btn" title="Exportar seleccionados a TXT">
+<i class="w-4 h-4 mr-1" data-lucide="file-text"></i> TXT
+      </button>
+<button class="py-2 text-xs font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 transition duration-150 shadow flex items-center justify-center disabled:bg-gray-400" id="delete-all-tickets-btn">
+<i class="w-4 h-4 mr-1" data-lucide="trash-2"></i> ELIMINAR TODOS
+      </button>
+</div>
+</div>
+</div>
+<div class="fixed top-3 left-4 z-50 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 invisible print:hidden" id="toast-message"></div>
+<input accept=".xlsx, .xls" class="hidden print:hidden" id="xlsx-upload-hidden" type="file"/>
+<div class="min-h-screen flex flex-col">
+<header class="bg-white shadow-md p-4 sticky top-0 z-10 print:hidden">
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center group space-x-0 cursor-pointer hover:opacity-80 transition duration-200 p-1 -ml-1 rounded-lg" id="logo-db-trigger" title="Haga click para Cargar Base de Datos (XLSX). Su DB estÃ¡ guardada localmente.">
+<svg class="w-8 h-8 text-gray-700 transition transform duration-200 -mr-1" fill="none" title="Icono de Catalizador/Mofle con Flujo de Escape Animado" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#374151" height="50" rx="8" stroke="#4b5563" strokewidth="2" width="30" x="35" y="25"></rect>
+<rect fill="#4b5563" height="10" stroke="#4b5563" strokewidth="2" width="16" x="42" y="75"></rect>
+<rect fill="#4b5563" height="10" stroke="#4b5563" strokewidth="2" width="16" x="42" y="15"></rect>
+<circle cx="50" cy="50" fill="#9ca3af" r="3"></circle>
+<path class="flame-path" d="M 40 10 C 35 5, 45 0, 50 5" fill="none" stroke="#FF6347" strokelinecap="round" strokelinejoin="round" strokeopacity="0.8" strokewidth="2.5"></path>
+<path class="flame-path-delay-1" d="M 50 10 C 50 5, 55 0, 60 5" fill="none" stroke="#FFA500" strokelinecap="round" strokelinejoin="round" strokeopacity="1.0" strokewidth="3"></path>
+<path class="flame-path-delay-2" d="M 60 10 C 65 5, 65 0, 70 5" fill="none" stroke="#FF6347" strokelinecap="round" strokelinejoin="round" strokeopacity="0.6" strokewidth="2"></path>
+<line stroke="white" strokelinecap="round" strokeopacity="0.2" strokewidth="2" x1="45" x2="45" y1="25" y2="75"></line>
+</svg>
+<h1 class="text-xl font-extrabold">
+<span class="elegant-logo">ARI AUTO APP</span>
+</h1>
+</div>
+<div class="flex items-center space-x-3">
+<div class="px-3 py-1 bg-white rounded-md border border-gray-300 shadow-sm transition duration-150">
+<p class="text-xs font-bold text-gray-700">
+                            FECHA: <span class="text-indigo-600" id="current-date"></span>
+</p>
+</div>
+<!-- BotÃ³n para abrir citas -->
+<button class="p-2 text-indigo-600 hover:text-white bg-indigo-100 hover:bg-indigo-600 rounded-full transition duration-200 shadow-md" id="open-saved-tickets-btn" title="Tickets Guardados / Corte de Caja">
+<i class="w-6 h-6" data-lucide="archive"></i>
+</button>
+<button class="p-2 text-amber-600 hover:text-white bg-amber-100 hover:bg-amber-600 rounded-full transition duration-200 shadow-md" id="open-debts-modal-btn" title="Registrar Deudas">
+<i class="w-6 h-6" data-lucide="wallet"></i>
+</button>
+<button class="p-2 text-pink-600 hover:text-white bg-pink-100 hover:bg-pink-600 rounded-full transition duration-200 shadow-md" id="open-appointment-btn" title="Citas de Clientes">
+<i class="w-6 h-6" data-lucide="calendar"></i>
+</button>
+<button class="p-1.5 text-red-600 hover:text-white bg-red-100 hover:bg-red-600 rounded-full transition duration-200 shadow-md disabled:bg-gray-200 disabled:text-gray-400" disabled="" id="clear-cart-btn" title="BORRAR TODO EL TICKET">
+<svg class="w-6 h-6" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+</svg>
+</button>
+</div>
+</div>
+<div class="flex items-center space-x-3">
+<div class="relative flex-grow">
+<div class="flex items-center border border-gray-300 rounded-full bg-gray-50 focus-within:ring-2 focus-within:ring-indigo-500 transition duration-150">
+<i class="w-7 h-7 ml-3 text-gray-400" data-lucide="search"></i>
+<input class="w-full p-3 pr-4 bg-transparent outline-none text-gray-800 placeholder-gray-400 uppercase" id="search-input" placeholder="BUSCADOR POR CÃ“DIGO (MÃNIMO 2 CARACTERES)" title="LA BÃšSQUEDA COMIENZA A PARTIR DE 2 CARACTERES." type="text"/>
+</div>
+<div class="absolute top-full mt-1 w-full bg-white border border-indigo-200 rounded-lg shadow-2xl z-20 max-h-80 overflow-y-auto hidden" id="suggestions-container">
+</div>
+</div>
+<button class="mic-button flex-shrink-0 bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed" id="voice-search-btn" title="BÃšSQUEDA POR VOZ">
+<svg class="w-8 h-8" fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="32" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="22"></line>
+</svg>
+</button>
+</div>
+</header>
+<div class="hidden print-header">
+<h1 class="text-2xl font-extrabold text-gray-900">AriAuto App - Ticket de Venta</h1>
+<p class="text-sm text-gray-600">Fecha: <span id="print-ref-date"></span></p>
+<div class="text-sm font-semibold text-gray-700 mt-2">
+                NOTA DE VENTA: <span class="font-normal text-gray-900" id="print-ref-note"></span>
+</div>
+<hr class="my-2 border-gray-400"/>
+</div>
+<main class="container mx-auto p-4 flex-grow">
+<div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner hidden" id="empty-cart-message">
+<i class="w-16 h-16 text-gray-400 mx-auto mb-3" data-lucide="package"></i>
+<p class="text-gray-500 text-lg">EL TICKET ESTÃ VACÃO.</p>
+<div class="mt-4 flex justify-center">
+<button class="mt-4 px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg shadow hover:bg-yellow-600 transition" id="new-ticket-btn" title="Generar un nuevo ticket N+1">
             Generar ticket
         </button>
-    </div>
-            </div>
-
-            <div id="ticket-table-container" class="relative overflow-x-auto bg-white rounded-lg shadow-xl hidden">
-<!-- Botón X para cerrar ticket -->
-<button
-    id="close-ticket-btn"
-    class="absolute top-2 right-2 text-gray-400 hover:text-red-600 bg-gray-100 hover:bg-red-100 rounded-full p-1.5 shadow-md transition duration-200"
-    title="Cerrar ticket actual"
->
-    <i data-lucide="x" class="w-6 h-6"></i>
-</button>
-
-                <table class="min-w-full table-auto" id="ticket-table">
-                    <thead>
-                        <tr class="bg-indigo-50 border-b border-indigo-200 text-left text-xs font-semibold uppercase tracking-wider text-indigo-700 print:bg-white print:text-gray-800 print:border-b-2 print:border-gray-800">
-                            <th class="px-3 py-3 w-10">No.</th>
-                            <th class="px-3 py-3 text-center">Sel.</th>
-                            <th class="px-3 py-3">CÓDIGO</th> 
-                            <th class="px-3 py-3 text-center hidden md:table-cell print:table-cell">P. UNIT.</th>
-                            <th class="px-3 py-3 text-center">CANT.</th> 
-                            <th class="px-3 py-3 text-right">SUBTOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ticket-body" class="divide-y divide-gray-200 print:divide-gray-400">
-                        </tbody>
-                </table>
-            </div>
-        
-<!-- Modal Deudas / Deudores (Neutro, compacto) -->
-<div id="debts-modal" class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 p-4 hidden">
-  <div id="debts-modal-card" class="bg-white rounded-xl shadow-xl w-full max-w-xl">
-    <div class="p-5">
-      <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-4">
-        <h3 class="text-lg font-semibold text-gray-700">Deudas y Deudores</h3>
-        <button id="close-debts-modal" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="flex border-b mb-3 text-sm font-medium">
-        <button id="debts-tab-active" class="flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600">Activas</button>
-        <button id="debts-tab-history" class="flex-1 py-2 text-center text-gray-500 hover:text-amber-600">Historial</button>
-      </div>
-
-      <div id="debts-active-content" class="space-y-4">
-        <div class="space-y-3">
-          <input id="debtor-name" type="text" placeholder="Nombre del deudor" class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-          <input id="debtor-amount" type="number" placeholder="Cantidad" class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-          <select id="debtor-type" class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-            <option value="nosDebe">Nos debe</option>
-            <option value="leDebemos">Le debemos</option>
-          </select>
-          <button id="save-debt-btn" class="w-full py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition">Guardar Deuda</button>
-        </div>
-
-        <div class="overflow-x-auto border border-gray-200 rounded-md">
-          <table class="min-w-full text-sm text-gray-700">
-            <thead class="bg-gray-100 border-b">
-              <tr>
-                <th class="px-3 py-2 text-left font-semibold">Nombre</th>
-                <th class="px-3 py-2 text-right font-semibold">Monto</th>
-                <th class="px-3 py-2 text-center font-semibold">Tipo</th>
-                <th class="px-3 py-2 text-center font-semibold">Fecha</th>
-                <th class="px-3 py-2 text-center font-semibold">Acción</th>
-              </tr>
-            </thead>
-            <tbody id="debts-active-body" class="divide-y"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="debts-history-content" class="hidden">
-        <div class="overflow-x-auto border border-gray-200 rounded-md">
-          <table class="min-w-full text-sm text-gray-700">
-            <thead class="bg-gray-100 border-b">
-              <tr>
-                <th class="px-3 py-2 text-left font-semibold">Nombre</th>
-                <th class="px-3 py-2 text-right font-semibold">Monto</th>
-                <th class="px-3 py-2 text-center font-semibold">Tipo</th>
-                <th class="px-3 py-2 text-center font-semibold">Fecha Liquidación</th>
-                <th class="px-3 py-2 text-center font-semibold">Acción</th>
-              </tr>
-            </thead>
-            <tbody id="debts-history-body" class="divide-y"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
-
+</div>
+<div class="relative overflow-x-auto bg-white rounded-lg shadow-xl hidden" id="ticket-table-container">
+<!-- BotÃ³n X para cerrar ticket -->
+<button class="absolute top-2 right-2 text-gray-400 hover:text-red-600 bg-gray-100 hover:bg-red-100 rounded-full p-1.5 shadow-md transition duration-200" id="close-ticket-btn" title="Cerrar ticket actual">
+<i class="w-6 h-6" data-lucide="x"></i>
+</button>
+<table class="min-w-full table-auto" id="ticket-table">
+<thead>
+<tr class="bg-indigo-50 border-b border-indigo-200 text-left text-xs font-semibold uppercase tracking-wider text-indigo-700 print:bg-white print:text-gray-800 print:border-b-2 print:border-gray-800">
+<th class="px-3 py-3 w-10">No.</th>
+<th class="px-3 py-3 text-center">Sel.</th>
+<th class="px-3 py-3">CÃ“DIGO</th>
+<th class="px-3 py-3 text-center hidden md:table-cell print:table-cell">P. UNIT.</th>
+<th class="px-3 py-3 text-center">CANT.</th>
+<th class="px-3 py-3 text-right">SUBTOTAL</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 print:divide-gray-400" id="ticket-body">
+</tbody>
+</table>
+</div>
+<!-- Modal Deudas / Deudores (Neutro, compacto) -->
+<div class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 p-4 hidden" id="debts-modal">
+<div class="bg-white rounded-xl shadow-xl w-full max-w-xl" id="debts-modal-card">
+<div class="p-5">
+<div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-4">
+<h3 class="text-lg font-semibold text-gray-700">Deudas y Deudores</h3>
+<button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition" id="close-debts-modal">
+<i class="w-5 h-5" data-lucide="x"></i>
+</button>
+</div>
+<div class="flex border-b mb-3 text-sm font-medium">
+<button class="flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600" id="debts-tab-active">Activas</button>
+<button class="flex-1 py-2 text-center text-gray-500 hover:text-amber-600" id="debts-tab-history">Historial</button>
+</div>
+<div class="space-y-4" id="debts-active-content">
+<div class="space-y-3">
+<input class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500" id="debtor-name" placeholder="Nombre del deudor" type="text"/>
+<input class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500" id="debtor-amount" placeholder="Cantidad" type="number"/>
+<select class="w-full border rounded-md p-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500" id="debtor-type">
+<option value="nosDebe">Nos debe</option>
+<option value="leDebemos">Le debemos</option>
+</select>
+<button class="w-full py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition" id="save-debt-btn">Guardar Deuda</button>
+</div>
+<div class="overflow-x-auto border border-gray-200 rounded-md">
+<table class="min-w-full text-sm text-gray-700">
+<thead class="bg-gray-100 border-b">
+<tr>
+<th class="px-3 py-2 text-left font-semibold">Nombre</th>
+<th class="px-3 py-2 text-right font-semibold">Monto</th>
+<th class="px-3 py-2 text-center font-semibold">Tipo</th>
+<th class="px-3 py-2 text-center font-semibold">Fecha</th>
+<th class="px-3 py-2 text-center font-semibold">AcciÃ³n</th>
+</tr>
+</thead>
+<tbody class="divide-y" id="debts-active-body"></tbody>
+</table>
+</div>
+</div>
+<div class="hidden" id="debts-history-content">
+<div class="overflow-x-auto border border-gray-200 rounded-md">
+<table class="min-w-full text-sm text-gray-700">
+<thead class="bg-gray-100 border-b">
+<tr>
+<th class="px-3 py-2 text-left font-semibold">Nombre</th>
+<th class="px-3 py-2 text-right font-semibold">Monto</th>
+<th class="px-3 py-2 text-center font-semibold">Tipo</th>
+<th class="px-3 py-2 text-center font-semibold">Fecha LiquidaciÃ³n</th>
+<th class="px-3 py-2 text-center font-semibold">AcciÃ³n</th>
+</tr>
+</thead>
+<tbody class="divide-y" id="debts-history-body"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
 </main>
-        
-        
 <!-- Modal Citas / Recordatorios (azul violeta estilo app) -->
-<div id="appointment-modal" class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 p-4 hidden">
-  <div id="appointment-modal-card" class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all scale-95 opacity-0">
-    <div class="flex items-center gap-3 mb-4">
-      <div class="flex items-center justify-center w-10 h-10 rounded-md bg-violet-600 text-white">
-        <i data-lucide="calendar" class="w-5 h-5"></i>
-      </div>
-      <h3 class="text-lg font-bold text-gray-800">Citas / Recordatorios</h3>
-      <div class="ml-auto">
-        <button id="cancel-appointment-btn" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full">
-          <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Formulario compacto -->
-    <div class="space-y-3 mb-4 border-b border-gray-100 pb-4">
-      <div>
-        <label for="client-name" class="block text-sm font-medium text-gray-700">Nombre del cliente</label>
-        <input id="client-name" type="text" class="w-full border border-gray-200 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:border-violet-500" placeholder="Ej: Juan Pérez">
-      </div>
-
-      <div>
-        <label for="appointment-datetime" class="block text-sm font-medium text-gray-700">Fecha y hora</label>
-        <input id="appointment-datetime" type="datetime-local" class="w-full border border-gray-200 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
-      </div>
-
-      <div class="flex flex-col items-center space-y-2 mt-2">
-        <button id="save-appointment-btn" class="w-full px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition shadow">
+<div class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 p-4 hidden" id="appointment-modal">
+<div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all scale-95 opacity-0" id="appointment-modal-card">
+<div class="flex items-center gap-3 mb-4">
+<div class="flex items-center justify-center w-10 h-10 rounded-md bg-violet-600 text-white">
+<i class="w-5 h-5" data-lucide="calendar"></i>
+</div>
+<h3 class="text-lg font-bold text-gray-800">Citas / Recordatorios</h3>
+<div class="ml-auto">
+<button class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full" id="cancel-appointment-btn">
+<i class="w-6 h-6" data-lucide="x"></i>
+</button>
+</div>
+</div>
+<!-- Formulario compacto -->
+<div class="space-y-3 mb-4 border-b border-gray-100 pb-4">
+<div>
+<label class="block text-sm font-medium text-gray-700" for="client-name">Nombre del cliente</label>
+<input class="w-full border border-gray-200 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:border-violet-500" id="client-name" placeholder="Ej: Juan PÃ©rez" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700" for="appointment-datetime">Fecha y hora</label>
+<input class="w-full border border-gray-200 rounded-md p-2 mt-1 focus:ring-2 focus:ring-violet-500 focus:border-violet-500" id="appointment-datetime" type="datetime-local"/>
+</div>
+<div class="flex flex-col items-center space-y-2 mt-2">
+<button class="w-full px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 transition shadow" id="save-appointment-btn">
           Guardar Cita
         </button>
-        <p id="appointment-message" class="text-green-600 text-sm font-semibold text-center opacity-0 transition-opacity duration-300">
-          ✅ Cita guardada correctamente
+<p class="text-green-600 text-sm font-semibold text-center opacity-0 transition-opacity duration-300" id="appointment-message">
+          âœ… Cita guardada correctamente
         </p>
-      </div>
-    </div>
-
-    <!-- Lista compacta (estilo app) -->
-    <div id="appointments-list-container" class="mt-3">
-      <div id="no-appointments-text" class="text-sm text-gray-500 text-center py-6">No hay citas programadas</div>
-      <ul id="appointments-body" class="space-y-2"></ul>
-    </div>
-  </div>
 </div>
-
+</div>
+<!-- Lista compacta (estilo app) -->
+<div class="mt-3" id="appointments-list-container">
+<div class="text-sm text-gray-500 text-center py-6" id="no-appointments-text">No hay citas programadas</div>
+<ul class="space-y-2" id="appointments-body"></ul>
+</div>
+</div>
+</div>
 <footer class="sticky bottom-0 bg-blue-900 text-white shadow-2xl print:hidden">
-            <div class="container mx-auto p-2 flex justify-between items-center text-sm">
-                
-                <div class="flex items-center space-x-6 flex-shrink-0">
-                    
-    
-    <div id="partial-sum-container" class="text-lg font-bold flex items-center whitespace-nowrap hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-yellow-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-        <span class="mr-1">SUBSELECCIÓN:</span>
-        <span id="partial-sum-display" onclick="clearPartialSelections()" class="cursor-pointer text-yellow-300">$0.00</span>
-    </div>
-
-    <div id="total-display-container" class="text-2xl font-extrabold flex items-center whitespace-nowrap">
+<div class="container mx-auto p-2 flex justify-between items-center text-sm">
+<div class="flex items-center space-x-6 flex-shrink-0">
+<div class="text-lg font-bold flex items-center whitespace-nowrap hidden" id="partial-sum-container">
+<svg class="w-7 h-7 text-yellow-300 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="mr-1">SUBSELECCIÃ“N:</span>
+<span class="cursor-pointer text-yellow-300" id="partial-sum-display" onclick="clearPartialSelections()">$0.00</span>
+</div>
+<div class="text-2xl font-extrabold flex items-center whitespace-nowrap" id="total-display-container">
         TOTAL: 
-        <span id="total-display" class="ml-3 text-sky-300">
+        <span class="ml-3 text-sky-300" id="total-display">
             $0.00
         </span>
-    </div>
-                </div>
-                
-                <div class="flex items-center space-x-3">
-                    <span id="current-ticket-client" class="ml-2 text-white font-semibold truncate max-w-[180px] hidden"></span>
-                    <button
-                        id="save-ticket-btn"
-                        
-                        disabled
-                        class="flex items-center p-2 bg-green-500 text-white text-sm font-bold rounded-md shadow hover:bg-green-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        title="Cerrar y guardar ticket (Nuevo Ticket)."
-                    >
-                        <i data-lucide="save" class="w-8 h-8"></i>
-                    </button>
-                    <!-- NUEVO: Nombre de cliente actual -->
-                    <span id="current-ticket-client" class="ml-2 text-white font-semibold truncate max-w-[180px] hidden"></span>
-                    <button
-                        id="print-btn"
-                        disabled
-                        class="flex items-center p-2 bg-blue-500 text-white text-sm font-bold rounded-md shadow hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        title="Imprimir Ticket"
-                    >
-                        <i data-lucide="printer" class="w-8 h-8"></i>
-                    </button>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <script>
+</div>
+</div>
+<div class="flex items-center space-x-3">
+<span class="ml-2 text-white font-semibold truncate max-w-[180px] hidden" id="current-ticket-client"></span>
+<button class="flex items-center p-2 bg-green-500 text-white text-sm font-bold rounded-md shadow hover:bg-green-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed" disabled="" id="save-ticket-btn" title="Cerrar y guardar ticket (Nuevo Ticket).">
+<i class="w-8 h-8" data-lucide="save"></i>
+</button>
+<!-- NUEVO: Nombre de cliente actual -->
+<span class="ml-2 text-white font-semibold truncate max-w-[180px] hidden" id="current-ticket-client"></span>
+<button class="flex items-center p-2 bg-blue-500 text-white text-sm font-bold rounded-md shadow hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed" disabled="" id="print-btn" title="Imprimir Ticket">
+<i class="w-8 h-8" data-lucide="printer"></i>
+</button>
+</div>
+</div>
+</footer>
+</div>
+<script>
         // ---------------------------------------------------------------------
-        // 1. CONFIGURACIÓN Y ESTADO GLOBAL
+        // 1. CONFIGURACIÃ“N Y ESTADO GLOBAL
         // ---------------------------------------------------------------------
         const MIN_SEARCH_CHARS = 2; 
         const MAX_ITEM_QUANTITY = 1.0; 
@@ -668,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
             SAVED_TICKETS: 'salesTicketSavedTicketsHTML', // NUEVO: TICKETS CERRADOS
         };
 
-        // SVG para el ícono de eliminar (Garantiza visibilidad)
+        // SVG para el Ã­cono de eliminar (Garantiza visibilidad)
         const TRASH_ICON_SVG = `
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
                 <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
@@ -679,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cart: [],
             searchText: '',
             suggestions: [], 
-            lastSearchResults: [], // Almacena el último conjunto de sugerencias válidas
+            lastSearchResults: [], // Almacena el Ãºltimo conjunto de sugerencias vÃ¡lidas
             capitalNoteText: '#1', // La nota ya no es editable, pero se usa para referencia interna
             allProducts: [],
             manualCode: null,
@@ -732,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
             corteCajaTotal: $('#corte-caja-total'),
             totalClosedTickets: $('#total-closed-tickets'),
             deleteAallTicketsBtn: $('#delete-all-tickets-btn'),
-            // NUEVO: Botón y Contenedor de impresión masiva
+            // NUEVO: BotÃ³n y Contenedor de impresiÃ³n masiva
             printAllTicketsBtn: $('#print-all-tickets-btn'), 
             printAllTicketsContainer: $('#print-all-tickets-container'),
         };
@@ -774,12 +675,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // ---------------------------------------------------------------------
-        // 3. LÓGICA DE NEGOCIO Y DATOS
+        // 3. LÃ“GICA DE NEGOCIO Y DATOS
         // ---------------------------------------------------------------------
         
         // Helper para guardar el estado del ticket actual (cart y note)
         function saveAppState() {
-    // 🚫 Evitar guardar si el ticket está vacío
+    // ðŸš« Evitar guardar si el ticket estÃ¡ vacÃ­o
     if (!appState.cart || appState.cart.length === 0) {
         localStorage.removeItem(STORAGE_KEYS.CART);
         localStorage.removeItem(STORAGE_KEYS.CAPITAL_NOTE);
@@ -797,21 +698,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         /**
-         * Normaliza el texto de búsqueda para ser indiferente a 'o', 'O' y '0'.
+         * Normaliza el texto de bÃºsqueda para ser indiferente a 'o', 'O' y '0'.
          */
         function normalizeSearchText(text) {
     if (!text) return "";
 
-    // 🔹 Pasar todo a minúsculas y quitar espacios
+    // ðŸ”¹ Pasar todo a minÃºsculas y quitar espacios
     text = text.toLowerCase().trim();
 
-    // 🔹 Sustituir acentos y variantes visuales de "o"
+    // ðŸ”¹ Sustituir acentos y variantes visuales de "o"
     text = text
-        .replace(/[óòôö]/g, "o") // letras minúsculas acentuadas
-        .replace(/[ÓÒÔÖ]/g, "o") // mayúsculas acentuadas
-        .replace(/[º°]/g, "o");   // símbolos parecidos a "o"
+        .replace(/[Ã³Ã²Ã´Ã¶]/g, "o") // letras minÃºsculas acentuadas
+        .replace(/[Ã“Ã’Ã”Ã–]/g, "o") // mayÃºsculas acentuadas
+        .replace(/[ÂºÂ°]/g, "o");   // sÃ­mbolos parecidos a "o"
 
-    // 🔹 Hacer equivalentes "o" y "0" (pero sin tocar la "x")
+    // ðŸ”¹ Hacer equivalentes "o" y "0" (pero sin tocar la "x")
     text = text.replace(/0/g, "o");
 
     return text;
@@ -822,17 +723,17 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= 10000; i++) {
                 const paddedIndex = String(i).padStart(4, '0');
                 const code = i % 2 === 0 ? `P-0R-T${paddedIndex}` : `P-OR-T${paddedIndex}`; 
-                const make = `Producto ${i} - ${['Tornillo', 'Tuerca', 'Cable', 'Cinta', 'Broca', 'Sensor', 'Válvula'][i % 7]} ${i % 3 === 0 ? '(METAL)' : ''}`;
+                const make = `Producto ${i} - ${['Tornillo', 'Tuerca', 'Cable', 'Cinta', 'Broca', 'Sensor', 'VÃ¡lvula'][i % 7]} ${i % 3 === 0 ? '(METAL)' : ''}`;
                 const price = parseFloat((Math.random() * 50 + 1).toFixed(2));
                 products.push({ code, make, price });
             }
             products.push({ code: 'RESISTOR-ELEMENT-10K', make: 'Resistencia calefactora (TEST-ELEM)', price: 15.50 });
-            products.push({ code: '456ELEMENT789', make: 'Cable de Elemento Térmico (TEST-ELEM)', price: 22.00 });
+            products.push({ code: '456ELEMENT789', make: 'Cable de Elemento TÃ©rmico (TEST-ELEM)', price: 22.00 });
             products.push({ code: 'ELEMENTO333', make: 'Sensor de nivel (elemento TEST-ELEM)', price: 99.90 });
             products.push({ code: 'O-MEGA-100', make: 'Omega especial (LETRA O)', price: 50.00 });
             products.push({ code: '0-MEGA-100', make: 'Omega especial (NUMERO CERO)', price: 51.00 });
             products.push({ code: 'FRENOS-KIT', make: 'Kit de Pastillas de Freno Delanteras', price: 120.00 }); 
-            products.push({ code: 'ACEITE-5W40', make: 'Aceite Sintético 5W40', price: 35.00 }); 
+            products.push({ code: 'ACEITE-5W40', make: 'Aceite SintÃ©tico 5W40', price: 35.00 }); 
             products.push({ code: 'BUJ-950', make: 'BUJIA DE AUTO PARA HONDA CIVIC 2005 4PZ. MALA DESCRIPCION!', price: 10.00 }); 
             return products;
         }
@@ -848,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Si no hay DB guardada, cargar mock data y guardarla por primera vez
                     appState.allProducts = generateMockData();
                     localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(appState.allProducts));
-                    showMessage("Base de datos de simulación cargada. Cargue su XLSX para persistencia.", 'error');
+                    showMessage("Base de datos de simulaciÃ³n cargada. Cargue su XLSX para persistencia.", 'error');
                 }
 
                 // *** CARGAR TICKETS GUARDADOS (NUEVO) ***
@@ -864,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (storedNote) { 
                     appState.capitalNoteText = JSON.parse(storedNote); 
                 } else {
-                    // Si no hay nota guardada, calcular la siguiente ref válida
+                    // Si no hay nota guardada, calcular la siguiente ref vÃ¡lida
                     const allRefs = appState.savedTickets.map(t => parseInt(t.ref.replace('#', ''))).filter(n => !isNaN(n));
                     const maxRefNumber = allRefs.length > 0 ? Math.max(...allRefs) : 0;
                     appState.capitalNoteText = `#${maxRefNumber + 1}`;
@@ -882,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
 
-    render(); // 🔹 Renderiza el estado cargado al iniciar
+    render(); // ðŸ”¹ Renderiza el estado cargado al iniciar
                 
                 dom.currentDate.textContent = getCurrentDateFormatted();
                 // dom.noteInput.value = appState.capitalNoteText; // ELIMINADO
@@ -893,7 +794,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 appState.allProducts = generateMockData();
                 appState.cart = [];
                 appState.capitalNoteText = '#1';
-                showMessage("Error al restaurar datos. Se reinició a la configuración inicial.", 'error');
+                showMessage("Error al restaurar datos. Se reiniciÃ³ a la configuraciÃ³n inicial.", 'error');
             }
         }
 
@@ -902,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (text.length < MIN_SEARCH_CHARS) { 
                 appState.manualCode = null;
-                // Si el texto de búsqueda se borra o es muy corto, limpiamos la memoria de búsqueda
+                // Si el texto de bÃºsqueda se borra o es muy corto, limpiamos la memoria de bÃºsqueda
                 appState.lastSearchResults = []; 
                 renderSuggestions();
                 return;
@@ -914,11 +815,11 @@ document.addEventListener('DOMContentLoaded', () => {
 const filtered = appState.allProducts.filter(product => {
     const normalizedProductCode = normalizeSearchText(product.code);
     const normalizedProductMake = normalizeSearchText(product.make);
-    const combined = `${normalizedProductMake} ${normalizedProductCode}`; // 🔹 Marca + Código
+    const combined = `${normalizedProductMake} ${normalizedProductCode}`; // ðŸ”¹ Marca + CÃ³digo
 
     const codeMatch = normalizedProductCode.includes(normalizedSearchText);
     const makeMatch = normalizedProductMake.includes(normalizedSearchText);
-    const comboMatch = normalizeSearchText(combined).includes(normalizedSearchText); // 🔹 Nueva coincidencia
+    const comboMatch = normalizeSearchText(combined).includes(normalizedSearchText); // ðŸ”¹ Nueva coincidencia
 
     return codeMatch || makeMatch || comboMatch;
 });
@@ -926,11 +827,11 @@ const filtered = appState.allProducts.filter(product => {
             
             let finalSuggestions = filtered.slice(0, 14); 
 
-            // LÓGICA DE MEMORIA: Guardar resultados si fueron encontrados
+            // LÃ“GICA DE MEMORIA: Guardar resultados si fueron encontrados
             if (filtered.length > 0) {
                 appState.lastSearchResults = finalSuggestions;
             } else {
-                appState.lastSearchResults = []; // Limpiar si la búsqueda no dio resultados
+                appState.lastSearchResults = []; // Limpiar si la bÃºsqueda no dio resultados
             }
 
             if (filtered.length === 0) {
@@ -958,7 +859,7 @@ const filtered = appState.allProducts.filter(product => {
             const productToAdd = {
                 id: crypto.randomUUID(), 
                 code: product.code,
-                // Conservamos la descripción (make) internamente para mostrarla debajo del código
+                // Conservamos la descripciÃ³n (make) internamente para mostrarla debajo del cÃ³digo
                 make: manualPrice !== null ? `(MANUAL) ${product.code}` : product.make, 
                 price: finalPrice,
                 quantity: MAX_ITEM_QUANTITY, 
@@ -966,20 +867,20 @@ const filtered = appState.allProducts.filter(product => {
 
             appState.cart.push(productToAdd);
             
-            // 1. Limpiamos el input y el texto de búsqueda.
+            // 1. Limpiamos el input y el texto de bÃºsqueda.
             appState.searchText = '';
             dom.searchInput.value = '';
             
             appState.manualCode = null;
             
-            // 2. Forzamos la ocultación inmediata de las sugerencias
+            // 2. Forzamos la ocultaciÃ³n inmediata de las sugerencias
             appState.suggestions = [];
             
             // 3. Renderizar y mostrar mensaje
             render();
             showMessage(`${productToAdd.code} agregado al ticket.`, 'success');
 
-            // 4. *** CORRECCIÓN DE FOCO: Quitar foco de la barra de búsqueda ***
+            // 4. *** CORRECCIÃ“N DE FOCO: Quitar foco de la barra de bÃºsqueda ***
             dom.searchInput.blur();
         }
 
@@ -994,12 +895,12 @@ const filtered = appState.allProducts.filter(product => {
             } else if (!isNaN(newQuantity) && newQuantity >= 0) {
                 if (newQuantity > MAX_ITEM_QUANTITY) {
                     newQuantity = MAX_ITEM_QUANTITY;
-                    showMessage(`La cantidad máxima permitida es ${MAX_ITEM_QUANTITY.toFixed(2)}.`, 'error');
+                    showMessage(`La cantidad mÃ¡xima permitida es ${MAX_ITEM_QUANTITY.toFixed(2)}.`, 'error');
                 }
                 item.quantity = newQuantity;
                 
                 if (newQuantity === 0) {
-                    // Si la cantidad es cero, eliminamos el artículo para limpiar el ticket
+                    // Si la cantidad es cero, eliminamos el artÃ­culo para limpiar el ticket
                     removeItem(id);
                     return; 
                 }
@@ -1009,20 +910,20 @@ const filtered = appState.allProducts.filter(product => {
         }
         
         /**
-         * Elimina un artículo individual por su ID único.
+         * Elimina un artÃ­culo individual por su ID Ãºnico.
          */
         
 function removeItem(id) {
             const itemToRemove = appState.cart.find(item => item.id === id);
             if (!itemToRemove) {
-                 console.error(`Error: No se encontró el artículo con ID ${id}`);
+                 console.error(`Error: No se encontrÃ³ el artÃ­culo con ID ${id}`);
                  return;
             }
-            // Eliminar el artículo del carrito
+            // Eliminar el artÃ­culo del carrito
             appState.cart = appState.cart.filter(item => item.id !== id);
-            showMessage(`Se eliminó el código ${itemToRemove.code} del ticket.`, 'error');
+            showMessage(`Se eliminÃ³ el cÃ³digo ${itemToRemove.code} del ticket.`, 'error');
 
-            // Si el carrito quedó vacío, eliminar el ticket guardado con la misma ref (si existe)
+            // Si el carrito quedÃ³ vacÃ­o, eliminar el ticket guardado con la misma ref (si existe)
             if (appState.cart.length === 0) {
                 const currentRef = appState.capitalNoteText;
                 const idx = appState.savedTickets.findIndex(t => t.ref === currentRef);
@@ -1030,11 +931,11 @@ function removeItem(id) {
                     appState.savedTickets.splice(idx, 1);
                     if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
 
-            // ✅ Mostrar mensaje verde de confirmación
+            // âœ… Mostrar mensaje verde de confirmaciÃ³n
             setTimeout(() => {
     showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
 }, 300);
-                    showMessage(`El ticket ${currentRef} quedó vacío y se eliminó de tickets guardados.`, 'error');
+                    showMessage(`El ticket ${currentRef} quedÃ³ vacÃ­o y se eliminÃ³ de tickets guardados.`, 'error');
                 }
                 // Reiniciar la nota del ticket actual
                 appState.capitalNoteText = '#1';
@@ -1044,7 +945,7 @@ function removeItem(id) {
         }
 
         
-        // Función interna para limpiar el estado del ticket sin mensajes ni modales
+        // FunciÃ³n interna para limpiar el estado del ticket sin mensajes ni modales
         function _internalClearCart() {
             appState.cart = [];
             appState.capitalNoteText = '#1'; // La nota se reinicia internamente
@@ -1069,24 +970,24 @@ function confirmClearCart() {
         appState.savedTickets.splice(idx, 1);
         if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
 
-            // ✅ Mostrar mensaje verde de confirmación
+            // âœ… Mostrar mensaje verde de confirmaciÃ³n
             setTimeout(() => {
     showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
 }, 300);
-        showMessage(`Se eliminó el ticket guardado ${currentRef} porque se borró todo su contenido.`, 'error');
+        showMessage(`Se eliminÃ³ el ticket guardado ${currentRef} porque se borrÃ³ todo su contenido.`, 'error');
     }
 
     _internalClearCart();
-    render(); // 🔹 Refrescar UI
-    hideModal('#clear-cart-modal'); // ✅ Cierra el modal correctamente
-    showMessage(`Todos los artículos han sido eliminados del ticket.`, 'error');
+    render(); // ðŸ”¹ Refrescar UI
+    hideModal('#clear-cart-modal'); // âœ… Cierra el modal correctamente
+    showMessage(`Todos los artÃ­culos han sido eliminados del ticket.`, 'error');
 }
 
         function handleManualPriceConfirm(code, price) {
             const validatedPrice = parseFloat(price);
             
             if (isNaN(validatedPrice) || validatedPrice < 0) {
-                dom.manualPriceError.textContent = "Por favor, ingresa un precio válido (número positivo o cero).";
+                dom.manualPriceError.textContent = "Por favor, ingresa un precio vÃ¡lido (nÃºmero positivo o cero).";
                 dom.manualPriceError.classList.remove('hidden');
                 dom.manualPriceInput.classList.add('border-red-500');
                 return;
@@ -1094,7 +995,7 @@ function confirmClearCart() {
 
             const manualProduct = {
                 code: code.toUpperCase(),
-                make: `Artículo no encontrado: ${code}`,
+                make: `ArtÃ­culo no encontrado: ${code}`,
                 price: parseFloat(validatedPrice),
             };
             
@@ -1114,14 +1015,14 @@ function confirmClearCart() {
         
         function saveTicket() {
             if (appState.cart.length === 0) {
-                showMessage("El ticket está vacío. No se puede cerrar.", 'error');
+                showMessage("El ticket estÃ¡ vacÃ­o. No se puede cerrar.", 'error');
                 return;
             }
 
             const currentRef = appState.capitalNoteText;
             const existingTicketIndex = appState.savedTickets.findIndex(t => t.ref === currentRef);
 
-            // 🔹 Preguntar nombre SOLO si es nuevo
+            // ðŸ”¹ Preguntar nombre SOLO si es nuevo
             let customerName = "";
             if (existingTicketIndex === -1) {
                 customerName = prompt("Ingresa el nombre del cliente para este ticket:");
@@ -1132,7 +1033,7 @@ function confirmClearCart() {
 
             const ticketToSave = {
                 customer: customerName,
-                id: crypto.randomUUID(), // Nuevo ID para la versión guardada, ayuda a la unicidad
+                id: crypto.randomUUID(), // Nuevo ID para la versiÃ³n guardada, ayuda a la unicidad
                 ref: currentRef,
                 date: new Date().toISOString(),
                 cart: [...appState.cart],
@@ -1146,7 +1047,7 @@ function confirmClearCart() {
                 appState.savedTickets[existingTicketIndex] = ticketToSave;
                 message = `Ticket Ref. ${currentRef} actualizado y guardado.`;
             } else {
-                // 1. AÑADIR NUEVO TICKET
+                // 1. AÃ‘ADIR NUEVO TICKET
                 appState.savedTickets.unshift(ticketToSave); 
                 message = `Ticket Ref. ${currentRef} cerrado y guardado.`;
             }
@@ -1154,7 +1055,7 @@ function confirmClearCart() {
             // 2. Guardar la lista de tickets
             saveSavedTicketsData();
 
-            // ✅ Mostrar mensaje verde de confirmación
+            // âœ… Mostrar mensaje verde de confirmaciÃ³n
             setTimeout(() => {
     showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
 }, 300);
@@ -1163,8 +1064,8 @@ function confirmClearCart() {
             _internalClearCart(); 
             
             
-    render(); // 🔹 Refrescar UI para mostrar 'Ticket vacío'// 4. Actualizar la nota para el nuevo ticket (#N + 1)
-            // Buscamos el número más alto en toda la lista de guardados para el nuevo ticket.
+    render(); // ðŸ”¹ Refrescar UI para mostrar 'Ticket vacÃ­o'// 4. Actualizar la nota para el nuevo ticket (#N + 1)
+            // Buscamos el nÃºmero mÃ¡s alto en toda la lista de guardados para el nuevo ticket.
             const allRefs = appState.savedTickets.map(t => parseInt(t.ref.replace('#', ''))).filter(n => !isNaN(n));
             const maxRefNumber = allRefs.length > 0 ? Math.max(...allRefs) : 0;
             const newRef = `#${maxRefNumber + 1}`;
@@ -1183,7 +1084,7 @@ function confirmClearCart() {
                 return;
             }
 
-            if (appState.cart.length > 0 && confirm(`Estás a punto de cargar el Ticket Ref. ${ticketToLoad.ref}. Esto ELIMINARÁ el ticket actual. ¿Continuar?`)) {
+            if (appState.cart.length > 0 && confirm(`EstÃ¡s a punto de cargar el Ticket Ref. ${ticketToLoad.ref}. Esto ELIMINARÃ el ticket actual. Â¿Continuar?`)) {
                 
                 // Cargar el carrito y nota
                 appState.cart = [...ticketToLoad.cart];
@@ -1194,7 +1095,7 @@ function confirmClearCart() {
                 showMessage(`TICKET ${ticketToLoad.ref} CARGADO. PUEDES EDITAR EL TICKET DE ${ticketToLoad.customer?.toUpperCase() || 'CLIENTE'}.`, 'info');
                 render();
             } else if (appState.cart.length === 0) {
-                 // Si el carrito está vacío, se carga sin preguntar
+                 // Si el carrito estÃ¡ vacÃ­o, se carga sin preguntar
                  appState.cart = [...ticketToLoad.cart];
                  appState.capitalNoteText = ticketToLoad.ref;
                  // dom.noteInput.value = ticketToLoad.ref; // ELIMINADO
@@ -1207,11 +1108,11 @@ function confirmClearCart() {
         
         window.deleteSavedTicket = (ticketId) => {
             const ticketRef = appState.savedTickets.find(t => t.id === ticketId)?.ref || 'Ticket';
-            if (confirm(`¿Estás seguro de que deseas eliminar el ${ticketRef} de la lista de tickets cerrados?`)) {
+            if (confirm(`Â¿EstÃ¡s seguro de que deseas eliminar el ${ticketRef} de la lista de tickets cerrados?`)) {
                 appState.savedTickets = appState.savedTickets.filter(t => t.id !== ticketId);
                 saveSavedTicketsData();
 
-            // ✅ Mostrar mensaje verde de confirmación
+            // âœ… Mostrar mensaje verde de confirmaciÃ³n
             setTimeout(() => {
     showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
 }, 300);
@@ -1226,75 +1127,80 @@ function confirmClearCart() {
             
             const totalAmount = appState.savedTickets.reduce((sum, t) => sum + t.total, 0);
 
-            const confirmDelete = confirm(`Se eliminarán ${total} tickets por un total de $${totalAmount.toFixed(2)}. Esta es una eliminación total y NO se puede deshacer. ¿Está seguro?`);
+            const confirmDelete = confirm(`Se eliminarÃ¡n ${total} tickets por un total de $${totalAmount.toFixed(2)}. Esta es una eliminaciÃ³n total y NO se puede deshacer. Â¿EstÃ¡ seguro?`);
             
             if (confirmDelete) {
                 appState.savedTickets = [];
                 saveSavedTicketsData();
 
-            // ✅ Mostrar mensaje verde de confirmación
+            // âœ… Mostrar mensaje verde de confirmaciÃ³n
             setTimeout(() => {
     showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
 }, 300);
                 renderSavedTickets();
-                showMessage(`Eliminación total realizada. ${total} tickets (${totalAmount.toFixed(2)}) eliminados.`, 'success');
+                showMessage(`EliminaciÃ³n total realizada. ${total} tickets (${totalAmount.toFixed(2)}) eliminados.`, 'success');
             }
         }
 
-        function renderSavedTickets() {
-            const tbody = dom.savedTicketsBody;
-            tbody.innerHTML = '';
-            
-            const totalAmount = appState.savedTickets.reduce((sum, t) => sum + t.total, 0);
-            const totalCount = appState.savedTickets.length;
-            
-            dom.corteCajaTotal.textContent = `$${totalAmount.toFixed(2)}`;
-            dom.totalClosedTickets.textContent = totalCount;
-            dom.deleteAallTicketsBtn.disabled = totalCount === 0;
-            dom.printAllTicketsBtn.disabled = totalCount === 0; // Habilitar el nuevo botón
+        
+function renderSavedTickets() {
+    const tbody = dom.savedTicketsBody;
+    tbody.innerHTML = '';
+    
+    const totalAmount = appState.savedTickets.reduce((sum, t) => sum + t.total, 0);
+    const totalCount = appState.savedTickets.length;
+    
+    dom.corteCajaTotal.textContent = `$${totalAmount.toFixed(2)}`;
+    dom.totalClosedTickets.textContent = totalCount;
+    dom.deleteAallTicketsBtn.disabled = totalCount === 0;
+    dom.printAllTicketsBtn.disabled = totalCount === 0;
 
-            if (totalCount === 0) {
-                tbody.innerHTML = `<tr id="empty-saved-tickets-row"><td colspan="4" class="py-4 text-center text-gray-500">No hay tickets cerrados.</td></tr>`;
-            } else {
-                const rowsHTML = appState.savedTickets.map(ticket => {
-                    const customerName = ticket.customer || "SIN NOMBRE";
-                    const date = new Date(ticket.date);
-                    const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+    if (totalCount === 0) {
+        tbody.innerHTML = `<tr id="empty-saved-tickets-row"><td colspan="6" class="py-4 text-center text-gray-500">No hay tickets cerrados.</td></tr>`;
+    } else {
+        const rowsHTML = appState.savedTickets.map(ticket => {
+            const customerName = ticket.customer || "SIN NOMBRE";
+            const date = new Date(ticket.date);
+            const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
             const day = String(date.getDate()).padStart(2, '0');
             const month = months[date.getMonth()];
             const dateStr = `${day} ${month}`;
-                    const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-                    
-                    return `
-                        <tr class="hover:bg-gray-50 transition duration-150">
-                            <td class="px-3 py-2 text-sm font-bold text-gray-800">${ticket.ref}</td>
-                            <td class="px-3 py-2 text-sm text-gray-600 whitespace-nowrap">${dateStr} ${timeStr}</td>
-                            <td class="px-3 py-2 text-sm text-gray-700 uppercase">${customerName}</td>
-<td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
-                            <td class="px-3 py-2 text-center flex justify-center space-x-2">
-                                <button
-    onclick="loadSavedTicket('${ticket.id}')"
-    class="text-white p-1 rounded-md shadow-sm text-xs font-semibold 
-           ${appState.cart.length > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-600'}"
-    ${appState.cart.length > 0 ? 'disabled' : ''}
-    title="${appState.cart.length > 0 ? 'No se puede cargar mientras haya un ticket activo' : 'Cargar ticket guardado'}"
->
-    CARGAR
-</button>
-                                <button onclick="deleteSavedTicket('${ticket.id}')" class="text-white bg-red-500 hover:bg-red-600 p-1 rounded-md shadow-sm text-xs font-semibold">
-                                    X
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-                tbody.innerHTML = rowsHTML;
-            }
-            lucide.createIcons();
-        }
+            const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            
+            return `
+                <tr class="hover:bg-gray-50 transition duration-150">
+                    <td class="px-3 py-2 text-sm text-center">
+                        <input type="checkbox" class="saved-ticket-checkbox" data-ticket-id="${ticket.id}" />
+                    </td>
+                    <td class="px-3 py-2 text-sm font-bold text-gray-800">${ticket.ref}</td>
+                    <td class="px-3 py-2 text-sm text-gray-600 whitespace-nowrap">${dateStr} ${timeStr}</td>
+                    <td class="px-3 py-2 text-sm text-gray-700 uppercase">${customerName}</td>
+                    <td class="px-3 py-2 text-sm font-extrabold text-right text-green-700">$${ticket.total.toFixed(2)}</td>
+                    <td class="px-3 py-2 text-center flex justify-center space-x-2">
+                        <button
+                            onclick="loadSavedTicket('${ticket.id}')"
+                            class="text-white p-1 rounded-md shadow-sm text-xs font-semibold 
+                                   ${appState.cart.length > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-600'}"
+                            ${appState.cart.length > 0 ? 'disabled' : ''}
+                            title="${appState.cart.length > 0 ? 'No se puede cargar mientras haya un ticket activo' : 'Cargar ticket guardado'}"
+                        >
+                            CARGAR
+                        </button>
+                        <button onclick="deleteSavedTicket('${ticket.id}')" class="text-white bg-red-500 hover:bg-red-600 p-1 rounded-md shadow-sm text-xs font-semibold">
+                            X
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        tbody.innerHTML = rowsHTML;
+    }
+    lucide.createIcons();
+}
+
 
         /**
-         * Genera y dispara la impresión de todos los tickets guardados.
+         * Genera y dispara la impresiÃ³n de todos los tickets guardados.
          * MODIFICADO para eliminar datos extra y columnas.
          */
         function printAllSavedTickets() {
@@ -1315,13 +1221,13 @@ function confirmClearCart() {
                 <div class="p-4">
                     <h1 class="text-xl font-extrabold text-gray-900 text-center mb-2">AriAuto APP</h1>
                     
-                    <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de Impresión: ${getCurrentDateFormatted()}</p>
+                    <p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de ImpresiÃ³n: ${getCurrentDateFormatted()}</p>
                     
                     <table class="min-w-full table-auto border-collapse">
                         <thead>
                             <tr class="bg-gray-100 border-b-2 border-gray-800 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                 <th class="px-3 py-2 w-10">No.</th>
-                                <th class="px-3 py-2">CÓDIGO</th> 
+                                <th class="px-3 py-2">CÃ“DIGO</th> 
                                 <th class="px-3 py-2 text-center">P. UNIT.</th>
                                 <th class="px-3 py-2 text-center">CANT.</th> 
                                 <th class="px-3 py-2 text-right">SUBTOTAL</th>
@@ -1330,7 +1236,7 @@ function confirmClearCart() {
                         <tbody>
             `;
             
-            // 2. Iterar sobre todos los tickets y consolidar los artículos
+            // 2. Iterar sobre todos los tickets y consolidar los artÃ­culos
             appState.savedTickets.forEach((ticket) => {
                 // Inner loop for items
                 ticket.cart.forEach(item => {
@@ -1354,7 +1260,7 @@ function confirmClearCart() {
                 });
             });
 
-            // 3. Cerrar la tabla y añadir el gran total
+            // 3. Cerrar la tabla y aÃ±adir el gran total
             allTicketsHTML += `
                         </tbody>
                     </table>
@@ -1368,7 +1274,7 @@ function confirmClearCart() {
             container.innerHTML = allTicketsHTML;
     container.classList.add('printing');
 
-    // 🔴 Quitar encabezado fijo antes de imprimir masivo
+    // ðŸ”´ Quitar encabezado fijo antes de imprimir masivo
     const fixedHeader = document.querySelector('.print-header');
     let fixedHeaderParent = null;
     if (fixedHeader) {
@@ -1382,7 +1288,7 @@ function confirmClearCart() {
         container.innerHTML = '';
         container.classList.remove('printing');
 
-        // 🔵 Restaurar encabezado fijo después
+        // ðŸ”µ Restaurar encabezado fijo despuÃ©s
         if (fixedHeader && fixedHeaderParent) {
             fixedHeaderParent.insertBefore(fixedHeader, fixedHeaderParent.firstChild);
         }
@@ -1390,11 +1296,11 @@ function confirmClearCart() {
         }
 
         // ---------------------------------------------------------------------
-        // 4. RENDERING (ACTUALIZACIÓN DEL DOM)
+        // 4. RENDERING (ACTUALIZACIÃ“N DEL DOM)
         // ---------------------------------------------------------------------
         
         function renderSuggestions() {
-            // ... (Lógica de renderSuggestions sin cambios)
+            // ... (LÃ³gica de renderSuggestions sin cambios)
             const container = dom.suggestionsContainer;
             
             if (appState.suggestions.length === 0) {
@@ -1462,11 +1368,11 @@ function confirmClearCart() {
             
             dom.clearCartBtn.disabled = !hasItems;
             dom.printBtn.disabled = !hasItems;
-            dom.saveTicketBtn.disabled = !hasItems; // NUEVO: Habilitar botón de guardar
+            dom.saveTicketBtn.disabled = !hasItems; // NUEVO: Habilitar botÃ³n de guardar
             dom.emptyCartMsg.classList.toggle('hidden', hasItems);
             dom.ticketTableContainer.classList.toggle('hidden', !hasItems);
             
-            // LÓGICA DE EDICIÓN DE NOTA: Deshabilitar si hay ítems - ELIMINADA
+            // LÃ“GICA DE EDICIÃ“N DE NOTA: Deshabilitar si hay Ã­tems - ELIMINADA
             // dom.noteInput.disabled = hasItems; 
 
             if (hasItems) {
@@ -1532,14 +1438,14 @@ function confirmClearCart() {
                 handlePartialSumChange();
             }
             
-            // Actualizar datos de impresión (fecha y nota)
+            // Actualizar datos de impresiÃ³n (fecha y nota)
             dom.printRefDate.textContent = getCurrentDateFormatted();
             dom.printRefNote.textContent = appState.capitalNoteText; 
 
-            saveAppState(); // Llama a saveData después de cada renderizado para asegurar la persistencia del ticket actual.
+            saveAppState(); // Llama a saveData despuÃ©s de cada renderizado para asegurar la persistencia del ticket actual.
         }
 
-        // Renderizado general (llama a los específicos)
+        // Renderizado general (llama a los especÃ­ficos)
         function render() {
             renderCart();
             renderSuggestions();
@@ -1549,7 +1455,7 @@ function confirmClearCart() {
         // 5. MANEJADORES DE EVENTOS GLOBALES
         // ---------------------------------------------------------------------
         
-        // Exponer la función para ser llamada desde el HTML
+        // Exponer la funciÃ³n para ser llamada desde el HTML
         window.handleSuggestionClick = (event) => {
             let li = event.target.closest('li');
             if (!li) return;
@@ -1569,7 +1475,7 @@ function confirmClearCart() {
             }
         };
         
-        // Exponer la función para ser llamada desde el HTML
+        // Exponer la funciÃ³n para ser llamada desde el HTML
         window.handleQuantityChange = (event, id) => {
             const newQuantity = event.target.value;
             updateQuantity(id, newQuantity);
@@ -1578,8 +1484,8 @@ function confirmClearCart() {
         window.handleRemoveItemClick = removeItem;
 
         function handleInputFocus() {
-            // LÓGICA DE MEMORIA DE BÚSQUEDA
-            // Si el input está vacío Y tenemos resultados de una búsqueda previa, muéstralos.
+            // LÃ“GICA DE MEMORIA DE BÃšSQUEDA
+            // Si el input estÃ¡ vacÃ­o Y tenemos resultados de una bÃºsqueda previa, muÃ©stralos.
             if (dom.searchInput.value.trim() === '' && appState.lastSearchResults.length > 0) {
                 appState.suggestions = appState.lastSearchResults;
                 renderSuggestions();
@@ -1598,7 +1504,7 @@ function confirmClearCart() {
                         addItem(suggestion);
                     }
                 } else if (appState.suggestions.length > 1) {
-                    showMessage("Múltiples resultados. Selecciona uno de la lista.", 'error');
+                    showMessage("MÃºltiples resultados. Selecciona uno de la lista.", 'error');
                 } else if (appState.searchText.length >= MIN_SEARCH_CHARS) {
                     showManualPriceModal(appState.searchText.toUpperCase());
                 }
@@ -1613,7 +1519,7 @@ function confirmClearCart() {
 
             
             if (typeof window.XLSX === 'undefined') {
-                showMessage('La librería de XLSX aún no está cargada. Inténtalo de nuevo en un momento.', 'error');
+                showMessage('La librerÃ­a de XLSX aÃºn no estÃ¡ cargada. IntÃ©ntalo de nuevo en un momento.', 'error');
                 return;
             }
             
@@ -1632,8 +1538,8 @@ function confirmClearCart() {
                     
                     const newProducts = rawJson
                         .map(row => {
-                            // Búsqueda flexible de encabezados
-                            const codeKey = Object.keys(row).find(k => k.toLowerCase().includes('code') || k.toLowerCase().includes('código') || k.toLowerCase().includes('sku'));
+                            // BÃºsqueda flexible de encabezados
+                            const codeKey = Object.keys(row).find(k => k.toLowerCase().includes('code') || k.toLowerCase().includes('cÃ³digo') || k.toLowerCase().includes('sku'));
                             const makeKey = Object.keys(row).find(k => k.toLowerCase().includes('make') || k.toLowerCase().includes('descrip') || k.toLowerCase().includes('producto'));
                             const priceKey = Object.keys(row).find(k => k.toLowerCase().includes('price') || k.toLowerCase().includes('precio'));
                             
@@ -1652,20 +1558,20 @@ function confirmClearCart() {
 
                     if (newProducts.length > 0) {
                         appState.allProducts = newProducts;
-                        // *** LA ACCIÓN CLAVE: GUARDAR LA NUEVA BASE DE DATOS EN LOCALSTORAGE ***
+                        // *** LA ACCIÃ“N CLAVE: GUARDAR LA NUEVA BASE DE DATOS EN LOCALSTORAGE ***
                         localStorage.setItem(STORAGE_KEYS.PRODUCTS_DB, JSON.stringify(appState.allProducts));
                         
-                        // Limpiar el estado de búsqueda después de cargar la DB
+                        // Limpiar el estado de bÃºsqueda despuÃ©s de cargar la DB
                         _internalClearCart(); 
 
                         
-    render(); // 🔹 Refrescar UI para mostrar 'Ticket vacío'showMessage(`¡Base de datos cargada con éxito! ${newProducts.length} productos importados y GUARDADOS.`, 'success');
+    render(); // ðŸ”¹ Refrescar UI para mostrar 'Ticket vacÃ­o'showMessage(`Â¡Base de datos cargada con Ã©xito! ${newProducts.length} productos importados y GUARDADOS.`, 'success');
                     } else {
-                        showMessage("Error: No se encontraron productos válidos en el archivo XLSX. Revise sus encabezados (debe tener Código, Descripción y Precio).", 'error');
+                        showMessage("Error: No se encontraron productos vÃ¡lidos en el archivo XLSX. Revise sus encabezados (debe tener CÃ³digo, DescripciÃ³n y Precio).", 'error');
                     }
                 } catch (error) {
                     console.error("Error al procesar el archivo XLSX:", error);
-                    showMessage("Ocurrió un error al leer el archivo. Consulte la consola.", 'error');
+                    showMessage("OcurriÃ³ un error al leer el archivo. Consulte la consola.", 'error');
                 } finally {
                     if (dom.fileInput) { dom.fileInput.value = ''; }
                     dom.searchInput.focus();
@@ -1677,13 +1583,13 @@ function confirmClearCart() {
         }
 
         function showClearCartModal() {
-            $('#clear-modal-text').innerHTML = `¿Estás seguro de que deseas eliminar los **${appState.cart.length} artículos** de este ticket? Esta acción no se puede deshacer.`;
+            $('#clear-modal-text').innerHTML = `Â¿EstÃ¡s seguro de que deseas eliminar los **${appState.cart.length} artÃ­culos** de este ticket? Esta acciÃ³n no se puede deshacer.`;
             showModal('#clear-cart-modal');
         }
         
         function showManualPriceModal(code) {
             appState.manualCode = code;
-            dom.manualModalCodeDisplay.textContent = `El código ${code} no se encontró. Asigna un precio unitario:`;
+            dom.manualModalCodeDisplay.textContent = `El cÃ³digo ${code} no se encontrÃ³. Asigna un precio unitario:`;
             dom.manualPriceInput.value = '0.00';
             dom.manualPriceInput.classList.remove('border-red-500');
             dom.manualPriceError.classList.add('hidden');
@@ -1698,19 +1604,19 @@ function confirmClearCart() {
                 performSearch(); 
             });
             
-            // LÓGICA DE MEMORIA: Al enfocar, restauramos los últimos resultados si el campo está vacío
+            // LÃ“GICA DE MEMORIA: Al enfocar, restauramos los Ãºltimos resultados si el campo estÃ¡ vacÃ­o
             dom.searchInput.addEventListener('focus', () => {
                 handleInputFocus(); 
                 renderSuggestions(); 
             }); 
             
-            // CORRECCIÓN CLAVE: PREVENIR QUE EL CLICK EN LA SUGERENCIA DESENFOQUE EL INPUT
+            // CORRECCIÃ“N CLAVE: PREVENIR QUE EL CLICK EN LA SUGERENCIA DESENFOQUE EL INPUT
             dom.suggestionsContainer.addEventListener('mousedown', (e) => {
                 e.preventDefault(); 
             });
 
             dom.searchInput.addEventListener('blur', () => {
-                // Ocultamos las sugerencias si el foco se pierde y no hay una acción de mousedown
+                // Ocultamos las sugerencias si el foco se pierde y no hay una acciÃ³n de mousedown
                 setTimeout(() => {
                     if (appState.suggestions.length > 0) {
                          dom.suggestionsContainer.classList.add('hidden');
@@ -1720,11 +1626,11 @@ function confirmClearCart() {
             
             dom.searchInput.addEventListener('keydown', handleSearchKeydown);
 
-            // LÓGICA: Borrar texto de búsqueda si se hace clic fuera del input o las sugerencias
+            // LÃ“GICA: Borrar texto de bÃºsqueda si se hace clic fuera del input o las sugerencias
             document.addEventListener('click', (event) => {
                 const target = event.target;
                 
-                // Verifica si el clic fue fuera de la barra de búsqueda Y fuera del contenedor de sugerencias
+                // Verifica si el clic fue fuera de la barra de bÃºsqueda Y fuera del contenedor de sugerencias
                 const clickedSearchBar = dom.searchInput.contains(target);
                 const clickedSuggestions = dom.suggestionsContainer.contains(target);
 
@@ -1736,7 +1642,7 @@ function confirmClearCart() {
                         appState.lastSearchResults = []; 
                         appState.suggestions = [];
                         renderSuggestions();
-                        showMessage("Búsqueda borrada al hacer clic en espacio en blanco.", 'info');
+                        showMessage("BÃºsqueda borrada al hacer clic en espacio en blanco.", 'info');
                     }
                     
                     // Asegurarse de quitar el foco
@@ -1755,11 +1661,11 @@ function confirmClearCart() {
             dom.logoDbTrigger.addEventListener('click', () => { dom.fileInput.click(); });
             dom.fileInput.addEventListener('change', handleFileUpload);
             
-            // NUEVO: Botón Imprimir Todos
+            // NUEVO: BotÃ³n Imprimir Todos
             dom.printAllTicketsBtn.addEventListener('click', printAllSavedTickets);
 
             // Modal de Borrado
-            dom.confirmClearBtn.addEventListener('click', confirmClearCart); // Usa la función de confirmación limpia
+            dom.confirmClearBtn.addEventListener('click', confirmClearCart); // Usa la funciÃ³n de confirmaciÃ³n limpia
             dom.cancelClearBtn.addEventListener('click', () => hideModal('#clear-cart-modal'));
             
             // Modal de Tickets Guardados
@@ -1781,7 +1687,7 @@ function confirmClearCart() {
             });
             
             // -------------------------------------------------------------------
-            // Lógica de Búsqueda por Voz
+            // LÃ³gica de BÃºsqueda por Voz
             // -------------------------------------------------------------------
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
@@ -1796,16 +1702,16 @@ function confirmClearCart() {
                 recognition.onresult = (event) => {
     let transcript = event.results[0][0].transcript;
 
-    // 🔹 Normalizar texto: quitar acentos, espacios y comas
+    // ðŸ”¹ Normalizar texto: quitar acentos, espacios y comas
     transcript = transcript
         .normalize("NFD")                 // separa acentos
         .replace(/[\u0300-\u036f]/g, "")  // elimina marcas de acento
         .replace(/[ ,]/g, "")             // elimina espacios y comas
-        .toLowerCase();                   // opcional: todo minúsculas
+        .toLowerCase();                   // opcional: todo minÃºsculas
 
     dom.searchInput.value = transcript;
 
-    // 🔥 Forzar búsqueda automática para mostrar sugerencias
+    // ðŸ”¥ Forzar bÃºsqueda automÃ¡tica para mostrar sugerencias
     appState.searchText = transcript;
     performSearch();
 };
@@ -1821,9 +1727,9 @@ function confirmClearCart() {
                     appState.isListening = false;
                     recognition.onend();
                     if (event.error === 'no-speech') {
-                        showMessage("No se detectó voz.", 'info');
+                        showMessage("No se detectÃ³ voz.", 'info');
                     } else if (event.error === 'not-allowed') {
-                        showMessage("Permiso de micrófono denegado. Revise la configuración de su navegador.", 'error');
+                        showMessage("Permiso de micrÃ³fono denegado. Revise la configuraciÃ³n de su navegador.", 'error');
                     } else {
                         console.error('Error de reconocimiento:', event.error);
                         showMessage("Error en el reconocimiento de voz.", 'error');
@@ -1839,17 +1745,17 @@ function confirmClearCart() {
                             appState.isListening = true;
                             appState.searchText = '';
                             dom.searchInput.value = '';
-                            showMessage("Escuchando... di el código o descripción.", 'info');
+                            showMessage("Escuchando... di el cÃ³digo o descripciÃ³n.", 'info');
                             dom.voiceSearchBtn.classList.remove('bg-red-600');
                             dom.voiceSearchBtn.classList.add('bg-red-800', 'listening');
                         } catch (e) {
-                            showMessage("Reconocimiento ya activo o error de inicialización.", 'error');
+                            showMessage("Reconocimiento ya activo o error de inicializaciÃ³n.", 'error');
                         }
                     }
                 });
             } else {
                 dom.voiceSearchBtn.disabled = true;
-                dom.voiceSearchBtn.title = "Búsqueda por voz no soportada en este navegador.";
+                dom.voiceSearchBtn.title = "BÃºsqueda por voz no soportada en este navegador.";
                 dom.voiceSearchBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
                 dom.voiceSearchBtn.classList.add('bg-gray-400');
             }
@@ -1870,16 +1776,16 @@ function confirmClearCart() {
             
             document.getElementById('partial-sum-display').textContent = `$${sum.toFixed(2)}`;
             
-            // Lógica para mostrar/ocultar los totales
+            // LÃ³gica para mostrar/ocultar los totales
             const partialContainer = document.getElementById('partial-sum-container');
             const totalContainer = document.getElementById('total-display-container');
             
             if (checkedCount > 0) {
-                // Si hay selecciones: Ocultar Total, Mostrar Subselección
+                // Si hay selecciones: Ocultar Total, Mostrar SubselecciÃ³n
                 if (totalContainer) totalContainer.classList.add('hidden');
                 if (partialContainer) partialContainer.classList.remove('hidden');
             } else {
-                // Si no hay selecciones: Mostrar Total, Ocultar Subselección
+                // Si no hay selecciones: Mostrar Total, Ocultar SubselecciÃ³n
                 if (totalContainer) totalContainer.classList.remove('hidden');
                 if (partialContainer) partialContainer.classList.add('hidden');
             }
@@ -1893,22 +1799,22 @@ function confirmClearCart() {
         }
 
         // ---------------------------------------------------------------------
-        // 6. INICIALIZACIÓN
+        // 6. INICIALIZACIÃ“N
         // ---------------------------------------------------------------------
-        // Inicialización principal: cargar datos y asegurar que el estado 'ticketActive'
+        // InicializaciÃ³n principal: cargar datos y asegurar que el estado 'ticketActive'
         // refleje correctamente el carrito restaurado (evita bloqueo de addItem tras refresh).
         window.onload = function() {
             lucide.createIcons(); 
             loadData();
             setupEventListeners();
 
-            // Garantizar que ticketActive se calcule según el carrito/restaurados
+            // Garantizar que ticketActive se calcule segÃºn el carrito/restaurados
             try {
                 const hasCart = appState.cart && appState.cart.length > 0;
                 const hasSavedRef = Array.isArray(appState.savedTickets) && appState.savedTickets.some(t => t.ref === appState.capitalNoteText);
                 appState.ticketActive = hasCart || hasSavedRef;
 
-                // Sin la función setTicketActive (está en un IIFE), replicamos su efecto en el DOM
+                // Sin la funciÃ³n setTicketActive (estÃ¡ en un IIFE), replicamos su efecto en el DOM
                 if (dom.ticketTableContainer) dom.ticketTableContainer.classList.toggle('hidden', !appState.ticketActive);
                 if (dom.emptyCartMsg) dom.emptyCartMsg.classList.toggle('hidden', appState.ticketActive);
                 if (dom.saveTicketBtn) dom.saveTicketBtn.disabled = !appState.ticketActive;
@@ -1919,29 +1825,28 @@ function confirmClearCart() {
             // Dibujar estado cargado (carrito, sugerencias, totales)
             render();
 
-            // Asegurar foco en búsqueda para UX
+            // Asegurar foco en bÃºsqueda para UX
             dom.searchInput.focus();
         };
     
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-
 <script>
 window.addEventListener("load", () => {
   try {
     lucide.createIcons();
   } catch (e) {
-    console.warn("Lucide no cargó, usando fallback SVG reducido.");
+    console.warn("Lucide no cargÃ³, usando fallback SVG reducido.");
     const svgMap = {
       "archive": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="4"/><path d="M21 7v13H3V7"/><path d="M10 12h4"/></svg>`,
       "save": `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`,
@@ -1963,45 +1868,43 @@ window.addEventListener("load", () => {
   }
 });
 
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-
-<!-- INICIO: Modal y validación de nombre de XLSX (dd-mm-yyyy sin extensión) -->
-<div id="wrong-db-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 hidden print:hidden">
-  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm transform transition-all">
-    <div class="flex items-center text-red-600 mb-4">
-      <i data-lucide="alert-triangle" class="w-8 h-8 mr-3 text-yellow-500"></i>
-      <h3 class="text-lg font-bold text-gray-800">Archivo XLSX Incorrecto</h3>
-    </div>
-    <p class="text-gray-700 mb-6">
+<!-- INICIO: Modal y validaciÃ³n de nombre de XLSX (dd-mm-yyyy sin extensiÃ³n) -->
+<div class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4 hidden print:hidden" id="wrong-db-modal">
+<div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm transform transition-all">
+<div class="flex items-center text-red-600 mb-4">
+<i class="w-8 h-8 mr-3 text-yellow-500" data-lucide="alert-triangle"></i>
+<h3 class="text-lg font-bold text-gray-800">Archivo XLSX Incorrecto</h3>
+</div>
+<p class="text-gray-700 mb-6">
       El archivo de base de datos no corresponde a la fecha actual (<span id="expected-date"></span>).
     </p>
-    <div class="flex justify-end space-x-3">
-      <button id="update-db-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-150 shadow-md">
+<div class="flex justify-end space-x-3">
+<button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-150 shadow-md" id="update-db-btn">
         Actualizar Base de Datos
       </button>
-      <button id="continue-db-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-150 shadow-md">
+<button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-150 shadow-md" id="continue-db-btn">
         Continuar con la Misma
       </button>
-    </div>
-  </div>
 </div>
-
+</div>
+</div>
 <script>
 /**
  * Valida que localStorage.lastFileName (sin extension) coincida con la fecha actual dd-mm-yyyy.
  * Si no coincide, muestra un toast rojo y un modal con opciones de actualizar o continuar.
- * Esta función asume que existe showMessage(type) y el input #xlsx-upload-hidden en la página.
+ * Esta funciÃ³n asume que existe showMessage(type) y el input #xlsx-upload-hidden en la pÃ¡gina.
  */
 function validateDBDate() {
   try {
@@ -2047,7 +1950,7 @@ function validateDBDate() {
   }
 }
 
-// Hook: Ejecutar la validación al cargar la página y cada vez que se actualice el input file
+// Hook: Ejecutar la validaciÃ³n al cargar la pÃ¡gina y cada vez que se actualice el input file
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function(){
     if (typeof validateDBDate === 'function') validateDBDate();
@@ -2063,20 +1966,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-<!-- FIN: Modal y validación de nombre de XLSX -->
-
+<!-- FIN: Modal y validaciÃ³n de nombre de XLSX -->
 <script>
 (function(){
   function computeNextRef(){
@@ -2091,7 +1993,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (dom.ticketTableContainer) dom.ticketTableContainer.classList.toggle('hidden', !appState.ticketActive);
       if (dom.emptyCartMsg) dom.emptyCartMsg.classList.toggle('hidden', appState.ticketActive);
       if (dom.saveTicketBtn) dom.saveTicketBtn.disabled = !appState.ticketActive;
-      // 🔍 No se deshabilita la barra de búsqueda: siempre activa para consultas
+      // ðŸ” No se deshabilita la barra de bÃºsqueda: siempre activa para consultas
     }
   }
 
@@ -2111,7 +2013,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!('ticketActive' in appState)) {
       appState.ticketActive = (appState.cart && appState.cart.length>0)?true:false;
     }
-    // ✅ Activar automáticamente el ticket si hay carrito o número activo (mejora: evitar ticket en blanco)
+    // âœ… Activar automÃ¡ticamente el ticket si hay carrito o nÃºmero activo (mejora: evitar ticket en blanco)
     try {
       let shouldActivate = false;
 
@@ -2136,7 +2038,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // en caso de error, no activar ticket por seguridad
       appState.ticketActive = false;
     }
-    // ✅ Activar automáticamente el ticket si hay carrito (aunque no esté guardado) o si la referencia corresponde a un ticket guardado
+    // âœ… Activar automÃ¡ticamente el ticket si hay carrito (aunque no estÃ© guardado) o si la referencia corresponde a un ticket guardado
 const hasCart = appState.cart && appState.cart.length > 0;
 const hasSavedRef = Array.isArray(appState.savedTickets) && appState.savedTickets.some(t => t.ref === appState.capitalNoteText);
 if (hasCart || hasSavedRef) {
@@ -2147,7 +2049,7 @@ if (hasCart || hasSavedRef) {
 setTicketActive(appState.ticketActive);
   });
 
-  // 🚫 Impide agregar artículos sin ticket activo, muestra mensaje rojo
+  // ðŸš« Impide agregar artÃ­culos sin ticket activo, muestra mensaje rojo
   if (typeof window.addItem === 'function') {
     const oldAdd = window.addItem;
     window.addItem = function(product, manualPrice){
@@ -2159,11 +2061,11 @@ setTicketActive(appState.ticketActive);
     };
   }
 
-  // 💾 Guardar: guarda ticket y lo cierra
+  // ðŸ’¾ Guardar: guarda ticket y lo cierra
   if (typeof window.saveTicket === 'function') {
     window.saveTicket = function(){
       if (appState.cart.length === 0) {
-        try { showMessage("El ticket está vacío. No se puede guardar.", 'error'); } catch(e){}
+        try { showMessage("El ticket estÃ¡ vacÃ­o. No se puede guardar.", 'error'); } catch(e){}
         return;
       }
 
@@ -2199,13 +2101,13 @@ setTicketActive(appState.ticketActive);
 
       if (typeof saveSavedTicketsData === 'function') saveSavedTicketsData();
 
-            // ✅ Mostrar mensaje verde de confirmación
+            // âœ… Mostrar mensaje verde de confirmaciÃ³n
             setTimeout(() => {
     showMessage(`TICKET DE ${customerName.toUpperCase()} GUARDADO.`, 'success');
 }, 300);
       if (typeof renderSavedTickets === 'function') renderSavedTickets();
 
-      // Cerrar ticket después de guardar
+      // Cerrar ticket despuÃ©s de guardar
       appState.cart = [];
       setTicketActive(false);
       render();
@@ -2227,7 +2129,7 @@ setTicketActive(appState.ticketActive);
     };
   }
 
-  // Limpiar ticket → marcar inactivo
+  // Limpiar ticket â†’ marcar inactivo
   if (typeof window._internalClearCart === 'function') {
     const oldClear = window._internalClearCart;
     window._internalClearCart = function(){
@@ -2248,26 +2150,25 @@ setTicketActive(appState.ticketActive);
         if (dom && dom.ticketTableContainer) dom.ticketTableContainer.classList.toggle('hidden', !showTable);
         if (dom && dom.emptyCartMsg) dom.emptyCartMsg.classList.toggle('hidden', showTable);
         if (dom && dom.saveTicketBtn) dom.saveTicketBtn.disabled = !appState.ticketActive;
-        // 🔍 no se deshabilita buscador
+        // ðŸ” no se deshabilita buscador
       } catch(e){}
     };
   }
 })();
 
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-
-<!-- FIX: Forzar estado del botón GUARDAR según contenido del carrito al final del cargado de la página -->
+<!-- FIX: Forzar estado del botÃ³n GUARDAR segÃºn contenido del carrito al final del cargado de la pÃ¡gina -->
 <script>
   (function(){
     function forceUpdateSaveButton(){
@@ -2287,14 +2188,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Ejecutar inmediatamente por si ya se cargó todo
+    // Ejecutar inmediatamente por si ya se cargÃ³ todo
     try { forceUpdateSaveButton(); } catch(e){}
 
-    // Ejecutar en load y con un pequeño retardo para sobreescribir cualquier otro handler que cambie el botón
+    // Ejecutar en load y con un pequeÃ±o retardo para sobreescribir cualquier otro handler que cambie el botÃ³n
     window.addEventListener('load', () => {
       try {
         forceUpdateSaveButton();
-        setTimeout(forceUpdateSaveButton, 300); // pequeño retardo para garantizar que sea la última actualización
+        setTimeout(forceUpdateSaveButton, 300); // pequeÃ±o retardo para garantizar que sea la Ãºltima actualizaciÃ³n
       } catch(e){}
     });
   })();
@@ -2392,13 +2293,13 @@ document.addEventListener('DOMContentLoaded', () => {
       diff.textContent = diffTextFor(a.datetime);
       const del = document.createElement("button");
       del.className = "text-red-500 hover:text-red-700 font-bold text-lg";
-      del.innerHTML = "×";
+      del.innerHTML = "Ã—";
       del.title = "Eliminar cita";
       del.addEventListener("click", ()=>{
         appointments.splice(i,1);
         saveAppointmentsToStorage();
         renderList();
-        showMessage("🗑️ Cita eliminada","error");
+        showMessage("ðŸ—‘ï¸ Cita eliminada","error");
       });
 
       right.appendChild(diff);
@@ -2412,7 +2313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // message fade in/out
   let msgTimeout = null;
-  function showSaveMessage(text="✅ Cita guardada correctamente"){
+  function showSaveMessage(text="âœ… Cita guardada correctamente"){
     if (!msg) return;
     msg.textContent = text;
     msg.classList.remove("opacity-0");
@@ -2459,19 +2360,18 @@ document.addEventListener('DOMContentLoaded', () => {
 })(); 
 // ----------------------- FIN Citas -----------------------
 
-// 🔹 Al hacer clic en "Generar ticket", habilitar el botón del bote de basura
+// ðŸ”¹ Al hacer clic en "Generar ticket", habilitar el botÃ³n del bote de basura
 document.addEventListener('DOMContentLoaded', () => {
     const newTicketBtn = document.getElementById('new-ticket-btn');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (newTicketBtn && clearCartBtn) {
         newTicketBtn.addEventListener('click', () => {
-            clearCartBtn.disabled = false; // 🔓 Habilita el botón
+            clearCartBtn.disabled = false; // ðŸ”“ Habilita el botÃ³n
         });
     }
 });
 
 </script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('close-ticket-btn');
@@ -2491,9 +2391,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let message = '';
             if (!existingTicket) {
-                message = "¿Deseas guardar este ticket antes de cerrarlo?";
+                message = "Â¿Deseas guardar este ticket antes de cerrarlo?";
             } else if (hasChanges) {
-                message = "Este ticket tiene cambios no guardados. ¿Deseas guardarlos antes de cerrar?";
+                message = "Este ticket tiene cambios no guardados. Â¿Deseas guardarlos antes de cerrar?";
             } else {
                 animateCloseTicket();
                 return;
@@ -2518,8 +2418,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const clientNameDisplay = document.getElementById('current-ticket-client');
@@ -2555,10 +2453,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateClientNameDisplay();
 });
 </script>
-
-
-
-
 <script>
 function updateClientNameDisplay() {
     const clientSpan = document.getElementById('current-ticket-client');
@@ -2588,8 +2482,6 @@ render = function() {
     updateClientNameDisplay();
 };
 </script>
-
-
 <!-- Deudas JS - funcional (integrado) -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -2640,7 +2532,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Historial
     if(!debts.history.length){
-      historyBody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-3">Historial vacío</td></tr>';
+      historyBody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-3">Historial vacÃ­o</td></tr>';
     } else {
       historyBody.innerHTML = debts.history.map(d => {
         return '<tr class="hover:bg-gray-50">' +
@@ -2737,7 +2629,153 @@ document.addEventListener('DOMContentLoaded', function () {
   render();
 });
 </script>
+<!-- BEGIN: funciones aÃ±adidas para selecciÃ³n/exportaciÃ³n de tickets -->
+<script>
+function getSelectedSavedTickets() {
+    const checks = Array.from(document.querySelectorAll('.saved-ticket-checkbox'));
+    const selectedIds = checks.filter(c => c.checked).map(c => c.getAttribute('data-ticket-id'));
+    return appState.savedTickets.filter(t => selectedIds.includes(t.id));
+}
 
-</body>
+function printSelectedSavedTickets() {
+    const selected = getSelectedSavedTickets();
+    if (!selected || selected.length === 0) {
+        showMessage("No hay tickets seleccionados para imprimir.", "error");
+        return;
+    }
 
+    hideModal('#saved-tickets-modal');
+
+    const container = dom.printAllTicketsContainer;
+    container.innerHTML = '';
+    let html = '<div class="p-4">';
+    html += '<h1 class="text-xl font-extrabold text-center mb-2">AriAuto APP</h1>';
+    html += '<p class="text-sm text-gray-700 text-center mb-4 border-b-2 border-gray-400 pb-1">Fecha de ImpresiÃ³n: ' + getCurrentDateFormatted() + '</p>';
+    selected.forEach((ticket, idx) => {
+        html += `<div class="ticket-break mb-4"><h2 class="font-bold">Ref. ${ticket.ref} â€” ${ticket.customer || "SIN NOMBRE"}</h2>`;
+        html += `<p class="text-sm text-gray-600">${new Date(ticket.date).toLocaleString()}</p>`;
+        html += `<div class="text-right font-bold mt-2">TOTAL: $${ticket.total.toFixed(2)}</div></div>`;
+    });
+    html += '</div>';
+
+    container.innerHTML = html;
+    container.classList.add('printing');
+
+    const fixedHeader = document.querySelector('.print-header');
+    let fixedHeaderParent = null;
+    if (fixedHeader) {
+        fixedHeaderParent = fixedHeader.parentNode;
+        fixedHeaderParent.removeChild(fixedHeader);
+    }
+
+    window.print();
+
+    setTimeout(() => {
+        container.innerHTML = '';
+        container.classList.remove('printing');
+        if (fixedHeader && fixedHeaderParent) {
+            fixedHeaderParent.insertBefore(fixedHeader, fixedHeaderParent.firstChild);
+        }
+    }, 500);
+
+    showMessage("ImpresiÃ³n iniciada.", "success");
+}
+
+function exportSelectedToXLSX() {
+    const selected = getSelectedSavedTickets();
+    if (!selected || selected.length === 0) {
+        showMessage("No hay tickets seleccionados para exportar.", "error");
+        return;
+    }
+
+    const wsData = [
+        ["Ref", "Fecha/Hora", "Cliente", "Monto"]
+    ];
+
+    selected.forEach(t => {
+        const d = new Date(t.date);
+        const dateStr = d.toLocaleDateString('es-ES') + ' ' + d.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+        wsData.push([t.ref, dateStr, t.customer || "SIN NOMBRE", t.total.toFixed(2)]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Tickets");
+    const filename = `tickets_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(wb, filename);
+
+    showMessage(`Exportado ${selected.length} tickets a ${filename}`, "success");
+}
+
+function exportSelectedToTXT() {
+    const selected = getSelectedSavedTickets();
+    if (!selected || selected.length === 0) {
+        showMessage("No hay tickets seleccionados para exportar.", "error");
+        return;
+    }
+
+    let txt = '';
+    selected.forEach(t => {
+        const d = new Date(t.date);
+        const dateStr = d.toLocaleDateString('es-ES') + ' ' + d.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+        txt += `Ref: ${t.ref}\nFecha/Hora: ${dateStr}\nCliente: ${t.customer || "SIN NOMBRE"}\nMonto: $${t.total.toFixed(2)}\n\n`;
+    });
+
+    const filename = `tickets_${new Date().toISOString().slice(0,10)}.txt`;
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showMessage(`Exportado ${selected.length} tickets a ${filename}`, "success");
+}
+
+// Conectar eventos para los botones nuevos
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest ? e.target.closest('button') : e.target;
+    if (!btn) return;
+    const id = btn.id;
+    if (id === 'print-all-tickets-btn') printSelectedSavedTickets();
+    if (id === 'export-xlsx-btn') exportSelectedToXLSX();
+    if (id === 'export-txt-btn') exportSelectedToTXT();
+});
+</script>
+<!-- END: funciones aÃ±adidas -->
+<script>
+function exportSelectedTickets(format) {
+  const selectedIds = Array.from(document.querySelectorAll('.saved-ticket-checkbox:checked')).map(cb => cb.dataset.ticketId);
+  if (selectedIds.length === 0) {
+    alert('Selecciona al menos un ticket.');
+    return;
+  }
+
+  const selectedTickets = appState.savedTickets.filter(t => selectedIds.includes(t.id));
+
+  // âœ… Generar datos formateados
+  const data = selectedTickets.flatMap(t => t.cart.map(i => ({
+    CODE: i.code,
+    PRICE: `$${parseFloat(i.price).toFixed(2)}`
+  })));
+
+  if (format === 'xlsx') {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Tickets');
+    XLSX.writeFile(wb, 'tickets.xlsx');
+  } else if (format === 'txt') {
+    const text = data.map(d => `${d.CODE} ${d.PRICE}`).join('\n');
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'tickets.txt';
+    a.click();
+  }
+}
+
+document.getElementById('export-xlsx-btn').addEventListener('click', () => exportSelectedTickets('xlsx'));
+document.getElementById('export-txt-btn').addEventListener('click', () => exportSelectedTickets('txt'));
+</script></body>
 </html>
